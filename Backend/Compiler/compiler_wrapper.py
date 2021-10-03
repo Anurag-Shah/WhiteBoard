@@ -15,5 +15,5 @@
 #	1. text - text to compile
 # This function is a wrapper for the entire Compiler Process
 
-compiler_wrapper(text):
+def compiler_wrapper(text):
 	return ""
