@@ -16,5 +16,5 @@
 #	1. image - image matrix
 # This function is a wrapper for the entire OCR Process
 
-ocr_wrapper(image):
+def ocr_wrapper(image):
 	return ""
