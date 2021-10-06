@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import Index
+from .views import Index, User_List
 
 urlpatterns = [
-    path('', Index),
+    path('Users/', User_List),
 ]
