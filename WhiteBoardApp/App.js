@@ -3,6 +3,8 @@ import React from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import WelcomeScreen from './app/screens/WelcomeScreen';
 
-export default function App() {
+
+export default function App() 
+{
   return <WelcomeScreen />;
 }

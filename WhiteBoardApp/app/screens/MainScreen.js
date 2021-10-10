@@ -61,7 +61,7 @@ function MyDrawer() {
   );
 };
 
-function WelcomeScreen() {
+function MainScreen() {
   
   
   return (
@@ -92,4 +92,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default WelcomeScreen;
+export default MainScreen;

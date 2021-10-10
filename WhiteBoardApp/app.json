@@ -6,9 +6,9 @@
     "orientation": "portrait",
     "icon": "./app/assets/icon.png",
     "splash": {
-      "image": "./app/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#332424"
+      "image": "./app/assets/mainsplash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -17,12 +17,14 @@
       "**/*"
     ],
     "ios": {
+      
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/adaptive-icon.png",
-        "backgroundColor": "#332424"
+        "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
