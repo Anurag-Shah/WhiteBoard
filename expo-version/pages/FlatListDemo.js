@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView } from 'react-native';
 import { ListItem, SearchBar } from 'react-native-elements';
+//import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
 
 class FlatListDemo extends Component {
@@ -90,7 +91,7 @@ class FlatListDemo extends Component {
       );
     }
     return (
-      <View style={{ flex: 1 }}>
+      <SafeAreaView tyle={{ flex: 1}}>
         <FlatList
           data={this.state.data}
           renderItem={({ item }) => (
@@ -104,7 +105,7 @@ class FlatListDemo extends Component {
           ItemSeparatorComponent={this.renderSeparator}
           ListHeaderComponent={this.renderHeader}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 }
