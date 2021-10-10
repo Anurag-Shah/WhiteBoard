@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import storage from '../config/storage';
 import { FontAwesome, Ionicons, Entypo } from '@expo/vector-icons'
 import {
   StyleSheet,
+  Switch,
   TouchableOpacity,
   CheckBox,
   Text,
@@ -11,9 +13,9 @@ import {
   Image,
   SafeAreaView,
   TextInput,
+  Platform,
 } from 'react-native';
 import Dialog from "react-native-dialog";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function Prompt(props) {
@@ -55,27 +57,46 @@ function Prompt(props) {
 }
 
 
-function LoginPage(props) {
+function LoginPage({ navigation }) {
 
-  toggleRememberMe = () => {
+  const toggleRememberMe = () => {
     setRememberMe(!rememberMe);
     console.log("toggleMePressed");
   };
 
   useEffect(() => {
+    console.log("I am useEffect!");
     getUserInfo();
-  });
+  }, [rememberMe]);
 
-  const getUserInfo = async () => {
-    try {
-      const result = await AsyncStorage.getItem('USER');
-      if (result) {
-        username = USER.username;
-        password = USER.password;
-      }
-    } catch (error) {
-      console.log("error getting User Acoount Info...");
-    }
+  const getUserInfo = () => {
+    storage
+      .load({
+        key: 'Login-info',
+
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: true,
+        syncInBackground: true,
+      })
+      .then(ret => {
+        // found data go to then()
+        setUsername(ret.username);
+        setPwd(ret.password);
+      })
+      .catch(err => {
+        // any exception including data not found
+        // goes to catch()
+        console.warn(err.message);
+        switch (err.name) {
+          case 'NotFoundError':
+            // TODO;
+            break;
+          case 'ExpiredError':
+            // TODO
+            break;
+        }
+      });
   };
 
   const forgotPwd = () => {
@@ -90,26 +111,28 @@ function LoginPage(props) {
       setWrongInfo(false);
     } else {
       setWrongInfo(true);
+      console.log(wrongInfo);
     }
 
     if (!wrongInfo) {
       // If Login successfully
       if (rememberMe) {
-        const user = { username: username, password: password };
-        async () => {
-          await AsyncStorage.setItem('USER', user);
-        };
+        console.log("Remember me true");
+        let user = { username: username, password: password };
+        console.log(user);
+        storage.save({
+          key: "Login-info",
+          data: user,
+        });
       } else {
-        async () => {
-          try {
-            await AsyncStorage.removeItem('USER');
-          } catch (error) {
-            console.log("Error removing User info...");
-          }
-        }
+        console.log("Removing user info....");
+        storage.remove({
+          key: "Login-info",
+        });
       }
-      Alert.alert('Logged in Successfully!', 'Going to camera page...');
       // Redirecting to Camera Page
+      Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+
     } else {
       // else 
       // Error Msg
@@ -124,14 +147,14 @@ function LoginPage(props) {
   const [username, setUsername] = React.useState("");
   const [password, setPwd] = React.useState("");
   const [showPwd, setSecurity] = React.useState(false);
-  const [rememberMe, setRememberMe] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState(true);
   const [clicked, setClicked] = React.useState(false);
   const [wrongInfo, setWrongInfo] = React.useState(false);
   const [visible, setVisible] = React.useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Ionicons name="md-return-up-back" size={32} color="black" style={styles.back_icon} />
+      {/* <Ionicons name="md-return-up-back" size={32} color="black" style={styles.back_icon} /> */}
       <View style={styles.sub_container}>
         <Image
           resizeMode="contain"
@@ -167,10 +190,9 @@ function LoginPage(props) {
 
         <View style={styles.extra}>
           <View style={styles.checkbox}>
-            <CheckBox
-              value={rememberMe}
-              onValueChange={() => toggleRememberMe()}
-            />
+            {Platform.OS === "android" ?
+              <CheckBox value={rememberMe} onValueChange={() => toggleRememberMe()} /> :
+              <Switch value={rememberMe} onValueChange={() => toggleRememberMe()} style={{ marginRight: 5 }} />}
             <Text style={{ marginTop: 5 }}>Remember me</Text>
           </View>
           <View>
@@ -227,6 +249,8 @@ const styles = StyleSheet.create({
 
   container: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    backgroundColor: "white",
+    height: "100%"
     //flex:1,
   },
 
@@ -262,7 +286,7 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    marginTop: 100,
+    //marginTop: 100,
     width: 250,
     height: 180,
     //borderRadius: 800,
