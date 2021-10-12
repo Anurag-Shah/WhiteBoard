@@ -1,16 +1,18 @@
 import React from "react";
 import {
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
   StyleSheet,
   Image,
   TextInput,
-  Text,
   View,
   Button,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import { StatusBar } from "expo-status-bar";
 
-function RegistrationPage(props) {
+function RegistrationPage() {
   const [username, onChangeUsername] = React.useState(null);
   const [email, onChangeEmail] = React.useState(null);
   const [password, onChangePassword] = React.useState(null);
@@ -18,67 +20,72 @@ function RegistrationPage(props) {
 
   return (
     <SafeAreaView>
+      <StatusBar style="auto" />
       <Icon
         style={styles.icon}
         name="arrow-undo-outline"
         type="ionicon"
         color="#000"
-        alignItems="left"
-        //onPress
+        onPress={() => console.log("Back to login in page")} //TODO: redirect back to login page
       />
-      <View style={styles.container}>
-        <Image style={styles.image} source={require("../assets/logo.png")} />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeUsername}
-          value={username}
-          placeholder="username"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeEmail}
-          value={email}
-          placeholder="email address"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangePassword}
-          value={password}
-          placeholder="password"
-          contextMenuHidden={true}
-          secureTextEntry={true}
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeConfirm}
-          value={confirm}
-          placeholder="confirm password"
-          contextMenuHidden={true}
-          secureTextEntry={true}
-          onEndEditing={() => {
-            if (password == confirm) {
-              console.log("same");
-            } else {
-              console.log("not same");
-            }
-          }}
-        />
-        <View style={styles.button}>
-          <Button
-            title="Sign up"
-            color="#fff"
-            onPress={() => console.log("Sign up success!")} //TODO
+
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Image style={styles.image} source={require("../assets/logo.png")} />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeUsername}
+            value={username}
+            placeholder="username"
           />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeEmail}
+            value={email}
+            placeholder="email address"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangePassword}
+            value={password}
+            placeholder="password"
+            contextMenuHidden={true}
+            secureTextEntry={true}
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeConfirm}
+            value={confirm}
+            placeholder="confirm password"
+            contextMenuHidden={true}
+            secureTextEntry={true}
+            onEndEditing={() => {
+              if (password == confirm) {
+                console.log("same");
+              } else {
+                console.log("not same");
+              }
+            }}
+          />
+          <View style={styles.button}>
+            <Button
+              title="Sign up"
+              color="#fff"
+              onPress={() => console.log("Sign up success!")} //TODO: send new user info to backend and redirect to login in page
+            />
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   icon: {
+    marginTop: 5,
     marginLeft: 30,
+    alignItems: "flex-start",
   },
 
   container: {
