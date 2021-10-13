@@ -16,6 +16,7 @@ import {
   Platform,
 } from 'react-native';
 import Dialog from "react-native-dialog";
+import { loginApi, resetPwdApi } from '../requests/api';
 
 
 function Prompt(props) {
@@ -29,6 +30,22 @@ function Prompt(props) {
       setFeedback("Invalid input! Please enter a valid email...");
     } else {
       // Send Email to backend
+      const response = resetPwdApi(email);
+      if (response.code == 0) {
+        // Send successfully
+        setSuccess(true);
+        setFeedback("");
+        Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
+          { text: 'OK' }]);
+        props.setVisible(false);
+      } else if (response.code == -1) {
+        // Email has not been registered
+        setSuccess(false);
+        setFeedback("No account found!");
+      } else if (response.code == -2) {
+        // Error sending pwd reset email
+      }
+
       // Recieve success msg
       if (email == "jenna@gmail.com") {
         setSuccess(true);
@@ -107,15 +124,10 @@ function LoginPage({ navigation }) {
 
   const login = () => {
     console.log("Login Clicked");
-    if (username === "admin" && password === "666") {
-      setWrongInfo(false);
-    } else {
-      setWrongInfo(true);
-      console.log(wrongInfo);
-    }
-
-    if (!wrongInfo) {
+    const response = loginApi(username, password);
+    if (response.code == 0) {
       // If Login successfully
+      setWrongInfo(false);
       if (rememberMe) {
         console.log("Remember me true");
         let user = { username: username, password: password };
@@ -132,10 +144,9 @@ function LoginPage({ navigation }) {
       }
       // Redirecting to Camera Page
       Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-
     } else {
-      // else 
-      // Error Msg
+      setWrongInfo(true);
+      console.log(response.msg);
     }
   };
 
