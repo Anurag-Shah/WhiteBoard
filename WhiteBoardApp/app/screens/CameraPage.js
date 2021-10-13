@@ -25,20 +25,13 @@ export default function CameraPage({ navigation }) {
             .catch(err => {
                 // any exception including data not found
                 // goes to catch()
-                console.warn(err.message);
-                switch (err.name) {
-                    case 'NotFoundError':
-                        // TODO;
-                        break;
-                    case 'ExpiredError':
-                        // TODO
-                        break;
-                }
+                setLoginState(false)
+                console.log("User info Not found");
             });
     };
 
     const login = () => {
-        if (!login) {
+        if (!loginState) {
             navigation.navigate('Login');
         } else {
             Alert.alert("You already logged in!", "Enjoy your unlimited access to all features!");
