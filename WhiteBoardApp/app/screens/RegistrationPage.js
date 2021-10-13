@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import {
   SafeAreaView,
   TouchableWithoutFeedback,
@@ -16,7 +16,6 @@ import { StatusBar } from "expo-status-bar";
 export default class RegistrationPage extends React.Component {
   constructor(props) {
     super(props);
-    this.handleInvalidEmail = this.handleInvalidEmail.bind(this);
     this.state = {
       username: "",
       email: "",
@@ -35,7 +34,7 @@ export default class RegistrationPage extends React.Component {
 
   handleInvalidEmail() {
     if (this.state.email != "" && !this.state.validEmail) {
-      return <Text style={styles.errorMessage}>Invalid Email!</Text>;
+      return <Text style={styles.invalidEmail}>Invalid Email!</Text>;
     } else {
       return null;
     }
@@ -43,7 +42,7 @@ export default class RegistrationPage extends React.Component {
 
   handlePasswordMismatch() {
     if (this.state.confirm != "" && !this.state.samePassword) {
-      return <Text style={styles.errorMessage}>Password Mismatch!</Text>;
+      return <Text style={styles.passwordMismatch}>Password Mismatch!</Text>;
     } else {
       return null;
     }
@@ -102,16 +101,12 @@ export default class RegistrationPage extends React.Component {
                 this.setState({ samePassword: true });
               }}
               onEndEditing={() => {
-                console.log(this.state.password);
-                console.log(this.state.confirm);
                 if (
-                  (this.state.password != "" && this.state.confirm != "") ||
+                  this.state.confirm == "" ||
                   this.state.password == this.state.confirm
                 ) {
-                  console.log("same");
                   this.setState({ samePassword: true });
                 } else {
-                  console.log("not same");
                   this.setState({ samePassword: false });
                 }
               }}
@@ -178,9 +173,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-  errorMessage: {
+  invalidEmail: {
     color: "red",
     marginLeft: 200,
+  },
+
+  passwordMismatch: {
+    color: "red",
+    marginLeft: 150,
   },
 
   button: {
