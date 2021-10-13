@@ -5,5 +5,5 @@ import RegistrationPage from "./app/screens/RegistrationPage";
 import TextEditorPage from "./app/screens/TextEditorPage.js";
 
 export default function App() {
-  return <TextEditorPage />;
+  return <RegistrationPage />;
 }
