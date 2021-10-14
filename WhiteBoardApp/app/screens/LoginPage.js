@@ -30,23 +30,22 @@ function Prompt(props) {
       setFeedback("Invalid input! Please enter a valid email...");
     } else {
       // Send Email to backend
-      const response = resetPwdApi(email);
-      if (response.code == 0) {
-        // Send successfully
-        setSuccess(true);
-        setFeedback("");
-        Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-          { text: 'OK' }]);
-        props.setVisible(false);
-      } else if (response.code == -1) {
-        // Email has not been registered
-        setSuccess(false);
-        setFeedback("No account found!");
-      } else if (response.code == -2) {
-        // Error sending pwd reset email
-      }
-
-      // Recieve success msg
+//       const response = resetPwdApi(email);
+//       if (response.code == 0) {
+//         // Send successfully
+//         setSuccess(true);
+//         setFeedback("");
+//         Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
+//           { text: 'OK' }]);
+//         props.setVisible(false);
+//       } else if (response.code == -1) {
+//         // Email has not been registered
+//         setSuccess(false);
+//         setFeedback("No account found!");
+//       } else if (response.code == -2) {
+//         // Error sending pwd reset email
+//       }
+      
       if (email == "jenna@gmail.com") {
         setSuccess(true);
         setFeedback("");
@@ -57,6 +56,7 @@ function Prompt(props) {
         setSuccess(false);
         setFeedback("No account found!");
       }
+
     }
   };
 
@@ -124,7 +124,8 @@ function LoginPage({ navigation }) {
 
   const login = () => {
     console.log("Login Clicked");
-    const response = loginApi(username, password);
+    //const response = loginApi(username, password);
+    let response = { code: 0, msg: "Login successfully!" };
     if (response.code == 0) {
       // If Login successfully
       setWrongInfo(false);
