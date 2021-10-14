@@ -26,6 +26,8 @@ from rest_framework import generics, mixins
 import io
 import json
 
+import ocr
+
 # Create your views here.
 
 # Class AllUserList
