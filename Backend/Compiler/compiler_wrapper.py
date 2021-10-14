@@ -26,7 +26,8 @@ def compiler_wrapper(input):
 		with open("compile.c", "w") as outfile:
 			outfile.write("")
 		os.remove("compile.c")
-		os.remove("a.out")
+		if (os.path.exists("a.out")):
+			os.remove("a.out")
 		return proc.stdout
 	else:
 		"Language Not Supported"
