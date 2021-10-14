@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Group, User
+from .models import Group, User, GroupImages
 
 # Register your models here.
 
@@ -12,3 +12,8 @@ class UserModel(admin.ModelAdmin):
 class GroupModel(admin.ModelAdmin):
     list_filter = ('Gpname', 'GpID')
     list_display = ('Gpname', 'GpID')
+
+@admin.register(GroupImages)
+class GroupImagesModel(admin.ModelAdmin):
+    list_filter = ('name', 'GpID')
+    list_display = ('name', 'GpID')

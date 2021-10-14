@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Group
+from .models import User, Group, GroupImages
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,5 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['GPname', 'GPID', 'GPDescription']
+        fields = ['Gpname', 'GpID', 'GpDescription']
     user = UserSerializer
+
+class GroupImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroupImages
+        fields = ['name', 'Image', 'GpID']
+    group = GroupSerializer
