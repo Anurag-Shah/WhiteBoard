@@ -16,6 +16,7 @@
 # This function is a wrapper for the entire Compiler Process
 
 import subprocess
+import os
 
 def compiler_wrapper(input):
 	if input[1] == "C":
@@ -24,6 +25,8 @@ def compiler_wrapper(input):
 		proc = subprocess.run(['sh', './compile_c.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 		with open("compile.c", "w") as outfile:
 			outfile.write("")
+		os.remove("compile.c")
+		os.remove("a.out")
 		return proc.stdout
 	else:
 		"Language Not Supported"

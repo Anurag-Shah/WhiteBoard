@@ -26,8 +26,6 @@ def preprocess_image(image):
 	return image
 
 def preprocess_tesseract(image):
-	print(image.size[0])
-	print(image.size[1])
 	out = image
 	if image.size[0] > image.size[1]:
 		# width > height

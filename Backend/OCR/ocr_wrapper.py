@@ -57,9 +57,6 @@ def ocr_wrapper(image):
 	elif texttype == "typeform_pretrained":
 		# This will be removed when obsolete
 		out = preprocess_typeform.preprocess_tesseract(image)
-		image.show()
-		out.show()
-		print(out.size)
 		out = ocr_typeform.ocr_tesseract(out)
 		code = ocr_postprocess_text.tesseract_postprocess(out)
 	else:
