@@ -22,8 +22,7 @@ from rest_framework.decorators import APIView
 from rest_framework import generics, mixins
 import io
 import json
-
-import ocr
+import os
 
 # Create your views here.
 
@@ -121,8 +120,10 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        ocr(image_path)
-        return Response(status.HTTP_200_OK)
+        zip_file = open("C:/Users/OREO/Documents/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
+        response = HttpResponse(zip_file, content_type='application/force-download')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
+        return response
     
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
