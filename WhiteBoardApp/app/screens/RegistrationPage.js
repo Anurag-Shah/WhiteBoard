@@ -50,7 +50,7 @@ export default class RegistrationPage extends React.Component {
 
   render() {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={styles.safearea}>
         <StatusBar style="auto" />
         <Icon
           style={styles.icon}
@@ -146,6 +146,10 @@ export default class RegistrationPage extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  safearea: {
+    backgroundColor: "#fff",
+  },
+
   icon: {
     marginTop: 5,
     marginLeft: 30,
