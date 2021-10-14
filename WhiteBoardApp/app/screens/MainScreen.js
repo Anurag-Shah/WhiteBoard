@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Provider } from 'react-redux';
@@ -6,11 +5,6 @@ import { createStore } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator  } from '@react-navigation/stack';
-=======
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { StyleSheet, View, Image } from "react-native";
->>>>>>> main
 
 
 import userReducer from './shared/reducer/UserReducer';
@@ -67,31 +61,24 @@ function MyDrawer() {
   );
 };
 
-function WelcomeScreen() {
+function MainScreen() {
   
   
   return (
-<<<<<<< HEAD
     <Provider store={store}>
       <NavigationContainer>
         <MyDrawer />
       </NavigationContainer>
     </Provider>
-=======
-    <View style={styles.container}>
-      <Image source={require("../assets/logo.png")} />
-      <StatusBar style="auto" />
-    </View>
->>>>>>> main
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileImg: {
     width:80,
@@ -105,4 +92,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default WelcomeScreen;
+export default MainScreen;

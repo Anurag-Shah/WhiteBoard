@@ -6,8 +6,8 @@
     "orientation": "portrait",
     "icon": "./app/assets/icon.png",
     "splash": {
-      "image": "./app/assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./app/assets/mainsplash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
@@ -17,6 +17,8 @@
       "**/*"
     ],
     "ios": {
+      
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
