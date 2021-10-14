@@ -71,6 +71,6 @@ def ocr_wrapper(image):
 if __name__ == "__main__":
 	# Testing function for pipeline
 	test_im_path = "images/tesseract_tests/"
-	test_im = "IMG_4930"
-	imsuffix = ".jpg"
+	test_im = "test2"
+	imsuffix = ".png"
 	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix)))
