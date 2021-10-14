@@ -32,16 +32,22 @@ export default function CameraPage({ navigation }) {
 
     const login = () => {
         if (!loginState) {
-            navigation.navigate('Login');
+            navigation.push('Login');
         } else {
             Alert.alert("You already logged in!", "Enjoy your unlimited access to all features!");
         }
+        // navigation.push('Login');
     };
+    const logout = () => {
+        setLoginState(false);
+        Alert.alert("Logged out!", "See you soon!");
+    }
     const [loginState, setLoginState] = useState(false);
     return (
         <SafeAreaView>
             <Text>CameraPage</Text>
             <Button title="Login" onPress={() => login()}></Button>
+            <Button title="Log Out" onPress={() => logout()}></Button>
         </SafeAreaView>
     )
 }
