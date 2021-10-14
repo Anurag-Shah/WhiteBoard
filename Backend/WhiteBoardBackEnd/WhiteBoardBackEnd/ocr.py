@@ -9,9 +9,12 @@
 
 
 import sys
-from PIL import Image
+
 sys.path.insert(1, "../../Compiler")
 sys.path.insert(1, "../../OCR")
+
+import os
+from PIL import Image
 from ocr_wrapper import ocr_wrapper
 from compiler_wrapper import compiler_wrapper
 
@@ -26,7 +29,13 @@ from compiler_wrapper import compiler_wrapper
 #	Backend/Compiler/compiler_wrapper.py
 
 def ocr(fname):
-	compiler_wrapper(ocr_wrapper(Image.open(fname)))
+	image = Image.open(fname)
+	os.chdir("../../OCR")
+	ocr_out = ocr_wrapper(image)
+	os.chdir("../Compiler")
+	compiler_out = compiler_wrapper(ocr_out)
+	os.chdir("../WhiteBoardBackEnd/WhiteBoardBackEnd")
+	return compiler_out
 
 
 if __name__ == "__main__":
