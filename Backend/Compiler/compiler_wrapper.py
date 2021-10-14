@@ -21,11 +21,12 @@ def compiler_wrapper(input):
 	if input[1] == "C":
 		with open("compile.c", "w") as outfile:
 			outfile.write(input[0])
-		subprocess.call(['sh', './compile_c.sh'])
+		proc = subprocess.run(['sh', './compile_c.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 		with open("compile.c", "w") as outfile:
 			outfile.write("")
+		return proc.stdout
 	else:
-		print("Language Not Supported")
+		"Language Not Supported"
 
 if __name__ == "__main__":
 	# Testing function for pipeline
