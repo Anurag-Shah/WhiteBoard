@@ -8,6 +8,7 @@ class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
     uid = models.IntegerField(primary_key=True)
+    PW = models.IntegerField(default=9999)
     class meta():
         db_table = 'User'
         ordering = ['uid']

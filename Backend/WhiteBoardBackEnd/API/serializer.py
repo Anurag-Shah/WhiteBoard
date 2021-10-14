@@ -4,7 +4,7 @@ from .models import User, Group, GroupImages
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name', 'email', 'uid']
+        fields = ['name', 'email', 'uid', 'PW']
 
 
 class GroupSerializer(serializers.ModelSerializer):
