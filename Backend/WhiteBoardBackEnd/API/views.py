@@ -8,6 +8,7 @@
 #############################################################################
 
 import sys
+from PIL.Image import MIME
 
 sys.path.insert(1, "../../Compiler")
 sys.path.insert(1, "../../OCR")
@@ -120,6 +121,7 @@ class ImageUpload(APIView):
         name = request.data['name']
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
+        image_path = image.Image
         # Call OCR with 'file' here
         return Response(status.HTTP_200_OK)
     
