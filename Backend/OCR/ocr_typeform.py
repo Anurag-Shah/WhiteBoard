@@ -14,6 +14,11 @@
 import ocr_utils
 from ocr_utils import OCRError
 
+import pytesseract
+
+TESS_CONFIG_STRING = """--psm 6 -c tessedit_char_whitelist="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:\\'\\",<.>?/ " """
+
+
 # ocr_typeform
 # Author: Anurag
 # Return value: single character
@@ -30,6 +35,7 @@ def ocr_typeform(image):
 # Parameters:
 #	1. image - image matrix
 # This function uses the tesseract library to perform OCR on an image
+# NOTE: This function requires tesseract-ocr to be installed and the executable's dir to be included in PATH
 
 def ocr_tesseract(image):
-	return image
+	return pytesseract.image_to_string(image, lang='eng', config=TESS_CONFIG_STRING)

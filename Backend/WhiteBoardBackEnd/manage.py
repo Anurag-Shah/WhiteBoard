@@ -6,6 +6,10 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    sys.path.insert(1, os.path.abspath("API"))
+    sys.path.insert(1, os.path.abspath("../Compiler"))
+    sys.path.insert(1, os.path.abspath("../OCR"))
+    print(sys.path)
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WhiteBoardBackEnd.settings')
     try:
         from django.core.management import execute_from_command_line
