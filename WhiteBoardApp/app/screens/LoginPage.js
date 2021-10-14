@@ -122,33 +122,49 @@ function LoginPage({ navigation }) {
     // }
   };
 
-  // const getMoviesFromApi = () => {
-  //   console.log("hey\n");
-  //   return fetch('http://127.0.0.1:8000/user/login', {
-  //     method: 'POST',
-  //     headers: {
-  //       Accept: 'application/json',
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       username: username,
-  //       password: password
-  //     })
-  //   }).then((response) => response.json())
-  //     .then((json) => {
-  //       return json;
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
-
 
   const login = () => {
     console.log("Login Clicked");
-    //const res = loginApi(username, password);
-    loginApi(username, password).then((response) => {
-      if (response.code == 0) {
+//     // login Api communicates with the backend
+//     loginApi(username, password).then((response) => {
+//       if (response.code == 0) {
+//         // If Login successfully
+//         setWrongInfo(false);
+//         if (rememberMe) {
+//           console.log("Remember me true");
+//           let user = { username: username, password: password };
+//           console.log(user);
+//           storage.save({
+//             key: "Login-info",
+//             data: user,
+//           });
+//         } else {
+//           console.log("Removing user info....");
+//           storage.remove({
+//             key: "Login-info",
+//           });
+//         }
+//         // Redirecting to Camera Page
+//         Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+//       } else {
+//         setWrongInfo(true);
+//         console.log(response.msg);
+//       }
+//     });
+    
+    
+    // For frontend testing
+    const test_username = "admin";
+    const test_password = "666";
+    var response;
+    if (username === test_username && password === test_password){ // replace your testing username and password
+      response = {code: 0, msg: "Success"};
+    } else if (username = test_username && password !== test_password) {
+      response = {code: -1, msg: "wrong password"};
+    } else {
+      response = {code: -2, msg: "user does not exist"}
+    }
+    if (response.code == 0) {
         // If Login successfully
         setWrongInfo(false);
         if (rememberMe) {
@@ -167,11 +183,10 @@ function LoginPage({ navigation }) {
         }
         // Redirecting to Camera Page
         Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-      } else {
+     } else {
         setWrongInfo(true);
         console.log(response.msg);
-      }
-    });
+     }
   };
 
   const signUp = () => {
