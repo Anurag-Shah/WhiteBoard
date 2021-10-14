@@ -11,9 +11,6 @@
 
 import sys
 
-sys.path.insert(1, "../../Compiler")
-sys.path.insert(1, "../../OCR")
-
 # Do not move the above around or change the order otherwise the other import statements will break
 # Add any future import statements below this line
 
@@ -40,7 +37,6 @@ def ocr(fname):
 	compiler_out = compiler_wrapper(ocr_out)
 	os.chdir("../WhiteBoardBackEnd/API")
 	return compiler_out
-
 
 if __name__ == "__main__":
 	# Testing function for pipeline

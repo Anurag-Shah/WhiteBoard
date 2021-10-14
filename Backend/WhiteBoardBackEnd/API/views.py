@@ -10,9 +10,6 @@
 import sys
 from PIL.Image import MIME
 
-sys.path.insert(1, "../../Compiler")
-sys.path.insert(1, "../../OCR")
-
 from django.db.models.query import QuerySet
 from django.shortcuts import render, HttpResponse
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
