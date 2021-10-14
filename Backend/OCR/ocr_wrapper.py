@@ -39,7 +39,7 @@ from PIL import Image
 #	ocr_postprocess_text.py
 #	ocr_texttype_detection.py
 
-def ocr_wrapper(image):	
+def ocr_wrapper(image):
 	texttype = ocr_texttype_detection.detect(image)
 	code = ""
 	if texttype == "typeform":
@@ -56,7 +56,11 @@ def ocr_wrapper(image):
 		code = ocr_postprocess_text.ocr_postprocess(out)
 	elif texttype == "typeform_pretrained":
 		# This will be removed when obsolete
-		out = ocr_typeform.ocr_tesseract(image)
+		out = preprocess_typeform.preprocess_tesseract(image)
+		image.show()
+		out.show()
+		print(out.size)
+		out = ocr_typeform.ocr_tesseract(out)
 		code = ocr_postprocess_text.tesseract_postprocess(out)
 	else:
 		raise OCRError
@@ -67,6 +71,6 @@ def ocr_wrapper(image):
 if __name__ == "__main__":
 	# Testing function for pipeline
 	test_im_path = "images/tesseract_tests/"
-	test_im = "courierb_3"
-	imsuffix = ".png"
+	test_im = "IMG_4930"
+	imsuffix = ".jpg"
 	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix)))
