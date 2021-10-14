@@ -38,7 +38,7 @@ def ocr(fname):
 	ocr_out = ocr_wrapper(image)
 	os.chdir("../Compiler")
 	compiler_out = compiler_wrapper(ocr_out)
-	os.chdir("../WhiteBoardBackEnd/API")
+	os.chdir("../WhiteBoardBackEnd/WhiteBoardBackEnd")
 	return compiler_out
 
 

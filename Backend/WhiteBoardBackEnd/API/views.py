@@ -6,6 +6,12 @@
 # This is an django APIView that handles all the HTTP request received
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
+
+import sys
+
+sys.path.insert(1, "../../Compiler")
+sys.path.insert(1, "../../OCR")
+
 from django.db.models.query import QuerySet
 from django.shortcuts import render, HttpResponse
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
@@ -100,6 +106,7 @@ class SpecificGroup(APIView):
 class ImageUpload(APIView):
     def get_Group_image(self, GPid):
             aaa = GroupImages.objects.filter(GpID__GpID=GPid)
+            print (aaa)
             return aaa
     
     def get_group_object(self, id):
@@ -113,6 +120,7 @@ class ImageUpload(APIView):
         name = request.data['name']
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
+        # Call OCR with 'file' here
         return Response(status.HTTP_200_OK)
     
     def get(self, request, GPid):
