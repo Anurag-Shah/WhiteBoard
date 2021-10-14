@@ -122,7 +122,7 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        # Call OCR with 'file' here
+        ocr(image_path)
         return Response(status.HTTP_200_OK)
     
     def get(self, request, GPid):
