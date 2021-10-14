@@ -7,11 +7,15 @@
 # Performs OCR given a file name
 #############################################################################
 
+# Do not touch the next 3 lines
 
 import sys
 
 sys.path.insert(1, "../../Compiler")
 sys.path.insert(1, "../../OCR")
+
+# Do not move the above around or change the order otherwise the other import statements will break
+# Add any future import statements below this line
 
 import os
 from PIL import Image
@@ -20,9 +24,9 @@ from compiler_wrapper import compiler_wrapper
 
 # ocr_wrapper
 # Author: Anurag
-# Return value: (string of data, programming langauge)
+# Return value: compiler's output
 # Parameters:
-#	1. image - image matrix
+#	1. fname - file name
 # This function is a wrapper for the entire OCR Process
 # Calls functions in:
 #	Backend/OCR/ocr_wrapper.py
