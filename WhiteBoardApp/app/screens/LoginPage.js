@@ -16,7 +16,7 @@ import {
   Platform,
 } from 'react-native';
 import Dialog from "react-native-dialog";
-import { loginApi, resetPwdApi } from '../requests/api';
+import { loginApi, resetPwdApi, helloApi } from '../requests/api';
 
 
 function Prompt(props) {
@@ -27,46 +27,46 @@ function Prompt(props) {
     // Validate Input first
     if (email.indexOf('@') < 0) {
       setSuccess(false);
-      setFeedback("Invalid input! Please enter a valid email...");
+      setFeedback("Please enter a valid email...");
     } else {
-      // Send Email to backend
-//       const response = resetPwdApi(email);
-//       if (response.code == 0) {
-//         // Send successfully
-//         setSuccess(true);
-//         setFeedback("");
-//         Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-//           { text: 'OK' }]);
-//         props.setVisible(false);
-//       } else if (response.code == -1) {
-//         // Email has not been registered
-//         setSuccess(false);
-//         setFeedback("No account found!");
-//       } else if (response.code == -2) {
-//         // Error sending pwd reset email
-//       }
-      
-      if (email == "jenna@gmail.com") {
+      // Recieve success msg
+      if (email == "admin@gmail.com") {
         setSuccess(true);
         setFeedback("");
         Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-          { text: 'OK' }]);
-        props.setVisible(false);
+          { text: 'OK', onPress: () => props.setVisible(false) }]);
       } else {
         setSuccess(false);
         setFeedback("No account found!");
       }
 
+      // // Send Email to backend
+      // const response = resetPwdApi(email);
+      // if (response.code == 0) {
+      //   // Send successfully
+      //   setSuccess(true);
+      //   setFeedback("");
+      //   Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
+      //     { text: 'OK' }]);
+      //   props.setVisible(false);
+      // } else if (response.code == -1) {
+      //   // Email has not been registered
+      //   setSuccess(false);
+      //   setFeedback("No account found!");
+      // } else if (response.code == -2) {
+      //   // Error sending pwd reset email
+      // }
     }
   };
 
   return (
     <Dialog.Container visible={props.visible}>
-      <Dialog.Description>
-        Please enter your email to reset password:
-      </Dialog.Description>
+      {Platform.OS !== "android" ? <Dialog.Title>Please enter your email to reset password:</Dialog.Title> :
+        <Dialog.Description>
+          Please enter your email to reset password:
+        </Dialog.Description>}
       <Dialog.Input value={email} onChangeText={setEmail} />
-      <Text style={{ color: success ? "black" : "red", paddingLeft: 10 }}>{feedback}</Text>
+      <Text style={{ color: success ? "black" : "red", paddingLeft: 20, paddingBottom: 15 }}>{feedback}</Text>
       <Dialog.Button label="Cancel" onPress={() => props.setVisible(false)} />
       <Dialog.Button label="Confirm" onPress={() => handleConfirm()} />
     </Dialog.Container>
@@ -87,32 +87,29 @@ function LoginPage({ navigation }) {
   }, [rememberMe]);
 
   const getUserInfo = () => {
+    // Store user account info in local storage
     storage
       .load({
         key: 'Login-info',
-
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
-        autoSync: true,
+        autoSync: false,
         syncInBackground: true,
       })
       .then(ret => {
         // found data go to then()
+        console.log("Login Page found data!")
         setUsername(ret.username);
         setPwd(ret.password);
+        setRememberMe(true);
       })
       .catch(err => {
         // any exception including data not found
         // goes to catch()
-        console.warn(err.message);
-        switch (err.name) {
-          case 'NotFoundError':
-            // TODO;
-            break;
-          case 'ExpiredError':
-            // TODO
-            break;
-        }
+        console.log("User not found!")
+        setUsername('');
+        setPwd('');
+        setRememberMe(false);
       });
   };
 
@@ -120,35 +117,61 @@ function LoginPage({ navigation }) {
     console.log("Forgot Password...");
     setClicked(true);
     setVisible(true);
+    // if (Platform.OS !== "android") {
+    //   Alert.prompt("Please enter your email to reset password:", '', text => handleConfirm);
+    // }
   };
+
+  // const getMoviesFromApi = () => {
+  //   console.log("hey\n");
+  //   return fetch('http://127.0.0.1:8000/user/login', {
+  //     method: 'POST',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({
+  //       username: username,
+  //       password: password
+  //     })
+  //   }).then((response) => response.json())
+  //     .then((json) => {
+  //       return json;
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
+
 
   const login = () => {
     console.log("Login Clicked");
-    //const response = loginApi(username, password);
-    let response = { code: 0, msg: "Login successfully!" };
-    if (response.code == 0) {
-      // If Login successfully
-      setWrongInfo(false);
-      if (rememberMe) {
-        console.log("Remember me true");
-        let user = { username: username, password: password };
-        console.log(user);
-        storage.save({
-          key: "Login-info",
-          data: user,
-        });
+    //const res = loginApi(username, password);
+    loginApi(username, password).then((response) => {
+      if (response.code == 0) {
+        // If Login successfully
+        setWrongInfo(false);
+        if (rememberMe) {
+          console.log("Remember me true");
+          let user = { username: username, password: password };
+          console.log(user);
+          storage.save({
+            key: "Login-info",
+            data: user,
+          });
+        } else {
+          console.log("Removing user info....");
+          storage.remove({
+            key: "Login-info",
+          });
+        }
+        // Redirecting to Camera Page
+        Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
       } else {
-        console.log("Removing user info....");
-        storage.remove({
-          key: "Login-info",
-        });
+        setWrongInfo(true);
+        console.log(response.msg);
       }
-      // Redirecting to Camera Page
-      Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-    } else {
-      setWrongInfo(true);
-      console.log(response.msg);
-    }
+    });
   };
 
   const signUp = () => {
@@ -159,7 +182,7 @@ function LoginPage({ navigation }) {
   const [username, setUsername] = React.useState("");
   const [password, setPwd] = React.useState("");
   const [showPwd, setSecurity] = React.useState(false);
-  const [rememberMe, setRememberMe] = React.useState(true);
+  const [rememberMe, setRememberMe] = React.useState(false);
   const [clicked, setClicked] = React.useState(false);
   const [wrongInfo, setWrongInfo] = React.useState(false);
   const [visible, setVisible] = React.useState(false);
