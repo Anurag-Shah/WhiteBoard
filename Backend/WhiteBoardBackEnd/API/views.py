@@ -18,7 +18,7 @@ from django.http import JsonResponse
 from .models import User, Group, GroupImages
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import APIView
+from rest_framework.decorators import APIView, api_view
 from rest_framework import generics, mixins
 import io
 import json
@@ -27,7 +27,7 @@ import os
 # Create your views here.
 
 # Class AllUserList
-# Author: Chunao Liu
+# Author: Chunao Liu, Jenna Zhang
 # Return value: JsonResponse
 # Inheritence: 
 #       APIView
@@ -128,6 +128,27 @@ class ImageUpload(APIView):
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
+    
+    
+# Function login
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function responds to frontend user login request
+@api_view(['POST'])
+def login(request):
+    data = JSONParser().parse(request)
+    try:
+        user = User.objects.get(name=data['username'])
+        if user.PW == data['password']:
+            res = {"code": 0, "msg": "Login successfully"}
+            return JsonResponse(res)
+        else:
+            res = {"code": -1, "msg": "Wrong password"}
+            return JsonResponse(res)
+    except user.DoesNotExist:
+        print("Username does not exist!")
+        res = {"code": -2, "msg": "User does not exist"}
+        return JsonResponse(res)
 
 
 
