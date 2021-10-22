@@ -23,6 +23,7 @@ from rest_framework import generics, mixins
 import io
 import json
 import os
+import ocr
 
 # Create your views here.
 
@@ -79,6 +80,14 @@ class SpecificUser(APIView):
         UserObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+# Class SpecificGroup
+# Author: Chunao Liu
+# Return value: JsonResponse
+# Inheritence: 
+#       APIView
+# This class respond to HTTP request
+# for a specific Group ID
+
 class SpecificGroup(APIView):
     def get_group_object(self, id):
         try:
@@ -102,6 +111,14 @@ class SpecificGroup(APIView):
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+# Class ImageUpload
+# Author: Chunao Liu
+# Return value: JsonResponse
+# Inheritence: 
+#       APIView
+# This class respond to HTTP request
+# for a group's image
+
 class ImageUpload(APIView):
     def get_Group_image(self, GPid):
             aaa = GroupImages.objects.filter(GpID__GpID=GPid)
@@ -114,13 +131,39 @@ class ImageUpload(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    # This is the function that got fired when a you send a HTTP Post request to
+    # upload an image to a group. Your HTTP should be like (JavaScript):
+
+    # var myHeaders = new Headers();
+    # myHeaders.append("image", "");
+
+    # var formdata = new FormData();
+    # formdata.append("Image", your_image, "[PROXY]");
+    # formdata.append("name", "First Hello World");
+
+    # var requestOptions = {
+    # method: 'POST',
+    # headers: myHeaders,
+    # body: formdata,
+    # redirect: 'follow'
+    # };
+
+    # fetch("http://ec2-3-144-80-126.us-east-2.compute.amazonaws.com:8080/Images/__Insert_Group_ID__", requestOptions)
+    # .then(response => response.text())
+    # .then(result => console.log(result))
+    # .catch(error => console.log('error', error));
+    
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        zip_file = open("C:/Users/OREO/Documents/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
+        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
+        zip_file = open("/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
+        # ocr_return should have the stack trace so far
+        ocr_return = ocr.ocr(path)
+        print("OCR is: " + ocr_return)
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
