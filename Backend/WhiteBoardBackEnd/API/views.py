@@ -1,29 +1,28 @@
 #############################################################################
 # API/views.py
 #
-# Authors: Chunao Liu
+# Authors: Chunao Liu, Jenna Zhang
 #
 # This is an django APIView that handles all the HTTP request received
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
-import sys
-from PIL.Image import MIME
-
-from django.db.models.query import QuerySet
-from django.shortcuts import render, HttpResponse
-from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
-from rest_framework.parsers import JSONParser
+from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
-from .models import User, Group, GroupImages
-from rest_framework.response import Response
+from django.middleware.csrf import get_token
+from django.shortcuts import HttpResponse
+from django.views.decorators.http import require_POST
 from rest_framework import status
-from rest_framework.decorators import APIView, api_view
-from rest_framework import generics, mixins
-import io
-import json
-import os
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.decorators import APIView
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 import ocr
+from .models import User, Group, GroupImages
+from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
+
 
 # Create your views here.
 
@@ -40,13 +39,13 @@ class AllUserList(APIView):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
         return Response(Serializer.data)
-    
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED) # HTTP 201: CREATED
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) # HTTP 400: BAD REQUEST
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # HTTP 201: CREATED
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # HTTP 400: BAD REQUEST
 
 
 # Class SpecificUser
@@ -63,11 +62,11 @@ class SpecificUser(APIView):
             return User.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
     def get(self, request, id):
         Serializer = UserSerializer(self.get_user_object(id))
         return Response(Serializer.data)
-    
+
     def put(self, request, id):
         Serializer = UserSerializer(self.get_user_object(id), data=request.data)
         if (Serializer.is_valid()):
@@ -79,6 +78,7 @@ class SpecificUser(APIView):
         UserObject = self.get_user_object(id)
         UserObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
+
 
 # Class SpecificGroup
 # Author: Chunao Liu
@@ -94,11 +94,11 @@ class SpecificGroup(APIView):
             return Group.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
     def get(self, request, id):
         Serializer = GroupSerializer(self.get_group_object(id))
         return Response(Serializer.data)
-    
+
     def put(self, request, id):
         Serializer = GroupSerializer(self.get_group_object(id), data=request.data)
         if (Serializer.is_valid()):
@@ -111,6 +111,7 @@ class SpecificGroup(APIView):
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+
 # Class ImageUpload
 # Author: Chunao Liu
 # Return value: JsonResponse
@@ -121,10 +122,10 @@ class SpecificGroup(APIView):
 
 class ImageUpload(APIView):
     def get_Group_image(self, GPid):
-            aaa = GroupImages.objects.filter(GpID__GpID=GPid)
-            print (aaa)
-            return aaa
-    
+        aaa = GroupImages.objects.filter(GpID__GpID=GPid)
+        print(aaa)
+        return aaa
+
     def get_group_object(self, id):
         try:
             return Group.objects.get(pk=id)
@@ -152,7 +153,7 @@ class ImageUpload(APIView):
     # .then(response => response.text())
     # .then(result => console.log(result))
     # .catch(error => console.log('error', error));
-    
+
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
@@ -167,33 +168,113 @@ class ImageUpload(APIView):
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
-    
+
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
-    
-    
-# Function login
+
+
+# Function sign_up
+# Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
+# Return value: JsonResponse
+# This function receives sign up request from the client and create a new user if
+# all fields are valid
+def sign_up(request):
+    data = JSONParser().parse(request)
+    name = data.get('username')
+    password = data.get('password')
+    email = data.get('email')
+    new_user = User(password=password)
+    # If username or email already exists, django.db.IntegrityError will be raised when we try to save
+    # But it does not indicate which field is duplicated, so we have to check manually
+
+    # Check email
+    try:
+        email_match = User.objects.get(email=email)
+        # if no exception raised, then the email already exists, return with error
+        return JsonResponse({"code": -1, "msg": "email already exists"})
+    except email_match.DoesNotExist:
+        # we are fine
+        new_user.email = email
+
+    # Check username
+    try:
+        name_match = User.objects.get(name=name)
+        # if no exception raised, then the username already exists, return with error
+        return JsonResponse({"code": -2, "msg": "username already exists"})
+    except email_match.DoesNotExist:
+        # we are fine
+        new_user.name = name
+
+    new_user.save()
+
+
+
+# Function login_view
 # Author: Jenna Zhang
 # Return value: JsonResponse
-# This function responds to frontend user login request
-@api_view(['POST'])
-def login(request):
+# This function allows the user to log in by providing their username and password
+@require_POST
+def login_view(request):
     data = JSONParser().parse(request)
-    try:
-        user = User.objects.get(name=data['username'])
-        if user.PW == data['password']:
-            res = {"code": 0, "msg": "Login successfully"}
-            return JsonResponse(res)
-        else:
-            res = {"code": -1, "msg": "Wrong password"}
-            return JsonResponse(res)
-    except user.DoesNotExist:
-        print("Username does not exist!")
-        res = {"code": -2, "msg": "User does not exist"}
-        return JsonResponse(res)
+    username = data.get('username')
+    password = data.get('password')
+
+    if username is None or password is None:
+        return JsonResponse({"code": 400, 'msg': 'Please provide username and password.'}, status=400)
+
+    user = authenticate(username=username, password=password)
+
+    if user is None:
+        return JsonResponse({"code": -1, "msg": 'Invalid credentials.'}, status=400)
+
+    login(request, user)
+    return JsonResponse({"code": 0, "detail": 'Successfully logged in.'})
 
 
+# Function get_csrf
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function generates a CSRF token and returns it as JSON
+def get_csrf(request):
+    response = JsonResponse({'msg': 'CSRF cookie set'})
+    response['X-CSRFToken'] = get_token(request)
+    return response
 
 
+# Function logout_view
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function logs the user out
+def logout_view(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
 
+    logout(request)
+    return JsonResponse({'detail': 'Successfully logged out.'})
+
+
+# Function sessionView
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function checks whether a session exists
+class SessionView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, format=None):
+        return JsonResponse({'isAuthenticated': True})
+
+
+# Function sessionView
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function fetches user data for an authenticated user
+class WhoAmIView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, format=None):
+        return JsonResponse({'username': request.user.username})
