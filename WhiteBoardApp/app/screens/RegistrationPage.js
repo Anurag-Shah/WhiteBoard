@@ -147,6 +147,7 @@ export default class RegistrationPage extends React.Component {
 
 const styles = StyleSheet.create({
   safearea: {
+    flex: 1,
     backgroundColor: "#fff",
   },
 
