@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
+import { Icon } from "react-native-elements";
+
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
 
@@ -10,23 +12,20 @@ class FlatListDemo extends Component {
 
     this.state = {
       loading: false,
-      data: [],
+      //data: [],
+      data: [ {
+        name: 'Amy Farha',
+        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+        subtitle: 'Vice President',
+        email: 'yang1773@purdue.edu'
+      },
+      {
+        name: 'Chris Jackson',
+        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+        subtitle: 'Vice Chairman',
+        email: 'kang1773@purdue.edu'
+      }],
       error: null,
-
-      FlatListItems: [
-        {key: 'One'},
-        {key: 'Two'},
-        {key: 'Three'},
-        {key: 'Four'},
-        {key: 'Five'},
-        {key: 'Six'},
-        {key: 'Seven'},
-        {key: 'Eight'},
-        {key: 'Nine'},
-        {key: 'Ten'},
-        {key: 'Eleven'},
-        {key: 'Twelve'}
-      ]
     };
 
     this.arrayholder = [];
@@ -37,19 +36,11 @@ class FlatListDemo extends Component {
     this.makeRemoteRequest();
   }
 
-  getData = () => {
-    fetch('http://ec2-18-217-232-152.us-east-2.compute.amazonaws.com:8000/Users/')
-    .then(response => {
-      return response.json(); 
-    })
-    .then(responseData => {
-      //console.log(responseData);
-    })
-  }
-
   makeRemoteRequest = () => {
     //const url = `https://randomuser.me/api/?&results=20`;
-    const url = 'http://ec2-18-217-232-152.us-east-2.compute.amazonaws.com:8000/Users/';
+    //const url = 'http://ec2-18-217-232-152.us-east-2.compute.amazonaws.com:8000/Users/';
+    const url = 'http://ec2-3-144-80-126.us-east-2.compute.amazonaws.com:8000/Users/';
+
     this.setState({ loading: true });
 
     fetch(url)
@@ -101,14 +92,25 @@ class FlatListDemo extends Component {
 
   renderHeader = () => {
     return (
-      <SearchBar
+      /*<SearchBar
         placeholder="Type Here..."
         lightTheme
         round
         onChangeText={text => this.searchFilterFunction(text)}
         autoCorrect={false}
         value={this.state.value}
-      />
+      />*/
+      <View style={{alignItems: 'flex-end'}}>
+
+      <Icon
+          name="adduser"
+          type="ant-design"
+          color="#149052"
+          size="35"
+          onPress={() => Alert.alert('adduser Button pressed')} 
+        />
+      </View>
+      
     );
   };
 
