@@ -8,22 +8,23 @@
 #############################################################################
 
 import sys
-from PIL.Image import MIME
-
-from django.db.models.query import QuerySet
-from django.shortcuts import render, HttpResponse
-from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
-from rest_framework.parsers import JSONParser
-from django.http import JsonResponse
-from .models import User, Group, GroupImages
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import APIView, api_view
-from rest_framework import generics, mixins
 import io
 import json
 import os
 import ocr
+
+from PIL.Image import MIME
+from django.db.models.query import QuerySet
+from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
+from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import APIView, api_view
+from rest_framework import generics, mixins
+
+from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
+from .models import User, Group, GroupImages
 
 # Create your views here.
 
@@ -205,4 +206,4 @@ def login(request):
         return JsonResponse(res)
 
 
-def register(request):
+# def register(request):
