@@ -14,6 +14,8 @@ import Save from './SaveScreen';
 import Library from './LibraryScreen';
 import Team from './TeamScreen';
 import Account from './AccountScreen';
+import TextEditorPage from './TextEditorPage';  
+import ImageScreen from './ImageScreen';
 
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
@@ -37,7 +39,8 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
-
+      <Stack.Screen name="Image" component={ImageScreen}></Stack.Screen>
+      <Stack.Screen name="TextEditorPage" component={TextEditorPage} options={{ title: 'WhiteBoard', headerShown: false }}></Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -76,9 +79,9 @@ function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileImg: {
     width:80,

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, AsyncStorage, SafeAreaView } from 'react-native';
+import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Sidebar extends React.Component {
 
@@ -13,6 +13,9 @@ export default class Sidebar extends React.Component {
         name: "Save",
         screen: "Save"
       }, {
+        name: "TextEditor",
+        screen: "TextEditorPage"
+      },{
         name: "Library",
         screen: "Library"
       }, {
@@ -46,7 +49,7 @@ export default class Sidebar extends React.Component {
   };
 
   render() {
-    const  userId  = "Yierpan42";
+    const userId  = "Yierpan42";
     const loggedIn = 'true';
     
     function Item({ item, navigation }) {
@@ -103,7 +106,7 @@ const styles = StyleSheet.create({
     
   },
   statusBarMargin: {
-    marginTop: (Platform.OS === 'ios') ? 0 : 24,
+    marginTop: (Platform.OS === 'ios') ? 0 : 0,
   },
   profileImg:{
     width:80,
