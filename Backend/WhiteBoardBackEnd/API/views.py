@@ -8,10 +8,17 @@
 #############################################################################
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail, BadHeaderError
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
-from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponse, redirect
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.http import require_POST
+from django.views.generic import FormView
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import APIView
@@ -22,6 +29,7 @@ from rest_framework.response import Response
 import ocr
 from .models import User, Group, GroupImages
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
+from forms import SetPasswordForm
 
 
 # Create your views here.
@@ -184,7 +192,7 @@ def sign_up(request):
     name = data.get('username')
     password = data.get('password')
     email = data.get('email')
-    new_user = User(password=password)
+    new_user = User(PW=password)
     # If username or email already exists, django.db.IntegrityError will be raised when we try to save
     # But it does not indicate which field is duplicated, so we have to check manually
 
@@ -209,7 +217,6 @@ def sign_up(request):
     new_user.save()
 
 
-
 # Function login_view
 # Author: Jenna Zhang
 # Return value: JsonResponse
@@ -223,7 +230,7 @@ def login_view(request):
     if username is None or password is None:
         return JsonResponse({"code": 400, 'msg': 'Please provide username and password.'}, status=400)
 
-    user = authenticate(username=username, password=password)
+    user = authenticate(name=username, PW=password)
 
     if user is None:
         return JsonResponse({"code": -1, "msg": 'Invalid credentials.'}, status=400)
@@ -278,3 +285,63 @@ class WhoAmIView(APIView):
     @staticmethod
     def get(request, format=None):
         return JsonResponse({'username': request.user.username})
+
+
+# Function pwd_reset
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function processes the password resetting requests from the front end
+@require_POST
+def pwd_reset(request):
+    data = JSONParser().parse(request)
+    email_address = data['email']
+
+    # First check if the given email exists
+    try:
+        user = User.objects.get(email=email_address)
+        subject = "Password Reset Requested"
+        email_template_name = "/password/password_reset_email.txt"
+        c = {
+            "email": email_address,
+            'domain': request.get_host(),
+            'site_name': 'WhiteBoard',
+            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+            "user": user,
+            'token': default_token_generator.make_token(user),
+            'protocol': 'http',
+        }
+        email = render_to_string(email_template_name, c)
+        try:
+            send_mail(subject, email, 'janneyzay540@gmail.com', [email_address], fail_silently=False)
+            password_reset_form = PasswordResetForm()
+            return JsonResponse({"code": 0, "msg": "Email successfully sent"})
+        except BadHeaderError:
+            return JsonResponse({"code": -2, "msg": "Error sending email"})
+
+    except user.DoesNotExist:
+        return JsonResponse({"code": -1, "msg": "Email does not exist"})
+
+
+
+class PasswordResetConfirmView(FormView):
+    template_name = "/password/password_reset_confirm.html"
+    form_class = SetPasswordForm
+    success_url = "password_reset/done/"
+
+    def form_valid(self, *arg, **kwargs):
+        form = super(PasswordResetConfirmView, self).form_valid(*arg, **kwargs)
+        uidb64=self.kwargs['uidb64']
+        token=self.kwargs['token']
+        UserModel = get_user_model()
+        try:
+            uid = urlsafe_base64_decode(uidb64)
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            new_password = form.cleaned_data['new_password2']
+            user.set_password(new_password)
+            user.save()
+        return form
+

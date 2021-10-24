@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import *
 
 urlpatterns = [
@@ -11,4 +12,9 @@ urlpatterns = [
     path('Users/whoami/', WhoAmIView, name='api-whoami'),
     path('Group/<int:id>', SpecificGroup.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
+    path("password_reset", pwd_reset, name="password_reset")
+    path('reset_password_confirm/<uidb64>/<token>',
+         PasswordResetConfirmView.as_view(),
+        name='reset_password_confirm'),
+
 ]

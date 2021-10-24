@@ -26,8 +26,18 @@ SECRET_KEY = 'django-insecure-qk!d=*&ds!@-jw8%8fu7qpx1xcsy5-0qnkt394+$k+^ua2mlil
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
+                 "127.0.0.1"
+                 ]
 
+
+# AWS SES settings
+EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_HOST = "janneyzay540@gmail.com"
+AWS_ACCESS_KEY_ID = 'AKIAZG5TX5PYI45FLJIA'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_SES_REGION_NAME = 'us-east-2' #(ex: us-east-2)
+AWS_SES_REGION_ENDPOINT ='sts.amazonaws.com' #(ex: email.us-east-2.amazonaws.com)
 
 # Application definition
 
@@ -60,7 +70,7 @@ ROOT_URLCONF = 'WhiteBoardBackEnd.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['/API/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,7 +89,7 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# Changed@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# Changed
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
