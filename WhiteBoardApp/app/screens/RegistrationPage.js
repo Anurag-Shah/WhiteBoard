@@ -21,6 +21,8 @@ import {
 import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
 
+const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
+
 export default class RegistrationPage extends React.Component {
   constructor(props) {
     super(props);

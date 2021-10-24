@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-qk!d=*&ds!@-jw8%8fu7qpx1xcsy5-0qnkt394+$k+^ua2mlil
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com']
+ALLOWED_HOSTS = [
+    'ec2-3-144-80-126.us-east-2.compute.amazonaws.com', '127.0.0.1']
 
 
 # Application definition
@@ -79,9 +80,9 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_data_base',
+        'NAME': 'whiteboard_db',
         'USER': 'root',
-        'PASSWORD': '990603qwerty',
+        'PASSWORD': 'michellezhe',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -131,4 +132,4 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/' # 'http://myhost:port/media/'
+MEDIA_URL = '/media/'  # 'http://myhost:port/media/'

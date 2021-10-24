@@ -18,6 +18,8 @@ import {
 import { Header, Icon } from "react-native-elements";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
+
 function TextEditorPage() {
   const [code, onChangeCode] = React.useState(null);
 
