@@ -1,7 +1,7 @@
 #############################################################################
 # API/views.py
 #
-# Authors: Chunao Liu
+# Authors: Chunao Liu, Michelle He
 #
 # This is an django APIView that handles all the HTTP request received
 # by the backend. It support get, put and delete objects from the database
@@ -30,29 +30,32 @@ import ocr
 # Class AllUserList
 # Author: Chunao Liu, Jenna Zhang
 # Return value: JsonResponse
-# Inheritence: 
+# Inheritence:
 #       APIView
 # This class respond to HTTP request
 # for all user's information
+
 
 class AllUserList(APIView):
     def get(self, request):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
         return Response(Serializer.data)
-    
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED) # HTTP 201: CREATED
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) # HTTP 400: BAD REQUEST
+            # HTTP 201: CREATED
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # HTTP 400: BAD REQUEST
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Class SpecificUser
 # Author: Chunao Liu
 # Return value: JsonResponse
-# Inheritence: 
+# Inheritence:
 #       APIView
 # This class respond to HTTP request
 # for a specific user ID
@@ -63,13 +66,14 @@ class SpecificUser(APIView):
             return User.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
     def get(self, request, id):
         Serializer = UserSerializer(self.get_user_object(id))
         return Response(Serializer.data)
-    
+
     def put(self, request, id):
-        Serializer = UserSerializer(self.get_user_object(id), data=request.data)
+        Serializer = UserSerializer(
+            self.get_user_object(id), data=request.data)
         if (Serializer.is_valid()):
             Serializer.save()
             return Response(Serializer.data)
@@ -83,10 +87,11 @@ class SpecificUser(APIView):
 # Class SpecificGroup
 # Author: Chunao Liu
 # Return value: JsonResponse
-# Inheritence: 
+# Inheritence:
 #       APIView
 # This class respond to HTTP request
 # for a specific Group ID
+
 
 class SpecificGroup(APIView):
     def get_group_object(self, id):
@@ -94,13 +99,14 @@ class SpecificGroup(APIView):
             return Group.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
     def get(self, request, id):
         Serializer = GroupSerializer(self.get_group_object(id))
         return Response(Serializer.data)
-    
+
     def put(self, request, id):
-        Serializer = GroupSerializer(self.get_group_object(id), data=request.data)
+        Serializer = GroupSerializer(
+            self.get_group_object(id), data=request.data)
         if (Serializer.is_valid()):
             Serializer.save()
             return Response(Serializer.data)
@@ -114,17 +120,18 @@ class SpecificGroup(APIView):
 # Class ImageUpload
 # Author: Chunao Liu
 # Return value: JsonResponse
-# Inheritence: 
+# Inheritence:
 #       APIView
 # This class respond to HTTP request
 # for a group's image
 
+
 class ImageUpload(APIView):
     def get_Group_image(self, GPid):
-            aaa = GroupImages.objects.filter(GpID__GpID=GPid)
-            print (aaa)
-            return aaa
-    
+        aaa = GroupImages.objects.filter(GpID__GpID=GPid)
+        print(aaa)
+        return aaa
+
     def get_group_object(self, id):
         try:
             return Group.objects.get(pk=id)
@@ -152,27 +159,31 @@ class ImageUpload(APIView):
     # .then(response => response.text())
     # .then(result => console.log(result))
     # .catch(error => console.log('error', error));
-    
+
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
-        zip_file = open("/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
+        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + \
+            str(image_path)
+        zip_file = open(
+            "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print("OCR is: " + ocr_return)
-        response = HttpResponse(zip_file, content_type='application/force-download')
+        response = HttpResponse(
+            zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
-    
+
     def get(self, request, GPid):
-        Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        Serializer = GroupImagesSerializer(
+            self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
-    
-    
+
+
 # Function login
 # Author: Jenna Zhang
 # Return value: JsonResponse
@@ -194,6 +205,4 @@ def login(request):
         return JsonResponse(res)
 
 
-
-
-
+def register(request):

@@ -1,3 +1,11 @@
+/**
+ * RegistrationPage.js
+ *
+ * Authors: Michelle He
+ *
+ * This is the registration page that allows users to create an account
+ */
+
 import React from "react";
 import {
   SafeAreaView,

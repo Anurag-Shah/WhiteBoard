@@ -1,3 +1,11 @@
+/**
+ * TextEditorPage.js
+ *
+ * Authors: Michelle He
+ *
+ * This is the text editor page that allows users to type code and run it
+ */
+
 import React from "react";
 import {
   Alert,
