@@ -17,11 +17,12 @@ import {
   Text,
   View,
   Button,
+  Alert,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
 
-const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
+const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
 
 export default class RegistrationPage extends React.Component {
   constructor(props) {
@@ -56,6 +57,28 @@ export default class RegistrationPage extends React.Component {
     } else {
       return null;
     }
+  }
+
+  sendUserInfo() {
+    const userinfo = {
+      username: this.state.username,
+      email: this.state.email,
+      password: this.state.password,
+    };
+
+    fetch(serverURL + "Register/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userinfo),
+    })
+      .then((response) => {
+        console.log(response); //TODO: response handling
+      })
+      .catch((error) => {
+        console.log("Fetch error:" + error);
+      });
   }
 
   render() {
@@ -145,7 +168,11 @@ export default class RegistrationPage extends React.Component {
               <Button
                 title="Sign up"
                 color="#fff"
-                onPress={() => console.log("Sign up success!")} //TODO: send new user info to backend and redirect to login in page
+                onPress={() => {
+                  this.sendUserInfo;
+                  console.log("user info sent");
+                  Alert.alert();
+                }} //TODO: send new user info to backend and redirect to login in page
               />
             </View>
           </View>

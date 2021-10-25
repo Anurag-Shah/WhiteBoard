@@ -206,4 +206,5 @@ def login(request):
         return JsonResponse(res)
 
 
-# def register(request):
+def register(request):
+    pass
