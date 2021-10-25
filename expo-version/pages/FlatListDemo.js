@@ -134,7 +134,8 @@ class FlatListDemo extends Component {
               <ListItem.Title>{item.name}</ListItem.Title>
               <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
               </ListItem.Content>
-              <ListItem.Chevron />
+              <ListItem.Chevron 
+              onPress={() => Alert.alert('Do you want to remove this user?')} />
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
               //<ListItem //style={{ height: 50 }}
