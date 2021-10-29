@@ -7,24 +7,24 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
 from django.http import JsonResponse
-from django.middleware.csrf import get_token
 from django.shortcuts import HttpResponse, redirect
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.decorators import APIView
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.decorators import APIView, permission_classes, authentication_classes
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
 import ocr
 from .models import User, Group, GroupImages
@@ -42,6 +42,9 @@ from forms import SetPasswordForm
 # This class respond to HTTP request
 # for all user's information
 
+# Need to uncomment the following two lines to enable token based authentication
+# @permission_classes([IsAuthenticated])
+# @authentication_classes([TokenAuthentication])
 class AllUserList(APIView):
     def get(self, request):
         users = User.objects.all()
@@ -64,6 +67,9 @@ class AllUserList(APIView):
 # This class respond to HTTP request
 # for a specific user ID
 
+# Need to uncomment the following two lines to enable token based authentication
+# @permission_classes([IsAuthenticated])
+# @authentication_classes([TokenAuthentication])
 class SpecificUser(APIView):
     def get_user_object(self, id):
         try:
@@ -96,6 +102,9 @@ class SpecificUser(APIView):
 # This class respond to HTTP request
 # for a specific Group ID
 
+# Need to uncomment the following two lines to enable token based authentication
+# @permission_classes([IsAuthenticated])
+# @authentication_classes([TokenAuthentication])
 class SpecificGroup(APIView):
     def get_group_object(self, id):
         try:
@@ -128,6 +137,9 @@ class SpecificGroup(APIView):
 # This class respond to HTTP request
 # for a group's image
 
+# Need to uncomment the following two lines to enable token based authentication
+# @permission_classes([IsAuthenticated])
+# @authentication_classes([TokenAuthentication])
 class ImageUpload(APIView):
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
@@ -187,12 +199,15 @@ class ImageUpload(APIView):
 # Return value: JsonResponse
 # This function receives sign up request from the client and create a new user if
 # all fields are valid
+@require_POST
+@permission_classes((AllowAny,))
 def sign_up(request):
     data = JSONParser().parse(request)
     name = data.get('username')
     password = data.get('password')
     email = data.get('email')
-    new_user = User(PW=password)
+    UserModel = get_user_model()
+    new_user = UserModel.objects.create_user(username=name)
     # If username or email already exists, django.db.IntegrityError will be raised when we try to save
     # But it does not indicate which field is duplicated, so we have to check manually
 
@@ -201,7 +216,7 @@ def sign_up(request):
         email_match = User.objects.get(email=email)
         # if no exception raised, then the email already exists, return with error
         return JsonResponse({"code": -1, "msg": "email already exists"})
-    except email_match.DoesNotExist:
+    except User.DoesNotExist:
         # we are fine
         new_user.email = email
 
@@ -210,11 +225,15 @@ def sign_up(request):
         name_match = User.objects.get(name=name)
         # if no exception raised, then the username already exists, return with error
         return JsonResponse({"code": -2, "msg": "username already exists"})
-    except email_match.DoesNotExist:
+    except User.DoesNotExist:
         # we are fine
-        new_user.name = name
+        new_user.username = name
 
+    # token = Token.objects.create(user=new_user).key
+    my_user = User(name=name, email=email)
     new_user.save()
+    my_user.save()
+    return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
 
 
 # Function login_view
@@ -222,6 +241,8 @@ def sign_up(request):
 # Return value: JsonResponse
 # This function allows the user to log in by providing their username and password
 @require_POST
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
 def login_view(request):
     data = JSONParser().parse(request)
     username = data.get('username')
@@ -230,23 +251,14 @@ def login_view(request):
     if username is None or password is None:
         return JsonResponse({"code": 400, 'msg': 'Please provide username and password.'}, status=400)
 
-    user = authenticate(name=username, PW=password)
+    user = authenticate(username=username, password=password)
 
     if user is None:
         return JsonResponse({"code": -1, "msg": 'Invalid credentials.'}, status=400)
 
     login(request, user)
-    return JsonResponse({"code": 0, "detail": 'Successfully logged in.'})
-
-
-# Function get_csrf
-# Author: Jenna Zhang
-# Return value: JsonResponse
-# This function generates a CSRF token and returns it as JSON
-def get_csrf(request):
-    response = JsonResponse({'msg': 'CSRF cookie set'})
-    response['X-CSRFToken'] = get_token(request)
-    return response
+    token = Token.objects.create(user=user).key
+    return JsonResponse({"code": 0, "detail": 'Successfully logged in.', "token": token})
 
 
 # Function logout_view
@@ -261,46 +273,22 @@ def logout_view(request):
     return JsonResponse({'detail': 'Successfully logged out.'})
 
 
-# Function sessionView
-# Author: Jenna Zhang
-# Return value: JsonResponse
-# This function checks whether a session exists
-class SessionView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request, format=None):
-        return JsonResponse({'isAuthenticated': True})
-
-
-# Function sessionView
-# Author: Jenna Zhang
-# Return value: JsonResponse
-# This function fetches user data for an authenticated user
-class WhoAmIView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request, format=None):
-        return JsonResponse({'username': request.user.username})
-
-
 # Function pwd_reset
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function processes the password resetting requests from the front end
 @require_POST
+@permission_classes((AllowAny,))
 def pwd_reset(request):
     data = JSONParser().parse(request)
     email_address = data['email']
+    UserModel = get_user_model()
 
     # First check if the given email exists
     try:
-        user = User.objects.get(email=email_address)
+        user = UserModel.objects.get(email=email_address)
         subject = "Password Reset Requested"
-        email_template_name = "/password/password_reset_email.txt"
+        email_template_name = "password/password_reset_email.txt"
         c = {
             "email": email_address,
             'domain': request.get_host(),
@@ -313,29 +301,29 @@ def pwd_reset(request):
         email = render_to_string(email_template_name, c)
         try:
             send_mail(subject, email, 'janneyzay540@gmail.com', [email_address], fail_silently=False)
-            password_reset_form = PasswordResetForm()
+            # password_reset_form = PasswordResetForm()
             return JsonResponse({"code": 0, "msg": "Email successfully sent"})
         except BadHeaderError:
             return JsonResponse({"code": -2, "msg": "Error sending email"})
 
-    except user.DoesNotExist:
+    except UserModel.DoesNotExist:
         return JsonResponse({"code": -1, "msg": "Email does not exist"})
 
 
-
 class PasswordResetConfirmView(FormView):
-    template_name = "/password/password_reset_confirm.html"
+    template_name = "password/password_reset_confirm.html"
     form_class = SetPasswordForm
     success_url = "password_reset/done/"
 
-    def form_valid(self, *arg, **kwargs):
-        form = super(PasswordResetConfirmView, self).form_valid(*arg, **kwargs)
-        uidb64=self.kwargs['uidb64']
-        token=self.kwargs['token']
+    def form_valid(self, form):
+        f = super(PasswordResetConfirmView, self).form_valid( form)
+        print(form.cleaned_data['new_password2'])
+        uidb64 = self.kwargs['uidb64']
+        token = self.kwargs['token']
         UserModel = get_user_model()
         try:
             uid = urlsafe_base64_decode(uidb64)
-            user = User.objects.get(pk=uid)
+            user = UserModel.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
@@ -343,5 +331,4 @@ class PasswordResetConfirmView(FormView):
             new_password = form.cleaned_data['new_password2']
             user.set_password(new_password)
             user.save()
-        return form
-
+        return f

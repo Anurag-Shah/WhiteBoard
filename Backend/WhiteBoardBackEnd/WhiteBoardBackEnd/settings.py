@@ -30,14 +30,13 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  "127.0.0.1"
                  ]
 
-
 # AWS SES settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
-AWS_ACCESS_KEY_ID = 'AKIAZG5TX5PYI45FLJIA'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_SES_REGION_NAME = 'us-east-2' #(ex: us-east-2)
-AWS_SES_REGION_ENDPOINT ='sts.amazonaws.com' #(ex: email.us-east-2.amazonaws.com)
+AWS_ACCESS_KEY_ID = 'AKIAZG5TX5PYISXTZSH5'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
+AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)
 
 # Application definition
 
@@ -49,17 +48,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'API',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # new
-    'django.contrib.sessions.middleware.SessionMiddleware', # new
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -148,26 +147,17 @@ MEDIA_URL = '/media/'  # 'http://myhost:port/media/'
 
 # NEW Settings
 
-AUTH_USER_MODEL = 'API.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_HTTPONLY = True
 
-# PRODUCTION ONLY, these two will only allow the cookies to be sent over HTTPS
-# CSRF_COOKIE_SECURE = True
-# SESSION_COOKIE_SECURE = True
 
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False
@@ -175,7 +165,7 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8888",
+    "http://127.0.0.1:8000",
 ]
 
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
-CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ['Content-Type']

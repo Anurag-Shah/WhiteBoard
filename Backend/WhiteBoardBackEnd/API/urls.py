@@ -5,16 +5,14 @@ from .views import *
 urlpatterns = [
     path('Users/', AllUserList.as_view()),
     path('Users/<int:id>', SpecificUser.as_view()),
-    path('Users/csrf/', get_csrf, name='api-csrf'),
-    path('Users/login/', login_view, name='api-login'),
-    path('Users/logout/', logout_view, name='api-logout'),
-    path('Users/session/', SessionView, name='api-session'),
-    path('Users/whoami/', WhoAmIView, name='api-whoami'),
+    path('User/login/', login_view, name='api-login'),
+    path('User/register/', sign_up, name='api-login'),
+    path('User/logout/', logout_view, name='api-logout'),
     path('Group/<int:id>', SpecificGroup.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
-    path("password_reset", pwd_reset, name="password_reset")
-    path('reset_password_confirm/<uidb64>/<token>',
+    path("password_reset", pwd_reset, name="password_reset"),
+    path('password_reset_confirm/<uidb64>/<token>',
          PasswordResetConfirmView.as_view(),
-        name='reset_password_confirm'),
+         name='password_reset_confirm'),
 
 ]

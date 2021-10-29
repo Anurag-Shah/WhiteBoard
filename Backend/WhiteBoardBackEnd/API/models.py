@@ -3,15 +3,16 @@ from django.db.models.deletion import CASCADE
 from django.contrib.auth.models import AbstractUser
 
 
-
 # Create your models here.
 # Models will be automatically converted into SQL tables
-class User(AbstractUser):
-    # name and email should be unique
-    name = models.CharField(max_length=25, unique=True)
-    email = models.EmailField(unique=True)
-    uid = models.IntegerField(primary_key=True)  #auto-incremented
-    PW = models.IntegerField(default=9999)
+
+# This user class contains no password info, so it is safe to send user objects to front-end
+class User(models.Model):
+    name = models.CharField(max_length=25)
+    email = models.EmailField()
+    uid = models.AutoField(primary_key=True)
+
+    # PW = models.IntegerField(default=9999)  # No longer needed
 
     class meta():
         db_table = 'User'
@@ -20,8 +21,14 @@ class User(AbstractUser):
     def __str__(self):
         return self.name
 
+
 # Modify default User Model in Django Authentication System
-# This model is for storing the attributes related to authentication
+# This model is for user authentication
+# class UserAuth(AbstractUser):
+#     # name and email should be unique
+#     username = models.CharField(max_length=25, unique=True)
+#     email = models.EmailField(unique=True)
+#     uid = models.IntegerField(primary_key=True)  # auto-incremented
 
 
 class Group(models.Model):
