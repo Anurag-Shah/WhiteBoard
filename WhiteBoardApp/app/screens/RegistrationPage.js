@@ -23,7 +23,8 @@ import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
 
 // const serverURL = "https://ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
-const serverURL = "http://127.0.0.1:8000/";
+// const serverURL = "http://127.0.0.1:8000/";
+const serverURL = "http://172.16.50.73:8000/";
 
 export default class RegistrationPage extends React.Component {
   constructor(props) {
@@ -60,40 +61,42 @@ export default class RegistrationPage extends React.Component {
     }
   }
 
-  sendUserInfo() {
+  async sendUserInfo() {
     const userinfo = {
       username: this.state.username,
       email: this.state.email,
       password: this.state.password,
     };
-    // try {
-    //   const response = await fetch(serverURL + "Register/", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(userinfo),
-    //   });
-    //   const data = await response.json();
-    //   console.log(data);
-    //   console.log("user info sent");
-    // } catch (error) {
-    //   console.log(error);
-    // }
 
-    fetch(serverURL + "Register/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userinfo),
-    })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
+    try {
+      const response = await fetch(serverURL + "Register/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userinfo),
       });
+      const data = await response.json();
+      console.log(data);
+      console.log("user info sent");
+    } catch (error) {
+      console.log(error);
+    }
+
+    // fetch(serverURL + "Register/", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(userinfo),
+    // })
+    //   .then((response) => {
+    //     console.log(response);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
 
     // TODO: response handling
     // if (username already exists) {

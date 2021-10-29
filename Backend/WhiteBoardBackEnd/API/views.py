@@ -208,8 +208,8 @@ def login(request):
 
 @api_view(['POST'])
 def register(request):
-    user = JSONParser().parse(request)
     print(request)
+    user = JSONParser().parse(request)
     print(user)
 
     success = {"code": 0, "msg": "Successfully registered"}
