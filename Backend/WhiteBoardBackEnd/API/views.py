@@ -206,5 +206,11 @@ def login(request):
         return JsonResponse(res)
 
 
+@api_view(['POST'])
 def register(request):
-    pass
+    user = JSONParser().parse(request)
+    print(request)
+    print(user)
+
+    success = {"code": 0, "msg": "Successfully registered"}
+    return JsonResponse(success)

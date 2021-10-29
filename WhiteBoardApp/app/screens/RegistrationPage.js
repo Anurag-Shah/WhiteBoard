@@ -22,7 +22,8 @@ import {
 import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
 
-const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
+// const serverURL = "https://ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
+const serverURL = "http://127.0.0.1:8000/";
 
 export default class RegistrationPage extends React.Component {
   constructor(props) {
@@ -65,6 +66,20 @@ export default class RegistrationPage extends React.Component {
       email: this.state.email,
       password: this.state.password,
     };
+    // try {
+    //   const response = await fetch(serverURL + "Register/", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(userinfo),
+    //   });
+    //   const data = await response.json();
+    //   console.log(data);
+    //   console.log("user info sent");
+    // } catch (error) {
+    //   console.log(error);
+    // }
 
     fetch(serverURL + "Register/", {
       method: "POST",
@@ -74,11 +89,26 @@ export default class RegistrationPage extends React.Component {
       body: JSON.stringify(userinfo),
     })
       .then((response) => {
-        console.log(response); //TODO: response handling
+        console.log(response);
       })
       .catch((error) => {
-        console.log("Fetch error:" + error);
+        console.log(error);
       });
+
+    // TODO: response handling
+    // if (username already exists) {
+    // Alert.alert("Username already in use", "Please choose another username.", [
+    //   { text: "OK" },
+    // ]);
+    // } else if (email already in use) {
+    // Alert.alert("Email address already in use", "Please try to login or choose another email address.", [
+    //   { text: "OK" },
+    // ]);
+    // } else {
+    // Alert.alert("Success", "Your account has been successfully created!", [
+    //   { text: "OK", onPress: () => console.log("to login page") }, //TODO: redirect to login page
+    // ]);
+    // }
   }
 
   render() {
@@ -169,9 +199,16 @@ export default class RegistrationPage extends React.Component {
                 title="Sign up"
                 color="#fff"
                 onPress={() => {
-                  this.sendUserInfo;
-                  console.log("user info sent");
-                  Alert.alert();
+                  if (this.state.validEmail && this.state.samePassword) {
+                    console.log("can send");
+                    this.sendUserInfo();
+                  } else {
+                    Alert.alert(
+                      "Input error",
+                      "Please correctly input your information.",
+                      [{ text: "OK" }]
+                    );
+                  }
                 }} //TODO: send new user info to backend and redirect to login in page
               />
             </View>
