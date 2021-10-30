@@ -10,4 +10,6 @@ urlpatterns = [
 
     path('Group/<int:id>', SpecificGroup.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
+
+    path('TypenCodes/<int:GPid>', ),    # TODO: view to handle typen code
 ]
