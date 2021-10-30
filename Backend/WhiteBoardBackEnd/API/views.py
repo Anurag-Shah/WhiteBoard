@@ -26,7 +26,6 @@ from rest_framework import generics, mixins
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
 from .models import User, Group, GroupImages
 
-# Create your views here.
 
 # Class AllUserList
 # Author: Chunao Liu, Jenna Zhang
@@ -35,8 +34,6 @@ from .models import User, Group, GroupImages
 #       APIView
 # This class respond to HTTP request
 # for all user's information
-
-
 class AllUserList(APIView):
     def get(self, request):
         users = User.objects.all()
@@ -60,7 +57,6 @@ class AllUserList(APIView):
 #       APIView
 # This class respond to HTTP request
 # for a specific user ID
-
 class SpecificUser(APIView):
     def get_user_object(self, id):
         try:
@@ -85,6 +81,7 @@ class SpecificUser(APIView):
         UserObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+
 # Class SpecificGroup
 # Author: Chunao Liu
 # Return value: JsonResponse
@@ -92,8 +89,6 @@ class SpecificUser(APIView):
 #       APIView
 # This class respond to HTTP request
 # for a specific Group ID
-
-
 class SpecificGroup(APIView):
     def get_group_object(self, id):
         try:
@@ -118,6 +113,7 @@ class SpecificGroup(APIView):
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+
 # Class ImageUpload
 # Author: Chunao Liu
 # Return value: JsonResponse
@@ -125,8 +121,6 @@ class SpecificGroup(APIView):
 #       APIView
 # This class respond to HTTP request
 # for a group's image
-
-
 class ImageUpload(APIView):
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
@@ -206,11 +200,42 @@ def login(request):
         return JsonResponse(res)
 
 
+# Function register
+# Author: Michelle He
+# Return value: JsonResponse
+# This function responds to frontend user registration request
 @api_view(['POST'])
 def register(request):
-    print(request)
     user = JSONParser().parse(request)
-    print(user)
 
-    success = {"code": 0, "msg": "Successfully registered"}
-    return JsonResponse(success)
+    username = user.get("username")
+    emailAdd = user.get("email")
+    pw = user.get("password")
+
+    usernameOK = False
+    emailOK = False
+    try:
+        User.objects.get(name=username)
+    except User.DoesNotExist:
+        usernameOK = True
+
+    try:
+        User.objects.get(email=emailAdd)
+    except User.DoesNotExist:
+        emailOK = True
+
+    if (usernameOK == False and emailOK == False):
+        response = {"code": -1,
+                    "msg": "Both username and email address already in use!"}
+    elif (usernameOK == False):
+        response = {"code": -2, "msg": "Username already in use!"}
+    elif (emailOK == False):
+        response = {"code": -3, "msg": "Email address already in use!"}
+    else:
+        newUser = User(name=username, email=emailAdd,
+                       uid=User.objects.last().uid + 1, PW=pw)
+        newUser.save()
+        response = {"code": 0, "msg": "Registration success!"}
+
+    print(response)
+    return JsonResponse(response)

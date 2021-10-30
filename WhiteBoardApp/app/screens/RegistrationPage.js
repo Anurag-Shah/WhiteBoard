@@ -26,6 +26,10 @@ import { StatusBar } from "expo-status-bar";
 // const serverURL = "http://127.0.0.1:8000/";
 const serverURL = "http://172.16.50.73:8000/";
 
+const BOTHINUSE = -1;
+const USERNAMEINUSE = -2;
+const EMAILINUSE = -3;
+
 export default class RegistrationPage extends React.Component {
   constructor(props) {
     super(props);
@@ -36,6 +40,7 @@ export default class RegistrationPage extends React.Component {
       confirm: "",
       validEmail: true,
       samePassword: true,
+      noEmpty: false,
     };
   }
 
@@ -61,6 +66,23 @@ export default class RegistrationPage extends React.Component {
     }
   }
 
+  noEmptyField() {
+    if (
+      this.state.username != "" &&
+      this.state.email != "" &&
+      this.state.password != "" &&
+      this.state.confirm != ""
+    ) {
+      this.state.noEmpty = true;
+    } else {
+      return Alert.alert(
+        "Empty field still exists!",
+        "Please make sure that all fields are filled.",
+        [{ text: "OK" }]
+      );
+    }
+  }
+
   async sendUserInfo() {
     const userinfo = {
       username: this.state.username,
@@ -69,7 +91,7 @@ export default class RegistrationPage extends React.Component {
     };
 
     try {
-      const response = await fetch(serverURL + "Register/", {
+      const res = await fetch(serverURL + "Register/", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -77,11 +99,38 @@ export default class RegistrationPage extends React.Component {
         },
         body: JSON.stringify(userinfo),
       });
-      const data = await response.json();
-      console.log(data);
-      console.log("user info sent");
+      const response = await res.json();
+
+      code = Object.values(response)[0];
+      if (code == BOTHINUSE) {
+        return Alert.alert(
+          "Username and email address already in use",
+          "Please login or choose another username and email address.",
+          [{ text: "OK" }]
+        );
+      } else if (code == USERNAMEINUSE) {
+        return Alert.alert(
+          "Username already in use",
+          "Please choose another username.",
+          [{ text: "OK" }]
+        );
+      } else if (code == EMAILINUSE) {
+        return Alert.alert(
+          "Email address already in use",
+          "Please try to login or choose another email address.",
+          [{ text: "OK" }]
+        );
+      } else {
+        return Alert.alert(
+          "Success",
+          "Your account has been successfully created!",
+          [
+            { text: "OK", onPress: () => console.log("to login page") }, //TODO: redirect to login page
+          ]
+        );
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Fetch error: " + error);
     }
 
     // fetch(serverURL + "Register/", {
@@ -97,21 +146,6 @@ export default class RegistrationPage extends React.Component {
     //   .catch((error) => {
     //     console.log(error);
     //   });
-
-    // TODO: response handling
-    // if (username already exists) {
-    // Alert.alert("Username already in use", "Please choose another username.", [
-    //   { text: "OK" },
-    // ]);
-    // } else if (email already in use) {
-    // Alert.alert("Email address already in use", "Please try to login or choose another email address.", [
-    //   { text: "OK" },
-    // ]);
-    // } else {
-    // Alert.alert("Success", "Your account has been successfully created!", [
-    //   { text: "OK", onPress: () => console.log("to login page") }, //TODO: redirect to login page
-    // ]);
-    // }
   }
 
   render() {
@@ -202,17 +236,19 @@ export default class RegistrationPage extends React.Component {
                 title="Sign up"
                 color="#fff"
                 onPress={() => {
-                  if (this.state.validEmail && this.state.samePassword) {
-                    console.log("can send");
-                    this.sendUserInfo();
-                  } else {
-                    Alert.alert(
-                      "Input error",
-                      "Please correctly input your information.",
-                      [{ text: "OK" }]
-                    );
+                  this.noEmptyField();
+                  if (this.state.noEmpty) {
+                    if (this.state.validEmail && this.state.samePassword) {
+                      this.sendUserInfo();
+                    } else {
+                      Alert.alert(
+                        "Input error",
+                        "Please correctly input your information.",
+                        [{ text: "OK" }]
+                      );
+                    }
                   }
-                }} //TODO: send new user info to backend and redirect to login in page
+                }}
               />
             </View>
           </View>
