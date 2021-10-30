@@ -5,9 +5,9 @@ from .views import *
 urlpatterns = [
     path('Users/', AllUserList.as_view()),
     path('Users/<int:id>', SpecificUser.as_view()),
-    path('User/login/', login_view, name='api-login'),
-    path('User/register/', sign_up, name='api-login'),
-    path('User/logout/', logout_view, name='api-logout'),
+    path('User/login/', login_view, name='login'),
+    path('User/register/', sign_up, name='register'),
+    path('User/logout/', logout_view, name='logout'),
     path('Group/<int:id>', SpecificGroup.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
     path("password_reset", pwd_reset, name="password_reset"),

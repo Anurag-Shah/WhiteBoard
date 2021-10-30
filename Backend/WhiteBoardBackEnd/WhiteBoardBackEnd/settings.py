@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-qk!d=*&ds!@-jw8%8fu7qpx1xcsy5-0qnkt394+$k+^ua2mlil
 DEBUG = True
 
 ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
-                 "127.0.0.1"
+                 "127.0.0.1",
+                 "66.253.158.235",
                  ]
 
 # AWS SES settings
@@ -163,9 +164,10 @@ REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8888",
-    "http://127.0.0.1:8000",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://127.0.0.1:8888",
+#     "http://127.0.0.1:8000",
+# ]
+# CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_EXPOSE_HEADERS = ['Content-Type']

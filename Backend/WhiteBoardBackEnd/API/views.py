@@ -257,7 +257,12 @@ def login_view(request):
         return JsonResponse({"code": -1, "msg": 'Invalid credentials.'}, status=400)
 
     login(request, user)
-    token = Token.objects.create(user=user).key
+    token = ''
+    try:
+        token = Token.objects.get(user=user).key
+    except Token.DoesNotExist:
+        token = Token.objects.create(user=user).key
+
     return JsonResponse({"code": 0, "detail": 'Successfully logged in.', "token": token})
 
 
@@ -289,13 +294,14 @@ def pwd_reset(request):
         user = UserModel.objects.get(email=email_address)
         subject = "Password Reset Requested"
         email_template_name = "password/password_reset_email.txt"
+        token = default_token_generator.make_token(user)
         c = {
             "email": email_address,
             'domain': request.get_host(),
             'site_name': 'WhiteBoard',
             "uid": urlsafe_base64_encode(force_bytes(user.pk)),
             "user": user,
-            'token': default_token_generator.make_token(user),
+            'token': token,
             'protocol': 'http',
         }
         email = render_to_string(email_template_name, c)
