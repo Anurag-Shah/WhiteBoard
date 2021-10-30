@@ -34,8 +34,8 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 # AWS SES settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
-AWS_ACCESS_KEY_ID = 'AKIAZG5TX5PYISXTZSH5'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = ''  # hidden
+AWS_SECRET_ACCESS_KEY = '' # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)
 
