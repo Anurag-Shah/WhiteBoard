@@ -160,7 +160,7 @@ class ImageUpload(APIView):
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
         path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
-        zip_file = open("/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
+        zip_file = open(path, 'rb')
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print("OCR is: " + ocr_return)
