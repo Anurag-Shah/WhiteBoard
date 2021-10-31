@@ -66,7 +66,7 @@ def ocr_wrapper(image):
 	else:
 		raise OCRError
 	language = ocr_lang_detect.detect(code)
-	return (code, language, out_image)
+	return (code, language, out_image, texttype)
 
 
 if __name__ == "__main__":
