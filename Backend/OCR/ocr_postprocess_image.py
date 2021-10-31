@@ -87,8 +87,7 @@ def ocr_postprocess_image(input_image, line_numbers):
 				pix = (i, y_left - 3)
 			pil_out.putpixel(pix, (255, 0, 0))
 			phase += 1
-	pil_out.show()
-	pil_out.save("test.png")
+	return pil_out, left_coords
 
 # detect_background_color
 # Author: Anurag

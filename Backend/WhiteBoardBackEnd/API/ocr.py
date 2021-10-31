@@ -24,6 +24,7 @@ def ocr(fname):
 	# Setup migrated into the function
 	from ocr_wrapper import ocr_wrapper
 	from compiler_wrapper import compiler_wrapper
+	from ocr_postprocess_image import ocr_postprocess_image
 
 	# Output:
 	# 1. Postprocessed image
@@ -31,12 +32,14 @@ def ocr(fname):
 	# 3. Result
 	# 4. Image Type (Typeform / Handwritten)
 	# 5. Image Programming Language
+	# 6. Error line y-coordinates
 
 	image = Image.open(fname).convert('RGB')
-	ocr_out, imlang, outimage, line_coords = ocr_wrapper(image)
-	compiler_out = compiler_wrapper(ocr_out)
+	ocr_out, imlang, outimage = ocr_wrapper(image)
+	compiler_out, line_numbers = compiler_wrapper(ocr_out, imlang)
+	post_image, line_coords = ocr_postprocess_image(outimage, line_numbers)
 	imtype = "Typeform"
-	return outimage, ocr_out, compiler_out, imtype, imlang
+	return outimage, ocr_out, compiler_out, imtype, imlang, left_coords
 
 if __name__ == "__main__":
 	sys.path.insert(1, os.path.abspath("../../Compiler"))
