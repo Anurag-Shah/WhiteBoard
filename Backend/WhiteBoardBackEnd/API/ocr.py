@@ -33,11 +33,8 @@ def ocr(fname):
 	# 5. Image Programming Language
 
 	image = Image.open(fname).convert('RGB')
-	os.chdir("../../OCR")
-	ocr_out = ocr_wrapper(image)
-	os.chdir("../Compiler")
-	compiler_out, imlang, outimage, line_coords = compiler_wrapper(ocr_out)
-	os.chdir("../WhiteBoardBackEnd/API")
+	ocr_out, imlang, outimage, line_coords = ocr_wrapper(image)
+	compiler_out = compiler_wrapper(ocr_out)
 	imtype = "Typeform"
 	return outimage, ocr_out, compiler_out, imtype, imlang
 
