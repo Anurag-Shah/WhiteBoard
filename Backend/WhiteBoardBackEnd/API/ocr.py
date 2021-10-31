@@ -60,7 +60,6 @@ def ocr(image_file_name, input_text=None):
 if __name__ == "__main__":
 	sys.path.insert(1, os.path.abspath("../../Compiler"))
 	sys.path.insert(1, os.path.abspath("../../OCR"))
-	print(sys.path)
 	# Testing function for pipeline
 	test_im_path = "../../OCR/images/tesseract_tests/"
 	test_im = "test2"
