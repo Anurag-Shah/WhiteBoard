@@ -47,7 +47,7 @@ def ocr(image_file_name, input_text=None):
 		image = Image.open(image_file_name).convert('RGB')
 		ocr_out, imlang, outimage, imtype = ocr_wrapper(image)
 		compiler_out, line_numbers = compiler_wrapper(ocr_out, imlang)
-		post_image, line_coords = ocr_postprocess_image(outimage, line_numbers)
+		post_image, left_coords = ocr_postprocess_image(outimage, line_numbers)
 	else:
 		# Raw text input
 		imlang = ocr_lang_detect.detect(input_text)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 	sys.path.insert(1, os.path.abspath("../../OCR"))
 	# Testing function for pipeline
 	test_im_path = "../../OCR/images/tesseract_tests/"
-	test_im = "test2"
+	test_im = "test3"
 	imsuffix = ".png"
 	print(ocr(test_im_path + test_im + imsuffix))
 	print(ocr(None, "hello"))
