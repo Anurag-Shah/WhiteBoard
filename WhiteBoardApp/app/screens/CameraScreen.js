@@ -29,7 +29,6 @@ const { height, width } = Dimensions.get('window');
 
 const serverUrl = 'http://ec2-3-15-170-72.us-east-2.compute.amazonaws.com:8080/';
 
-//const serverUrl = 'http://jsonplaceholder.typicode.com'; //just for testing
 const userName = 'Yierpan42';
 const groupId = 0;
 
@@ -39,7 +38,6 @@ export default function CameraScreen({ navigation }) {
   const [type, setType] = useState(Camera.Constants.Type.front);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [photo, setPhoto] = useState(null);
-  const [isCamera, setIsCamera] = useState(true);
   const [returnImg, setReturnImg] = useState(false);
   
   useEffect(() => {
