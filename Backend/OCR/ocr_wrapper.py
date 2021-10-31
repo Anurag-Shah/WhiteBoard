@@ -20,6 +20,7 @@ import ocr_typeform
 import ocr_postprocess_text
 import ocr_texttype_detection
 import ocr_lang_detect
+import ocr_postprocess_image
 
 from PIL import Image
 
@@ -42,32 +43,35 @@ from PIL import Image
 def ocr_wrapper(image):
 	texttype = ocr_texttype_detection.detect(image)
 	code = ""
+	out_image = ""
 	if texttype == "typeform":
 		im = preprocess_typeform.preprocess_image(image)
 		out = ""
 		for char in charseg_typeform.segment(im):
 			out += ocr_typeform.ocr_typeform(im)
 		code = ocr_postprocess_text.ocr_postprocess(out)
+		out_image = im
 	elif texttype == "handwritten":
 		im = preprocess_handwritten.preprocess_image(image)
 		out = ""
 		for char in charseg_handwritten.segment(im):
 			out += ocr_handwritten.ocr_handwritten(im)
 		code = ocr_postprocess_text.ocr_postprocess(out)
+		out_image = im
 	elif texttype == "typeform_pretrained":
-		# This will be removed when obsolete
 		out = preprocess_typeform.preprocess_tesseract(image)
-		out = ocr_typeform.ocr_tesseract(out)
-		code = ocr_postprocess_text.tesseract_postprocess(out)
+		out_image = out
+		ocr_out_text = ocr_typeform.ocr_tesseract(out)
+		code = ocr_postprocess_text.tesseract_postprocess(ocr_out_text)
 	else:
 		raise OCRError
 	language = ocr_lang_detect.detect(code)
-	return (code, language)
+	return (code, language, out_image, texttype)
 
 
 if __name__ == "__main__":
 	# Testing function for pipeline
 	test_im_path = "images/tesseract_tests/"
-	test_im = "test2"
+	test_im = "min_area_rect_test"
 	imsuffix = ".png"
-	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix)))
+	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix).convert('RGB')))
