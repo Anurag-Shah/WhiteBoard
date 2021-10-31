@@ -60,18 +60,18 @@ def ocr_wrapper(image):
 		code = ocr_postprocess_text.ocr_postprocess(out)
 	elif texttype == "typeform_pretrained":
 		out = preprocess_typeform.preprocess_tesseract(image)
-		out_image = ocr_postprocess_image.ocr_postprocess_image(image)
+		out_image, line_coords = ocr_postprocess_image.ocr_postprocess_image(image)
 		out = ocr_typeform.ocr_tesseract(out)
 		code = ocr_postprocess_text.tesseract_postprocess(out)
 	else:
 		raise OCRError
 	language = ocr_lang_detect.detect(code)
-	return (code, language, out_image)
+	return (code, language, out_image, line_coords)
 
 
 if __name__ == "__main__":
 	# Testing function for pipeline
 	test_im_path = "images/tesseract_tests/"
-	test_im = "test2"
+	test_im = "min_area_rect_test"
 	imsuffix = ".png"
-	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix)))
+	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix).convert('RGB')))

@@ -7,21 +7,12 @@
 # Performs OCR given a file name
 #############################################################################
 
-# Do not touch the next 3 lines
-
 import sys
-
-# Do not move the above around or change the order otherwise the other import statements will break
-# Add any future import statements below this line
-
 import os
 from PIL import Image
-from ocr_wrapper import ocr_wrapper
-from compiler_wrapper import compiler_wrapper
-
 # ocr_wrapper
 # Author: Anurag
-# Return value: compiler's output
+# Return value: output list
 # Parameters:
 #	1. fname - file name
 # This function is a wrapper for the entire OCR Process
@@ -30,15 +21,30 @@ from compiler_wrapper import compiler_wrapper
 #	Backend/Compiler/compiler_wrapper.py
 
 def ocr(fname):
-	image = Image.open(fname)
+	# Setup migrated into the function
+	from ocr_wrapper import ocr_wrapper
+	from compiler_wrapper import compiler_wrapper
+
+	# Output:
+	# 1. Postprocessed image
+	# 2. Text output
+	# 3. Result
+	# 4. Image Type (Typeform / Handwritten)
+	# 5. Image Programming Language
+
+	image = Image.open(fname).convert('RGB')
 	os.chdir("../../OCR")
 	ocr_out = ocr_wrapper(image)
 	os.chdir("../Compiler")
-	compiler_out = compiler_wrapper(ocr_out)
+	compiler_out, imlang, outimage, line_coords = compiler_wrapper(ocr_out)
 	os.chdir("../WhiteBoardBackEnd/API")
-	return compiler_out
+	imtype = "Typeform"
+	return outimage, ocr_out, compiler_out, imtype, imlang
 
 if __name__ == "__main__":
+	sys.path.insert(1, os.path.abspath("../../Compiler"))
+	sys.path.insert(1, os.path.abspath("../../OCR"))
+	print(sys.path)
 	# Testing function for pipeline
 	test_im_path = "../../OCR/images/tesseract_tests/"
 	test_im = "test2"
