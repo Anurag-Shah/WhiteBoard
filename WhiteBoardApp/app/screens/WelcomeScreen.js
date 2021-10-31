@@ -14,6 +14,7 @@ import Save from './SaveScreen';
 import Library from './LibraryScreen';
 import Team from './TeamScreen';
 import Account from './AccountScreen';
+import LoginPage from './LoginPage';
 
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
@@ -37,7 +38,7 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
-
+      <Stack.Screen name="LoginPage" component={LoginPage}></Stack.Screen>
     </Stack.Navigator>
   );
 }

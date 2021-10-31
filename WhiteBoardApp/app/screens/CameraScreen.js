@@ -22,6 +22,7 @@ import * as FileSystem from 'expo-file-system';
 
 import * as MediaLibrary from 'expo-media-library';
 
+import storage from '../config/storage';
 // import { useDispatch } from 'react-redux';
 // import { addClipItem, removeClipItem } from './shared/actions';
 
@@ -29,7 +30,6 @@ const { height, width } = Dimensions.get('window');
 
 const serverUrl = 'http://ec2-3-15-170-72.us-east-2.compute.amazonaws.com:8080/';
 
-const userName = 'Yierpan42';
 const groupId = 0;
 
 export default function CameraScreen({ navigation }) {
@@ -39,8 +39,9 @@ export default function CameraScreen({ navigation }) {
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [returnImg, setReturnImg] = useState(false);
-  
+  const [userName, setUserName] = useState('Yierpan42');
   useEffect(() => {
+    getUserInfo();
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -49,6 +50,29 @@ export default function CameraScreen({ navigation }) {
       setHasGalleryPermission(galleryStatus.status === 'granted');
     })();
   }, []);
+
+  const getUserInfo = () => {
+    // Store user account info in local storage
+    storage
+      .load({
+        key: 'login-session',
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: false,
+        syncInBackground: true,
+      })
+      .then(ret => {
+        // found data go to then()
+        console.log("Login Page found data!")
+        setUserName(ret.username);
+
+      })
+      .catch(err => {
+        // any exception including data not found
+        // goes to catch()
+        navigation.push('LoginPage');
+      });
+  };
 
   if (hasPermission === null || hasGalleryPermission === false) {
     return <View />;
