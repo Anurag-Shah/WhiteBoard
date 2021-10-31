@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Provider } from 'react-redux';
@@ -6,11 +5,6 @@ import { createStore } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator  } from '@react-navigation/stack';
-=======
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { StyleSheet, View, Image } from "react-native";
->>>>>>> main
 
 
 import userReducer from './shared/reducer/UserReducer';
@@ -20,6 +14,7 @@ import Save from './SaveScreen';
 import Library from './LibraryScreen';
 import Team from './TeamScreen';
 import Account from './AccountScreen';
+import LoginPage from './LoginPage';
 
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
@@ -43,7 +38,7 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
-
+      <Stack.Screen name="LoginPage" component={LoginPage}></Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -71,18 +66,11 @@ function WelcomeScreen() {
   
   
   return (
-<<<<<<< HEAD
     <Provider store={store}>
       <NavigationContainer>
         <MyDrawer />
       </NavigationContainer>
     </Provider>
-=======
-    <View style={styles.container}>
-      <Image source={require("../assets/logo.png")} />
-      <StatusBar style="auto" />
-    </View>
->>>>>>> main
   );
 }
 

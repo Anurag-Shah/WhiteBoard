@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import storage from '../config/storage';
-import { FontAwesome, Ionicons, Entypo } from '@expo/vector-icons'
+import { FontAwesome, Entypo } from '@expo/vector-icons'
 import {
   StyleSheet,
   Switch,
@@ -29,33 +29,33 @@ function Prompt(props) {
       setSuccess(false);
       setFeedback("Please enter a valid email...");
     } else {
-      // Recieve success msg
-      if (email == "admin@gmail.com") {
-        setSuccess(true);
-        setFeedback("");
-        Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-          { text: 'OK', onPress: () => props.setVisible(false) }]);
-      } else {
-        setSuccess(false);
-        setFeedback("No account found!");
-      }
-
-      // // Send Email to backend
-      // const response = resetPwdApi(email);
-      // if (response.code == 0) {
-      //   // Send successfully
+      // // Recieve success msg
+      // if (email == "admin@gmail.com") {
       //   setSuccess(true);
       //   setFeedback("");
       //   Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-      //     { text: 'OK' }]);
-      //   props.setVisible(false);
-      // } else if (response.code == -1) {
-      //   // Email has not been registered
+      //     { text: 'OK', onPress: () => props.setVisible(false) }]);
+      // } else {
       //   setSuccess(false);
       //   setFeedback("No account found!");
-      // } else if (response.code == -2) {
-      //   // Error sending pwd reset email
       // }
+
+      // Send Email to backend
+      const response = resetPwdApi(email);
+      if (response.code == 0) {
+        // Send successfully
+        setSuccess(true);
+        setFeedback("");
+        Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
+          { text: 'OK' }]);
+        props.setVisible(false);
+      } else if (response.code == -1) {
+        // Email has not been registered
+        setSuccess(false);
+        setFeedback("No account found!");
+      } else if (response.code == -2) {
+        // Error sending pwd reset email
+      }
     }
   };
 
@@ -90,7 +90,7 @@ function LoginPage({ navigation }) {
     // Store user account info in local storage
     storage
       .load({
-        key: 'Login-info',
+        key: 'login-session',
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
         autoSync: false,
@@ -125,68 +125,68 @@ function LoginPage({ navigation }) {
 
   const login = () => {
     console.log("Login Clicked");
-//     // login Api communicates with the backend
-//     loginApi(username, password).then((response) => {
-//       if (response.code == 0) {
-//         // If Login successfully
-//         setWrongInfo(false);
-//         if (rememberMe) {
-//           console.log("Remember me true");
-//           let user = { username: username, password: password };
-//           console.log(user);
-//           storage.save({
-//             key: "Login-info",
-//             data: user,
-//           });
-//         } else {
-//           console.log("Removing user info....");
-//           storage.remove({
-//             key: "Login-info",
-//           });
-//         }
-//         // Redirecting to Camera Page
-//         Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-//       } else {
-//         setWrongInfo(true);
-//         console.log(response.msg);
-//       }
-//     });
-    
-    
-    // For frontend testing
-    const test_username = "admin";
-    const test_password = "666";
-    var response;
-    if (username === test_username && password === test_password){ // replace your testing username and password
-      response = {code: 0, msg: "Success"};
-    } else if (username = test_username && password !== test_password) {
-      response = {code: -1, msg: "wrong password"};
-    } else {
-      response = {code: -2, msg: "user does not exist"}
-    }
-    if (response.code == 0) {
+    // login Api communicates with the backend
+    loginApi(username, password).then((response) => {
+      if (response.code == 0) {
         // If Login successfully
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
-          let user = { username: username, password: password };
+          let user = { username: username, password: password, token: response.token };
           console.log(user);
           storage.save({
-            key: "Login-info",
+            key: "login-session",
             data: user,
           });
         } else {
           console.log("Removing user info....");
           storage.remove({
-            key: "Login-info",
+            key: "login-session",
           });
         }
         // Redirecting to Camera Page
         Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-     } else {
+      } else {
         setWrongInfo(true);
         console.log(response.msg);
-     }
+      }
+    });
+
+
+    // For frontend testing
+    // const test_username = "admin";
+    // const test_password = "666";
+    // var response;
+    // if (username === test_username && password === test_password) { // replace your testing username and password
+    //   response = { code: 0, msg: "Success" };
+    // } else if (username == test_username && password !== test_password) {
+    //   response = { code: -1, msg: "wrong password" };
+    // } else {
+    //   response = { code: -2, msg: "user does not exist" }
+    // }
+    // if (response.code == 0) {
+    //   // If Login successfully
+    //   setWrongInfo(false);
+    //   if (rememberMe) {
+    //     console.log("Remember me true");
+    //     let user = { username: username, password: password };
+    //     console.log(user);
+    //     storage.save({
+    //       key: "login-session",
+    //       data: user,
+    //     });
+    //   } else {
+    //     console.log("Removing user info....");
+    //     storage.remove({
+    //       key: "login-session",
+    //     });
+    //   }
+    //   // Redirecting to Camera Page
+    //   Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+    // } else {
+    //   setWrongInfo(true);
+    //   console.log(response.msg);
+    // }
   };
 
   const signUp = () => {

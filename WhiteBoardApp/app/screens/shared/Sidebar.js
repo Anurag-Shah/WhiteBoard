@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, AsyncStorage, SafeAreaView } from 'react-native';
+import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Sidebar extends React.Component {
 
