@@ -39,9 +39,10 @@ export default function CameraScreen({ navigation }) {
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [returnImg, setReturnImg] = useState(false);
+  const [isCamera, setIsCamera] = useState(false);
   const [userName, setUserName] = useState('Yierpan42');
   useEffect(() => {
-    getUserInfo();
+    getUserInfo();  
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -90,6 +91,7 @@ export default function CameraScreen({ navigation }) {
     });
 
     if (!result.cancelled) {
+      setIsCamera(false);
       setPhoto(result.uri);
       // Alert.alert('PickImage')
     }
@@ -214,6 +216,7 @@ export default function CameraScreen({ navigation }) {
               onPress={async () => {
                 if (cameraRef) {
                   let result = await cameraRef.takePictureAsync();
+                  setIsCamera(true);
                   setPhoto(result.uri);                  
                   // Alert.alert("","TakePicture");
                 }
