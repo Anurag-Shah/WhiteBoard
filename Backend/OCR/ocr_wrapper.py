@@ -46,27 +46,27 @@ def ocr_wrapper(image):
 	out_image = ""
 	if texttype == "typeform":
 		im = preprocess_typeform.preprocess_image(image)
-		out_image = ocr_postprocess_image.ocr_postprocess_image(image)
 		out = ""
 		for char in charseg_typeform.segment(im):
 			out += ocr_typeform.ocr_typeform(im)
 		code = ocr_postprocess_text.ocr_postprocess(out)
+		out_image = im
 	elif texttype == "handwritten":
 		im = preprocess_handwritten.preprocess_image(image)
-		out_image = ocr_postprocess_image.ocr_postprocess_image(image)
 		out = ""
 		for char in charseg_handwritten.segment(im):
 			out += ocr_handwritten.ocr_handwritten(im)
 		code = ocr_postprocess_text.ocr_postprocess(out)
+		out_image = im
 	elif texttype == "typeform_pretrained":
 		out = preprocess_typeform.preprocess_tesseract(image)
-		out_image, line_coords = ocr_postprocess_image.ocr_postprocess_image(image)
-		out = ocr_typeform.ocr_tesseract(out)
-		code = ocr_postprocess_text.tesseract_postprocess(out)
+		out_image = out
+		ocr_out_text = ocr_typeform.ocr_tesseract(out)
+		code = ocr_postprocess_text.tesseract_postprocess(ocr_out_text)
 	else:
 		raise OCRError
 	language = ocr_lang_detect.detect(code)
-	return (code, language, out_image, line_coords)
+	return (code, language, out_image, texttype)
 
 
 if __name__ == "__main__":
