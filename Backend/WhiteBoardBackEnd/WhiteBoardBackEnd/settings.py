@@ -35,11 +35,15 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
 AWS_ACCESS_KEY_ID = ''  # hidden
-AWS_SECRET_ACCESS_KEY = '' # hidden
+AWS_SECRET_ACCESS_KEY = ''  # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)
 
 # Application definition
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -150,17 +154,15 @@ MEDIA_URL = '/media/'  # 'http://myhost:port/media/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
-}
-
-
-
-REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False
 }
 
@@ -168,6 +170,7 @@ REST_FRAMEWORK = {
 #     "http://127.0.0.1:8888",
 #     "http://127.0.0.1:8000",
 # ]
-# CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_EXPOSE_HEADERS = ['Content-Type']

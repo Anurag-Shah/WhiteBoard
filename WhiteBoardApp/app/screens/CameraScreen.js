@@ -1,16 +1,15 @@
-import React  , { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet,Text, View, Image, Platform,TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, StyleSheet, Text, View, Image, Platform, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Topbar from './shared/Topbar';
-import Modal from 'react-native-modal';
+import { Modal } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 
 const Server_url = 'http://localhost:8000';
 
-function CameraConnect(props) 
-{
+function CameraConnect(props) {
   const [hasPermission, setHasPermission] = useState(null);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -20,7 +19,7 @@ function CameraConnect(props)
     (async () => {
       const { status } = await Camera.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-      const  galleryStatus  = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === 'granted')
     })();
   }, []);
@@ -29,7 +28,7 @@ function CameraConnect(props)
     return <View />;
   }
   if (hasPermission === false || hasGalleryPermission === false) {
-      return <Text>No access to camera</Text>;
+    return <Text>No access to camera</Text>;
   }
 
   const pickImage = async () => {
@@ -49,47 +48,47 @@ function CameraConnect(props)
   return (
     <View style={styles.cameraContainer}>
       <Camera style={styles.camera} type={type} ratio={'1:1'} ref={(ref) => {
-         setCameraRef(ref);
-       }}>        
+        setCameraRef(ref);
+      }}>
       </Camera>
-      <View style={[styles.bContainer, styles.bStatusBarMargin,{paddingBottom:24}]} >        
-          <Text style={{ width:50 }}></Text>          
-          <TouchableOpacity style = {{ alignSelf:'center' }} onPress = {async () => {
-               if (cameraRef) {
-                 let photo = await cameraRef.takePictureAsync(null);
-                 console.log(photo)
-                 props.setImage(photo);
-                 props.showModal(true);
-               }
-             }}>
-            <Ionicons name="radio-button-on" size={72} style={{ color: '#222' }} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => pickImage()}>
-            <Ionicons name="image-outline" size={40} style={{ color: 'black' }} />
-          </TouchableOpacity>
-        </View>
+      <View style={[styles.bContainer, styles.bStatusBarMargin, { paddingBottom: 24 }]} >
+        <Text style={{ width: 50 }}></Text>
+        <TouchableOpacity style={{ alignSelf: 'center' }} onPress={async () => {
+          if (cameraRef) {
+            let photo = await cameraRef.takePictureAsync(null);
+            console.log(photo)
+            props.setImage(photo);
+            props.showModal(true);
+          }
+        }}>
+          <Ionicons name="radio-button-on" size={72} style={{ color: '#222' }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => pickImage()}>
+          <Ionicons name="image-outline" size={40} style={{ color: 'black' }} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 export default class CameraScreen extends React.Component {
-  
-  constructor (props) {
-    super (props); 
+
+  constructor(props) {
+    super(props);
     this.state = {
       visibleModal: false,
       cameraRef: null,
       image: null
-    };  
-  }
-  
-  setImage = (img) => {
-    this.setState({image: img});
+    };
   }
 
-  showModal = ( isVisible ) => {
+  setImage = (img) => {
+    this.setState({ image: img });
+  }
+
+  showModal = (isVisible) => {
     this.setState({ visibleModal: isVisible });
-  } 
+  }
 
   takePicture = async () => {
 
@@ -112,7 +111,7 @@ export default class CameraScreen extends React.Component {
     return;
     try {
       //TODO: enabling loading mark
-      let ret = await fetch(Server_url+'/scan', {
+      let ret = await fetch(Server_url + '/scan', {
         method: 'POST',
         body: formData,
         headers: {
@@ -122,25 +121,25 @@ export default class CameraScreen extends React.Component {
       // analyse ret
       // result
       // TODO: if success, redirect, else error display and stay
-      
-      
+
+
     } catch (error) {
       console.log(error);
     }
     //Todo: disable loading mark
-    
+
   }
   _renderButton = () => (
     <View style={[styles.modalBottomContainer, styles.modalBottomStatusBarMargin]}>
       <TouchableOpacity onPress={this.takePicture}>
         <View style={styles.modalButton}>
-          <Text style = {{fontSize:24, fontWeight:"bold", color:'green'}}>Accept</Text>
+          <Text style={{ fontSize: 24, fontWeight: "bold", color: 'green' }}>Accept</Text>
         </View>
       </TouchableOpacity>
-      <Text style={{ width:30 }}></Text>
+      <Text style={{ width: 30 }}></Text>
       <TouchableOpacity onPress={() => this.setState({ visibleModal: false })}>
         <View style={styles.modalButton}>
-          <Text style={{fontSize:24, fontWeight:"bold",color:'red'}}>Retake</Text>
+          <Text style={{ fontSize: 24, fontWeight: "bold", color: 'red' }}>Retake</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -149,32 +148,32 @@ export default class CameraScreen extends React.Component {
   _renderModalContent = () => (
     <View style={styles.modalContent}>
       <View>
-        <Image 
+        <Image
           style={{ width: 200, height: 400 }}
           source={{ uri: this.state.image.uri }}
           resizeMode="center"
         />
       </View>
       {this._renderButton()}
-     
+
     </View>
   );
-  
-   
 
-  render() {  
+
+
+  render() {
 
     return (
-      <SafeAreaView style={ styles.cameraContainer }>
-        <Topbar title="Camera" navigation={this.props.navigation}/>
-        { this.state.visibleModal &&
-        <View style={styles.container}>
-          <Modal isVisible={this.state.visibleModal === true}>
-            {this._renderModalContent()}
-          </Modal>
-        </View> }
+      <SafeAreaView style={styles.cameraContainer}>
+        <Topbar title="Camera" navigation={this.props.navigation} />
+        {this.state.visibleModal &&
+          <View style={styles.container}>
+            <Modal isVisible={this.state.visibleModal === true}>
+              {this._renderModalContent()}
+            </Modal>
+          </View>}
         {!this.state.visibleModal &&
-          <CameraConnect showModal={this.showModal} setImage={this.setImage}/>
+          <CameraConnect showModal={this.showModal} setImage={this.setImage} />
         }
       </SafeAreaView>
     );
@@ -202,11 +201,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   bContainer: {
-    width:"100%",
+    width: "100%",
     height: (Platform.OS === 'ios') ? 60 : 80,
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     backgroundColor: 'white'
   },
@@ -236,7 +235,7 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: 'white',
-    
+
     justifyContent: 'center',
     alignItems: 'center',
 
@@ -253,11 +252,11 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   modalBottomContainer: {
-    width:"100%",
+    width: "100%",
     height: (Platform.OS === 'ios') ? 60 : 80,
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: 'white'
   },
   modalBottomStatusBarMargin: {

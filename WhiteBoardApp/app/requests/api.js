@@ -1,24 +1,42 @@
 import urls from "./urls";
 import storage from "../config/storage";
+import { get } from "react-native/Libraries/Utilities/PixelRatio";
 
-const getToken = () => {
-    storage
-        .load({
+
+export const getToken = async () => {
+    try {
+        let data = await storage.load({
             key: 'login-session',
             // autoSync (default: true) means if data is not found or has expired,
             // then invoke the corresponding sync method
             autoSync: true,
             syncInBackground: true,
-        })
-        .then(ret => {
-            // found data go to then()
-            return "Token " + ret.data.token;
-        })
-        .catch(err => {
-            // any exception including data not found
-            console.log("No token found");
-            return '';
         });
+        let token = "Token " + data.token;
+        return token;
+    } catch (error) {
+        console.log(error);
+        return '';
+    }
+    // storage
+    //     .load({
+    //         key: 'login-session',
+    //         // autoSync (default: true) means if data is not found or has expired,
+    //         // then invoke the corresponding sync method
+    //         autoSync: true,
+    //         syncInBackground: true,
+    //     })
+    //     .then(ret => {
+    //         // found data go to then()
+    //         token = "Token " + ret.token;
+    //         console.log(token);
+    //         return token;
+    //     })
+    //     .catch(err => {
+    //         // any exception including data not found
+    //         console.log(err);
+    //         return '';
+    //     });
 };
 
 export const loginApi = async (username, pwd) => {
@@ -45,8 +63,28 @@ export const loginApi = async (username, pwd) => {
     }
 };
 
+export const logoutApi = async () => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.logout, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 export const resetPwdApi = async (email) => {
-    //let token = getToken();
+    let token = await getToken();
     try {
         const response = await fetch(urls.resetPwd, {
             method: 'POST',
@@ -59,7 +97,7 @@ export const resetPwdApi = async (email) => {
                 email: email,
             })
         });
-        const json = await response.json();
+        let json = await response.json();
         return json;
     } catch (error) {
         console.error(error);

@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  SafeAreaView,
   Alert,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -8,13 +9,12 @@ import {
   View,
 } from "react-native";
 import { Header, Icon } from "react-native-elements";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function TextEditorPage() {
   const [code, onChangeCode] = React.useState(null);
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View>
           <Header
@@ -67,7 +67,7 @@ function TextEditorPage() {
           }
         />
       </View>
-    </SafeAreaProvider>
+    </SafeAreaView>
   );
 }
 

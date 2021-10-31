@@ -11,7 +11,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
 from django.http import JsonResponse
-from django.shortcuts import HttpResponse, redirect
+from django.shortcuts import HttpResponse, redirect, render
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -19,8 +19,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.decorators import APIView, permission_classes, authentication_classes
+from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from rest_framework.decorators import APIView, permission_classes, authentication_classes, api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -201,13 +201,14 @@ class ImageUpload(APIView):
 # all fields are valid
 @require_POST
 @permission_classes((AllowAny,))
+@api_view(['POST'])
 def sign_up(request):
     data = JSONParser().parse(request)
     name = data.get('username')
     password = data.get('password')
     email = data.get('email')
     UserModel = get_user_model()
-    new_user = UserModel.objects.create_user(username=name)
+    new_user = UserModel.objects.create_user(username=name, password=password)
     # If username or email already exists, django.db.IntegrityError will be raised when we try to save
     # But it does not indicate which field is duplicated, so we have to check manually
 
@@ -240,7 +241,7 @@ def sign_up(request):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function allows the user to log in by providing their username and password
-@require_POST
+@api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
 def login_view(request):
@@ -257,25 +258,23 @@ def login_view(request):
         return JsonResponse({"code": -1, "msg": 'Invalid credentials.'}, status=400)
 
     login(request, user)
-    token = ''
-    try:
-        token = Token.objects.get(user=user).key
-    except Token.DoesNotExist:
-        token = Token.objects.create(user=user).key
+    token, created = Token.objects.get_or_create(user=user)
 
-    return JsonResponse({"code": 0, "detail": 'Successfully logged in.', "token": token})
+    return JsonResponse({"code": 0, "detail": 'Successfully logged in.', "token": token.key, "uid": user.pk})
 
 
 # Function logout_view
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function logs the user out
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
 def logout_view(request):
     if not request.user.is_authenticated:
-        return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
-
+        return JsonResponse({'code': -1, 'detail': 'You\'re not logged in.'}, status=400)
     logout(request)
-    return JsonResponse({'detail': 'Successfully logged out.'})
+    return JsonResponse({'code': 0, 'detail': 'Successfully logged out.'})
 
 
 # Function pwd_reset
@@ -319,10 +318,10 @@ def pwd_reset(request):
 class PasswordResetConfirmView(FormView):
     template_name = "password/password_reset_confirm.html"
     form_class = SetPasswordForm
-    success_url = "password_reset/done/"
+    # success_url = "password_reset/done/"
 
     def form_valid(self, form):
-        f = super(PasswordResetConfirmView, self).form_valid( form)
+        f = super(PasswordResetConfirmView, self).form_valid(form)
         print(form.cleaned_data['new_password2'])
         uidb64 = self.kwargs['uidb64']
         token = self.kwargs['token']
@@ -336,5 +335,17 @@ class PasswordResetConfirmView(FormView):
         if user is not None and default_token_generator.check_token(user, token):
             new_password = form.cleaned_data['new_password2']
             user.set_password(new_password)
+            try:
+                t = Token.objects.get(user=user)
+                t.delete()
+            except Token.DoesNotExist:
+                pass
             user.save()
         return f
+
+    def get_success_url(self):
+        return '/password_reset/done/'
+
+
+def password_reset_done(request):
+    return render(request, 'password/password_reset_done.html')
