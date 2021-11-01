@@ -16,7 +16,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -26,10 +25,16 @@ SECRET_KEY = 'django-insecure-qk!d=*&ds!@-jw8%8fu7qpx1xcsy5-0qnkt394+$k+^ua2mlil
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
+#                  "127.0.0.1",
+#                  "66.253.158.235",
+#                  ]
+
 ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
-                 "127.0.0.1",
-                 "66.253.158.235",
-                 ]
+                 'ec2-18-218-227-246.us-east-2.compute.amazonaws.com',
+                 '18.218.227.246',
+                 'ec2-3-15-170-72.us-east-2.compute.amazonaws.com',
+                 'ec2-3-144-142-207.us-east-2.compute.amazonaws.com', ]
 
 # AWS SES settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
@@ -94,12 +99,23 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # Changed
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'project_db',
+#         'USER': 'root',
+#         'PASSWORD': 'janney006',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'project_db',
+        'NAME': 'django_data_base',
         'USER': 'root',
-        'PASSWORD': 'janney006',
+        'PASSWORD': '990603qwerty',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -150,6 +166,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'  # 'http://myhost:port/media/'
 
+
 # NEW Settings
 
 REST_FRAMEWORK = {
@@ -165,11 +182,6 @@ REST_FRAMEWORK = {
     ],
     'COERCE_DECIMAL_TO_STRING': False
 }
-
-# CORS_ALLOWED_ORIGINS = [
-#     "http://127.0.0.1:8888",
-#     "http://127.0.0.1:8000",
-# ]
 
 CORS_ORIGIN_ALLOW_ALL = True
 

@@ -11,6 +11,7 @@ class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
     uid = models.AutoField(primary_key=True)
+    avatar = models.ImageField()
 
     # PW = models.IntegerField(default=9999)  # No longer needed
 
