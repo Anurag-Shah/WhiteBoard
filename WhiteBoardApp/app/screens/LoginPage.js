@@ -41,21 +41,23 @@ function Prompt(props) {
       // }
 
       // Send Email to backend
-      const response = resetPwdApi(email);
-      if (response.code == 0) {
-        // Send successfully
-        setSuccess(true);
-        setFeedback("");
-        Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-          { text: 'OK' }]);
-        props.setVisible(false);
-      } else if (response.code == -1) {
-        // Email has not been registered
-        setSuccess(false);
-        setFeedback("No account found!");
-      } else if (response.code == -2) {
-        // Error sending pwd reset email
-      }
+      resetPwdApi(email).then((response) => {
+        console.log(response);
+        if (response.code == 0) {
+          // Send successfully
+          setSuccess(true);
+          setFeedback("");
+          Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
+            { text: 'OK' }]);
+          props.setVisible(false);
+        } else if (response.code == -1) {
+          // Email has not been registered
+          setSuccess(false);
+          setFeedback("No account found!");
+        } else if (response.code == -2) {
+          // Error sending pwd reset email
+        }
+      });
     }
   };
 
@@ -84,7 +86,7 @@ function LoginPage({ navigation }) {
   useEffect(() => {
     console.log("I am useEffect!");
     getUserInfo();
-  }, [rememberMe]);
+  }, []);
 
   const getUserInfo = () => {
     // Store user account info in local storage
@@ -99,9 +101,15 @@ function LoginPage({ navigation }) {
       .then(ret => {
         // found data go to then()
         console.log("Login Page found data!")
-        setUsername(ret.username);
-        setPwd(ret.password);
-        setRememberMe(true);
+        if (ret.rememberMe) {
+          setUsername(ret.username);
+          setPwd(ret.password);
+          setRememberMe(true);
+        } else {
+          setUsername('');
+          setPwd('');
+          setRememberMe(false);
+        }
       })
       .catch(err => {
         // any exception including data not found
@@ -126,26 +134,27 @@ function LoginPage({ navigation }) {
   const login = () => {
     console.log("Login Clicked");
     // login Api communicates with the backend
+    let user = { username: username, password: password, token: '', rememberMe: true, logged_in: false };
     loginApi(username, password).then((response) => {
       if (response.code == 0) {
         // If Login successfully
+        user.logged_in = true;
+        user.token = response.token;
+        user.uid = response.uid;
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
-          let user = { username: username, password: password, token: response.token };
+          user.rememberMe = false;
           console.log(user);
-          storage.save({
-            key: "login-session",
-            data: user,
-          });
         } else {
-          console.log("Removing user info....");
-          storage.remove({
-            key: "login-session",
-          });
+          user.rememberMe = false;
         }
+        storage.save({
+          key: "login-session",
+          data: user,
+        });
         // Redirecting to Camera Page
-        Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+        Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.push('Camera') }]);
       } else {
         setWrongInfo(true);
         console.log(response.msg);
