@@ -18,6 +18,7 @@
 
 import subprocess
 import os
+import re
 
 def compiler_wrapper(compiler_input, language):
 	line_numbers = []
