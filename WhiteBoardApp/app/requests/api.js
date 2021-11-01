@@ -18,29 +18,9 @@ export const getToken = async () => {
         console.log(error);
         return '';
     }
-    // storage
-    //     .load({
-    //         key: 'login-session',
-    //         // autoSync (default: true) means if data is not found or has expired,
-    //         // then invoke the corresponding sync method
-    //         autoSync: true,
-    //         syncInBackground: true,
-    //     })
-    //     .then(ret => {
-    //         // found data go to then()
-    //         token = "Token " + ret.token;
-    //         console.log(token);
-    //         return token;
-    //     })
-    //     .catch(err => {
-    //         // any exception including data not found
-    //         console.log(err);
-    //         return '';
-    //     });
 };
 
 export const loginApi = async (username, pwd) => {
-    let token = getToken();
     try {
         const response = await fetch(urls.login, {
             method: 'POST',
@@ -48,7 +28,7 @@ export const loginApi = async (username, pwd) => {
                 token: '',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': token,
+                // 'Authorization': token,
             },
             body: JSON.stringify({
                 username: username,
@@ -83,8 +63,8 @@ export const logoutApi = async () => {
     }
 };
 
+// No token needed to reset password since the user is not logged in
 export const resetPwdApi = async (email) => {
-    let token = await getToken();
     try {
         const response = await fetch(urls.resetPwd, {
             method: 'POST',
@@ -101,6 +81,94 @@ export const resetPwdApi = async (email) => {
         return json;
     } catch (error) {
         console.error(error);
+    }
+};
+
+export const updateAccountApi = async (user, email) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.updateAccount, {
+            method: 'POST',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                uid: user.uid,
+                username: username,
+                email: email,
+            })
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getAvatarApi = async (user, email) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.avatar, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const setAvatarApi = async (formData) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.avatar, {
+            method: 'POST',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data',
+                'Authorization': token,
+            },
+            redirect: 'follow',
+            body: formData
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+export const sendPictureApi = async (url, formData) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'content-type': 'multipart/form-data',
+                'Authorization': token,
+            },
+            redirect: 'follow'
+        });
+        return response;
+    } catch (error) {
+        console.log(error);
+        console.log('Connection Error!');
+        return undefined
     }
 };
 

@@ -34,7 +34,9 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  'ec2-18-218-227-246.us-east-2.compute.amazonaws.com',
                  '18.218.227.246',
                  'ec2-3-15-170-72.us-east-2.compute.amazonaws.com',
-                 'ec2-3-144-142-207.us-east-2.compute.amazonaws.com', ]
+                 'ec2-3-144-142-207.us-east-2.compute.amazonaws.com',
+                 '66.253.158.235',
+                 ]
 
 # AWS SES settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
@@ -99,27 +101,27 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # Changed
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'project_db',
-#         'USER': 'root',
-#         'PASSWORD': 'janney006',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_data_base',
+        'NAME': 'project_db',
         'USER': 'root',
-        'PASSWORD': '990603qwerty',
+        'PASSWORD': 'janney006',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'django_data_base',
+#         'USER': 'root',
+#         'PASSWORD': '990603qwerty',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
 
 
 # Password validation

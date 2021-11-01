@@ -15,20 +15,19 @@ from django.shortcuts import HttpResponse, redirect, render
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication
 from rest_framework.decorators import APIView, permission_classes, authentication_classes, api_view
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import *
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 import ocr
 from .models import User, Group, GroupImages
-from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
+from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
 from forms import SetPasswordForm
 
 
@@ -141,6 +140,9 @@ class SpecificGroup(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class ImageUpload(APIView):
+    # or comment these tow lines:
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
         print(aaa)
@@ -152,39 +154,13 @@ class ImageUpload(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # This is the function that got fired when a you send a HTTP Post request to
-    # upload an image to a group. Your HTTP should be like (JavaScript):
-
-    # var myHeaders = new Headers();
-    # myHeaders.append("image", "");
-
-    # var formdata = new FormData();
-    # formdata.append("Image", your_image, "[PROXY]");
-    # formdata.append("name", "First Hello World");
-
-    # var requestOptions = {
-    # method: 'POST',
-    # headers: myHeaders,
-    # body: formdata,
-    # redirect: 'follow'
-    # };
-
-    # fetch("http://ec2-3-144-80-126.us-east-2.compute.amazonaws.com:8080/Images/__Insert_Group_ID__", requestOptions)
-    # .then(response => response.text())
-    # .then(result => console.log(result))
-    # .catch(error => console.log('error', error));
-
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
-        zip_file = open("/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
-        # ocr_return should have the stack trace so far
-        ocr_return = ocr.ocr(path)
-        print("OCR is: " + ocr_return)
+        zip_file = open("C:/Users/OREO/Documents/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
@@ -192,6 +168,30 @@ class ImageUpload(APIView):
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
+
+
+# Function process image
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function receives image from the frontend and send it to ocr to process the image
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
+def process_image(request):
+    # The image will be converted to text and compile
+    return Response
+
+
+# Function process image
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function receives image from the frontend and send it to ocr to process the image
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
+def process_text(request):
+    # If texted code is received, then the imageId field is null
+    return Response
 
 
 # Function sign_up
@@ -207,6 +207,7 @@ def sign_up(request):
     name = data.get('username')
     password = data.get('password')
     email = data.get('email')
+    serializer = UserSerializer()
     UserModel = get_user_model()
     new_user = UserModel.objects.create_user(username=name, password=password)
     # If username or email already exists, django.db.IntegrityError will be raised when we try to save
@@ -230,10 +231,16 @@ def sign_up(request):
         # we are fine
         new_user.username = name
 
-    # token = Token.objects.create(user=new_user).key
-    my_user = User(name=name, email=email)
     new_user.save()
+
+    # Each user belong to a default group
+    my_user = User(name=name, email=email)
     my_user.save()
+    default_group = Group(Gname=name, GpDescription=name + "'s default group", isDefault=True)
+    default_group.teamMember.add(my_user)
+    # my_user.group_set.get(isDefault=True)
+    default_group.save()
+
     return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
 
 
@@ -260,7 +267,9 @@ def login_view(request):
     login(request, user)
     token, created = Token.objects.get_or_create(user=user)
 
-    return JsonResponse({"code": 0, "detail": 'Successfully logged in.', "token": token.key, "uid": user.pk})
+    user_info = User.objects.get(name=username)
+    serializer = UserSerializer(user_info)
+    return JsonResponse({"code": 0, "detail": 'Successfully logged in.', "token": token.key, "user": serializer.data})
 
 
 # Function logout_view
@@ -277,10 +286,75 @@ def logout_view(request):
     return JsonResponse({'code': 0, 'detail': 'Successfully logged out.'})
 
 
+# Fuction Update Account Info
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function receives update accout info
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
+def update_user(request):
+    data = JSONParser().parse(request)
+    uid = data.get('uid')
+    user = User.objects.get(pk=uid)
+    name = data.get('username')
+    email = data.get('email')
+
+    # check if the username is duplicated
+    try:
+        name_match = User.objects.get(name=name)
+        if name_match.pk == uid:
+            pass
+        else:
+            return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+    except User.DoesNotExist:
+        user.name = name
+        request.user.username = name
+
+    # check if the email is duplicated
+    try:
+        email_match = User.objects.get(email=email)
+        if email_match.pk == uid:
+            pass
+        else:
+            return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+    except User.DoesNotExist:
+        user.email = email
+        request.user.email = email
+
+    user.save()
+    request.user.save()
+    return JsonResponse({"code": 0, "msg": "Account info successfully updated!"})
+
+
+class Avatar(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_user(self, request):
+        return User.objects.get(pk=request.user.pk)
+
+    def post(self, request):
+        print(request.data)
+        user = self.get_user(request)
+        file = request.data['Image']
+        user.avatar = file
+        user.save()
+        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!"})
+
+    def get(self, request):
+        user = self.get_user(request)
+        avatar = {"image": user.avatar}
+        seriliazer = AvatarSerializer(avatar)
+        return JsonResponse({"code": 0, "avatar": seriliazer.data})
+
+
 # Function pwd_reset
 # Author: Jenna Zhang
 # Return value: JsonResponse
-# This function processes the password resetting requests from the front end
+# This function processes the password resetting requests from the front end, validate the given email
+# address and send an email to the user to reset their passwords
 @require_POST
 @permission_classes((AllowAny,))
 def pwd_reset(request):
@@ -315,9 +389,17 @@ def pwd_reset(request):
         return JsonResponse({"code": -1, "msg": "Email does not exist"})
 
 
+# Class password_reset_done
+# Author: Jenna Zhang
+# Return value: redirection to password reset done page
+# Inheritence: FormView
+# This class respond to HTTP request
+# for a specific user ID
+# This class processes the new passwords the user enters to the password resetting page, and update password
 class PasswordResetConfirmView(FormView):
     template_name = "password/password_reset_confirm.html"
     form_class = SetPasswordForm
+
     # success_url = "password_reset/done/"
 
     def form_valid(self, form):
@@ -347,5 +429,9 @@ class PasswordResetConfirmView(FormView):
         return '/password_reset/done/'
 
 
+# Function password_reset_done
+# Author: Jenna Zhang
+# Return value: html page
+# This func
 def password_reset_done(request):
     return render(request, 'password/password_reset_done.html')

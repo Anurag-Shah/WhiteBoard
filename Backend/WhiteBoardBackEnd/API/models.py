@@ -11,10 +11,7 @@ class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
     uid = models.AutoField(primary_key=True)
-    default_group_id = models.IntegerField()
-    avatar = models.ImageField()
-
-    # PW = models.IntegerField(default=9999)  # No longer needed
+    avatar = models.ImageField(upload_to='Avatars', default=None)
 
     class meta():
         db_table = 'User'
@@ -66,7 +63,7 @@ class GroupCode(models.Model):
     CodeID = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
     Code = models.FileField(upload_to='Code/', default=None)
-    ImageID = models.ForeignKey(GroupImages, to_fields="ImageID", on_delete=CASCADE, null=True)
+    ImageID = models.OneToOneField(GroupImages, on_delete=CASCADE, null=True, blank=True)
     GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
 
     class meta():

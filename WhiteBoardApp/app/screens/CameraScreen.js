@@ -23,6 +23,7 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 
 import storage from '../config/storage';
+import { sendPictureApi } from '../requests/api';
 // import { useDispatch } from 'react-redux';
 // import { addClipItem, removeClipItem } from './shared/actions';
 
@@ -41,6 +42,8 @@ export default function CameraScreen({ navigation }) {
   const [returnImg, setReturnImg] = useState(false);
   const [isCamera, setIsCamera] = useState(false);
   const [userName, setUserName] = useState('Yierpan42');
+  const [loginState, setLoginState] = useState(false);
+  const [user, setUser] = useState();
   useEffect(() => {
     getUserInfo();
     (async () => {
@@ -53,25 +56,31 @@ export default function CameraScreen({ navigation }) {
   }, []);
 
   const getUserInfo = () => {
-    // Store user account info in local storage
     storage
       .load({
         key: 'login-session',
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
-        autoSync: false,
+        autoSync: true,
         syncInBackground: true,
       })
       .then(ret => {
         // found data go to then()
-        console.log("Login Page found data!")
+        setUser(ret);
         setUserName(ret.username);
-
+        console.log(ret);
+        if (ret.logged_in) {
+          setLoginState(true);
+        } else {
+          setLoginState(false);
+        }
       })
       .catch(err => {
         // any exception including data not found
         // goes to catch()
-        navigation.push('LoginPage');
+        setUser(undefined);
+        setLoginState(false)
+        console.log("User info Not found");
       });
   };
 
@@ -168,13 +177,17 @@ export default function CameraScreen({ navigation }) {
     formData.append('Image', localUri);
     formData.append('name', userName);
     formData.append('Description', 'static');
+
+    // Anyone can send a picture to the server, so no need to include token
+
     try {
-      const response = await fetch(serverUrl + 'Images/' + groupId, {
+      const response = await fetch(serverUrl + 'Images/process', {
         method: 'POST',
         body: formData,
         headers: {
           'content-type': 'multipart/form-data',
         },
+
         redirect: 'follow'
       });
       const zipPhoto = await response.text();
