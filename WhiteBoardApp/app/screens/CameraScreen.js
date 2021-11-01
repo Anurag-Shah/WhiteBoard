@@ -45,14 +45,6 @@ export default function CameraScreen({ navigation }) {
   const [isCamera, setIsCamera] = useState(false);
   const [userName, setUserName] = useState('Yierpan42');
 
-/*
-    filePath: response,
-     fileData: response.data,
-     fileUri: response.uri
-
-
-*/
-
   useEffect(() => {
     //getUserInfo();  
     (async () => {
