@@ -6,10 +6,16 @@ import { AntDesign } from '@expo/vector-icons';
 
 export default class Sidebar extends React.Component {
 
-  constructor (props) {
-    super (props);
+  constructor(props) {
+    super(props);
     this.state = {
-      routes:[{
+      route_anonymous: [
+        {
+          name: "Log In",
+          screen: "Login"
+        }
+      ],
+      routes_logged_in: [{
         name: "Save",
         screen: "Save"
       }, {
@@ -22,7 +28,7 @@ export default class Sidebar extends React.Component {
         name: "Account",
         screen: "Account"
       }],
-      name: '',
+      user: null,
     }
     this.retrieveData = this.retrieveData.bind(this);
   }
@@ -33,60 +39,65 @@ export default class Sidebar extends React.Component {
 
   retrieveData = async () => {
     try {
-      AsyncStorage.getItem('full_name').then(res => {
-        if (res != null) {
-          this.setState({name: res});
-        } else {
-          this.setState({name: ''});
-        }
+      let data = await storage.load({
+        key: 'login-session',
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: true,
+        syncInBackground: true,
       });
+      let user = data;
+      if (user && user.logged_in) {
+        this.setState({
+          user: user,
+        });
+      }
     } catch (error) {
-      alert(error);
+      console.log(error);
+      return null;
     }
   };
 
   render() {
-    const  userId  = "Yierpan42";
+    const userId = "Yierpan42";
     const loggedIn = 'true';
-    
+
     function Item({ item, navigation }) {
       return (
-        <TouchableOpacity style={styles.listItem} onPress={()=> (loggedIn == 'true') ? navigation.navigate(item.screen, { userId: userId }) : {}}>
-          
-          <Text style={[styles.title , {color:'white', fontWeight:"bold", fontSize:18}]}>{item.name}</Text>
+        <TouchableOpacity style={styles.listItem} onPress={() => (loggedIn == 'true') ? navigation.navigate(item.screen, { userId: userId }) : {}}>
+
+          <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
         </TouchableOpacity>
       );
     }
 
     return (
-      <SafeAreaView style={[ styles.container, styles.statusBarMargin]}>
-        
-        {(this.state.name != null && this.state.name != '') &&
-        <Text style={{fontWeight:"bold", fontSize:16, marginTop:10, color:'white'}}>Welcome back, { this.state.name }</Text>
+      <SafeAreaView style={[styles.container, styles.statusBarMargin]}>
+
+        {(this.state.user != null && this.state.user.logged_in) &&
+          <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white' }}>Welcome back, {this.state.name}</Text>
         }
-        <FlatList 
-            data={this.state.routes}
-            renderItem={({ item }) => <Item item={item} navigation={this.props.navigation}/>}
-            keyExtractor={item => item.name}
-            style = {{ width:'100%',alignSelf:'flex-start' }}
-            />
-        
+        <FlatList
+          data={this.state.user != null && this.state.user.logged_in ? this.state.routes_logged_in : this.state.route_anonymous}
+          renderItem={({ item }) => <Item item={item} navigation={this.props.navigation} />}
+          keyExtractor={item => item.name}
+          style={{ width: '100%', alignSelf: 'flex-start' }}
+        />
+
         {
-          (loggedIn == 'true') && 
+          (this.state.user != null && this.state.user.logged_in) &&
           <TouchableOpacity style={styles.button} >
             <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
             <Text style={styles.buttonTitle}>Login</Text>
           </TouchableOpacity>
         }
         {
-          (loggedIn == 'false') && 
-        
-            
-            <TouchableOpacity style={styles.button} >
-              <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }}/>
-              <Text style={styles.buttonTitle}>Logout</Text>
-            </TouchableOpacity>
-          
+          (this.state.user == null || !this.state.user.logged_in) &&
+          <TouchableOpacity style={styles.button} >
+            <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
+            <Text style={styles.buttonTitle}>Logout</Text>
+          </TouchableOpacity>
+
         }
       </SafeAreaView>
     );
@@ -99,33 +110,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: '#a5b498',
-    color:'white'
-    
+    color: 'white'
+
   },
   statusBarMargin: {
     marginTop: (Platform.OS === 'ios') ? 0 : 24,
   },
-  profileImg:{
-    width:80,
-    height:80,
-    borderRadius:40,
-    marginTop:40
+  profileImg: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginTop: 40
   },
   icon: {
     width: 30,
     height: 30
   },
-  listItem:{
-    height:60,
-    alignItems:"center",
-    flexDirection:"row",
+  listItem: {
+    height: 60,
+    alignItems: "center",
+    flexDirection: "row",
   },
-  title:{
-    fontSize:16,
-    marginLeft:20,
+  title: {
+    fontSize: 16,
+    marginLeft: 20,
   },
   button: {
-    flexDirection:"row",
+    flexDirection: "row",
     alignSelf: 'stretch',
     borderRadius: 4,
     backgroundColor: '#e36f2c',
