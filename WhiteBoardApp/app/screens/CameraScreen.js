@@ -28,7 +28,8 @@ import storage from '../config/storage';
 
 const { height, width } = Dimensions.get('window');
 
-const serverUrl = 'http://ec2-3-15-170-72.us-east-2.compute.amazonaws.com:8080/';
+//const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
+const serverUrl = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
 
 const groupId = 0;
 
@@ -41,8 +42,17 @@ export default function CameraScreen({ navigation }) {
   const [returnImg, setReturnImg] = useState(false);
   const [isCamera, setIsCamera] = useState(false);
   const [userName, setUserName] = useState('Yierpan42');
+
+/*
+    filePath: response,
+     fileData: response.data,
+     fileUri: response.uri
+
+
+*/
+
   useEffect(() => {
-    getUserInfo();  
+    //getUserInfo();  
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -86,13 +96,17 @@ export default function CameraScreen({ navigation }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      noData: true,
       aspect: [3, 4],
       quality: 1,
     });
 
     if (!result.cancelled) {
-      setIsCamera(false);
-      setPhoto(result.uri);
+      setPhoto(result);
+      setIsCamera(false);  
+      console.log(result);
+      console.log(result.uri);
+      console.log(result.data);    
       // Alert.alert('PickImage')
     }
   };
@@ -138,7 +152,7 @@ export default function CameraScreen({ navigation }) {
     let dformat = `${d.getTime()}`;
     const downloadResumable = FileSystem.createDownloadResumable(
       url,
-      FileSystem.documentDirectory + dformat + '.jpg',
+      FileSystem.documentDirectory + dformat + '.png',
       {},
       callback
     );
@@ -154,32 +168,58 @@ export default function CameraScreen({ navigation }) {
 
   const sendPicture = async (picture) => {
     // dispatch(removeClipItem());
-    let localUri = picture;
-    let filename = localUri.split('/').pop();
+    // let localUri = picture;
+    let filename = picture.uri.split('/').pop();
 
-    // Infer the type of the image
+    // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
 
     // Upload the image using the fetch and FormData APIs
-    let formData = new FormData();
+    //let formData = new FormData();
     // "Image, name" is the name of the form field the server expects
-    // GpID ; inserted into url
-    formData.append('Image', localUri);
-    formData.append('name', userName);
-    formData.append('Description', 'static');
+    //formData.append('name', 'VeryDum');
+    //formData.append('Image', localUri);    
+    //formData.append('Description', 'static');
+    //.append('Image', {uri: localUri,name: filename, filename :filename ,type:type});
+    //formData.append('Content-Type', type);
+
+    const createFormData = (photo, body = {}) => {
+      const data = new FormData();
+    
+      data.append('Image', {
+        name: filename,
+        type: type,
+        uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+        data: photo.base64
+      });
+    
+      Object.keys(body).forEach((key) => {
+        data.append(key, body[key]);
+      });
+      console.log(data);
+      return data;
+    };
+    
     try {
       const response = await fetch(serverUrl + 'Images/' + groupId, {
         method: 'POST',
-        body: formData,
+        //body: JSON.stringify(formData),
+        // body:formData,//getFormData(formData),
+        // headers: {
+        //   //token: '',
+        //   'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
+        // },
+        body: createFormData(picture, { name: 'TestY', description: 'picture' }),
         headers: {
-          'content-type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
         },
         redirect:'follow'
       });
-      const zipPhoto = await response.text();
-      console.log(zipPhoto);
-      setReturnImg(zipPhoto);
+      console.log(response);
+      //const zipPhoto = await response.text();
+      //console.log(zipPhoto);
+      setReturnImg(response);
       Alert.alert('Success', 'The photo was successfully sent!');
     } catch (error) {
       console.log(error);
@@ -217,7 +257,7 @@ export default function CameraScreen({ navigation }) {
                 if (cameraRef) {
                   let result = await cameraRef.takePictureAsync();
                   setIsCamera(true);
-                  setPhoto(result.uri);                  
+                  setPhoto(result);                  
                   // Alert.alert("","TakePicture");
                 }
               }}>
@@ -261,7 +301,7 @@ export default function CameraScreen({ navigation }) {
       {!returnImg && photo && (
         <View style={{ flex: 1, alignItems: 'center', justifyContent:  'center'}}>
           <Image
-            source={{ uri: photo }}
+            source={{ uri: photo.uri }}
             style={{
               width: width,
               height: height - ((Platform.OS === 'ios') ? 45+60 : 60+80+20), //Topbar & footer, status height due to OS
@@ -301,7 +341,8 @@ export default function CameraScreen({ navigation }) {
               borderWidth: 2,
             }}>
             <Image
-              source={{ uri: returnImg }}
+              // source={{ uri: returnImg }}
+              source={{ uri: `${returnImg}` }}
               style={{ width: 200, height: 250, resizeMode: 'contain' }}
             />
             <View style={[styles.modalBottomContainer]}>
