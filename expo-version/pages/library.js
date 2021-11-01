@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { Icon } from "react-native-elements";
 
@@ -12,6 +12,7 @@ class library extends Component {
 
     this.state = {
       loading: false,
+      show: false,
       //data: [],
       data: [ {
         name: 'testing1',
@@ -128,7 +129,24 @@ class library extends Component {
               <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
               </ListItem.Content>
               <ListItem.Chevron 
-              onPress={() => Alert.alert('Do you want to remove this user?')} />
+              onPress={() => this.setState({show:true})} />
+              <Modal
+               transparent={true}
+               visible={this.state.show}
+               >
+                 <SafeAreaView style={{backgroundColor:"#CED0CE", flex:1}}>
+                    <Text>{item.name}</Text>
+                    <Image
+                    style={{width: 500,
+                        height: 500}}
+                    source={item.avatar_url}/>
+                    <Button
+                        title="close"
+                        onPress={() => this.setState({show:false})}
+                    />
+                 </SafeAreaView>
+
+              </Modal>
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
               //<ListItem //style={{ height: 50 }}
