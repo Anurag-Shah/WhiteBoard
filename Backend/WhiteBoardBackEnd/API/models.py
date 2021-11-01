@@ -11,6 +11,7 @@ class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
     uid = models.AutoField(primary_key=True)
+    default_group_id = models.IntegerField()
     avatar = models.ImageField()
 
     # PW = models.IntegerField(default=9999)  # No longer needed
@@ -34,8 +35,9 @@ class User(models.Model):
 
 class Group(models.Model):
     Gpname = models.CharField(max_length=25)
-    GpID = models.IntegerField(primary_key=True)
+    GpID = models.AutoField(primary_key=True)
     GpDescription = models.TextField()
+    isDefault = models.BooleanField(default=True)
     teamMember = models.ManyToManyField(User)
 
     class meta():
@@ -55,6 +57,21 @@ class GroupImages(models.Model):
     class meta():
         db_table = 'ImageID'
         ordering = ['ImageID']
+
+    def __str__(self):
+        return self.name
+
+
+class GroupCode(models.Model):
+    CodeID = models.CharField(max_length=100)
+    name = models.CharField(max_length=50)
+    Code = models.FileField(upload_to='Code/', default=None)
+    ImageID = models.ForeignKey(GroupImages, to_fields="ImageID", on_delete=CASCADE, null=True)
+    GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
+
+    class meta():
+        db_table = 'GroupCode'
+        ordering = ['CodeID']
 
     def __str__(self):
         return self.name
