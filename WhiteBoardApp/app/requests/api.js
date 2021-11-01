@@ -21,6 +21,7 @@ export const getToken = async () => {
 };
 
 export const loginApi = async (username, pwd) => {
+    let token = getToken();
     try {
         const response = await fetch(urls.login, {
             method: 'POST',
@@ -28,7 +29,11 @@ export const loginApi = async (username, pwd) => {
                 token: '',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+<<<<<<< HEAD
                 // 'Authorization': token,
+=======
+                'Authorization': token,
+>>>>>>> bb8501ab573384d707223a7b24203f2fee7bebaf
             },
             body: JSON.stringify({
                 username: username,
@@ -38,6 +43,29 @@ export const loginApi = async (username, pwd) => {
         console.log(response);
         let data = await response.json();
         return data;
+<<<<<<< HEAD
+=======
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const logoutApi = async () => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.logout, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+>>>>>>> bb8501ab573384d707223a7b24203f2fee7bebaf
     } catch (error) {
         console.error(error);
     }
@@ -65,6 +93,7 @@ export const logoutApi = async () => {
 
 // No token needed to reset password since the user is not logged in
 export const resetPwdApi = async (email) => {
+    let token = await getToken();
     try {
         const response = await fetch(urls.resetPwd, {
             method: 'POST',
@@ -84,6 +113,7 @@ export const resetPwdApi = async (email) => {
     }
 };
 
+<<<<<<< HEAD
 export const updateAccountApi = async (user, email) => {
     let token = await getToken();
     try {
@@ -172,6 +202,8 @@ export const sendPictureApi = async (url, formData) => {
     }
 };
 
+=======
+>>>>>>> bb8501ab573384d707223a7b24203f2fee7bebaf
 
 const isResponseOk = (response) => {
     if (response.status >= 200 && response.status <= 299) {
@@ -179,4 +211,8 @@ const isResponseOk = (response) => {
     } else {
         throw Error(response.statusText);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bb8501ab573384d707223a7b24203f2fee7bebaf
