@@ -38,8 +38,7 @@ class FlatListDemo extends Component {
 
   makeRemoteRequest = () => {
     //const url = `https://randomuser.me/api/?&results=20`;
-    //const url = 'http://ec2-18-217-232-152.us-east-2.compute.amazonaws.com:8000/Users/';
-    const url = 'http://ec2-3-144-80-126.us-east-2.compute.amazonaws.com:8000/Users/';
+    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
 
     this.setState({ loading: true });
 

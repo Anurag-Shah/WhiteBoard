@@ -14,14 +14,14 @@ class library extends Component {
       loading: false,
       //data: [],
       data: [ {
-        name: 'testing file 1',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: '8/11/2021',
+        name: 'testing1',
+        avatar_url: require("../image/code_snip.jpg"),
+        email: '8/11/2021',
       },
       {
-        name: 'testing file 2',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: '8/29/2021',
+        name: 'testing2',
+        avatar_url: require("../image/code_snip.jpg"),
+        email: '8/29/2021',
       }],
       error: null,
     };
@@ -31,13 +31,16 @@ class library extends Component {
 
   componentDidMount() {
     //this.getData();
+
     this.makeRemoteRequest();
   }
 
   makeRemoteRequest = () => {
     //const url = `https://randomuser.me/api/?&results=20`;
-    //const url = 'http://ec2-18-217-232-152.us-east-2.compute.amazonaws.com:8000/Users/';
-    const url = 'http://ec2-3-144-80-126.us-east-2.compute.amazonaws.com:8000/Users/';
+    /*server test*/
+    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
+    /*local test*/
+    const url = '';
 
     this.setState({ loading: true });
 
@@ -55,6 +58,7 @@ class library extends Component {
       })
       .catch(error => {
         this.setState({ error, loading: false });
+        this.arrayholder = this.state.data;
       });
   };
 
@@ -90,24 +94,14 @@ class library extends Component {
 
   renderHeader = () => {
     return (
-      /*<SearchBar
+      <SearchBar
         placeholder="Type Here..."
         lightTheme
         round
         onChangeText={text => this.searchFilterFunction(text)}
         autoCorrect={false}
         value={this.state.value}
-      />*/
-      <View style={{alignItems: 'flex-end'}}>
-
-      <Icon
-          name="adduser"
-          type="ant-design"
-          color="#149052"
-          size="35"
-          onPress={() => Alert.alert('adduser Button pressed')} 
-        />
-      </View>
+      />
       
     );
   };
@@ -125,12 +119,13 @@ class library extends Component {
       <SafeAreaView style={{flex: 1}}>
         <FlatList
           data={this.state.data}
-          keyExtractor={item => item.email.toString()}
+          keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider>
+              <Avatar source={item.avatar_url} />
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>
-              <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+              <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
               </ListItem.Content>
               <ListItem.Chevron 
               onPress={() => Alert.alert('Do you want to remove this user?')} />
