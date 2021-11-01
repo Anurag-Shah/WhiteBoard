@@ -1,6 +1,6 @@
 
 #############################################################################
-# ocr_postprocess.py
+# ocr_postprocess_test.py
 #
 # Authors: Anurag
 #
