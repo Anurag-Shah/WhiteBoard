@@ -140,7 +140,8 @@ function LoginPage({ navigation }) {
         // If Login successfully
         user.logged_in = true;
         user.token = response.token;
-        user.uid = response.uid;
+        user.uid = response.user.uid;
+        user.groupId = response.user.uid;
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");

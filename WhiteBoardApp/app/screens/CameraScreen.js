@@ -23,13 +23,21 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 
 import storage from '../config/storage';
+<<<<<<< HEAD
+import { sendPictureApi } from '../requests/api';
+=======
+>>>>>>> main
 // import { useDispatch } from 'react-redux';
 // import { addClipItem, removeClipItem } from './shared/actions';
 
 const { height, width } = Dimensions.get('window');
 
+<<<<<<< HEAD
+const serverUrl = 'http://ec2-3-15-170-72.us-east-2.compute.amazonaws.com:8080/';
+=======
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
 const serverUrl = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
+>>>>>>> main
 
 const groupId = 0;
 
@@ -42,6 +50,12 @@ export default function CameraScreen({ navigation }) {
   const [returnImg, setReturnImg] = useState(false);
   const [isCamera, setIsCamera] = useState(false);
   const [userName, setUserName] = useState('Yierpan42');
+<<<<<<< HEAD
+  const [loginState, setLoginState] = useState(false);
+  const [user, setUser] = useState();
+  useEffect(() => {
+    getUserInfo();
+=======
 
 /*
     filePath: response,
@@ -53,6 +67,7 @@ export default function CameraScreen({ navigation }) {
 
   useEffect(() => {
     //getUserInfo();  
+>>>>>>> main
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -63,25 +78,49 @@ export default function CameraScreen({ navigation }) {
   }, []);
 
   const getUserInfo = () => {
+<<<<<<< HEAD
+=======
     // Store user account info in local storage
+>>>>>>> main
     storage
       .load({
         key: 'login-session',
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
+<<<<<<< HEAD
+        autoSync: true,
+=======
         autoSync: false,
+>>>>>>> main
         syncInBackground: true,
       })
       .then(ret => {
         // found data go to then()
+<<<<<<< HEAD
+        setUser(ret);
+        setUserName(ret.username);
+        console.log(ret);
+        if (ret.logged_in) {
+          setLoginState(true);
+        } else {
+          setLoginState(false);
+        }
+=======
         console.log("Login Page found data!")
         setUserName(ret.username);
 
+>>>>>>> main
       })
       .catch(err => {
         // any exception including data not found
         // goes to catch()
+<<<<<<< HEAD
+        setUser(undefined);
+        setLoginState(false)
+        console.log("User info Not found");
+=======
         navigation.push('LoginPage');
+>>>>>>> main
       });
   };
 
@@ -96,22 +135,53 @@ export default function CameraScreen({ navigation }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+<<<<<<< HEAD
+=======
       noData: true,
+>>>>>>> main
       aspect: [3, 4],
       quality: 1,
     });
 
     if (!result.cancelled) {
+<<<<<<< HEAD
+      setIsCamera(false);
+      setPhoto(result.uri);
+=======
       setPhoto(result);
       setIsCamera(false);  
       console.log(result);
       console.log(result.uri);
       console.log(result.data);    
+>>>>>>> main
       // Alert.alert('PickImage')
     }
   };
 
   const getPermissionAndroid = async () => {
+<<<<<<< HEAD
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      }
+      Alert.alert(
+        'Save remote Image',
+        'Grant Me Permission to save Image',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+        { cancelable: false },
+      );
+    } catch (err) {
+      Alert.alert(
+        'Save remote Image',
+        'Failed to save Image: ' + err.message,
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+        { cancelable: false },
+      );
+    }
+=======
       try {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -133,6 +203,7 @@ export default function CameraScreen({ navigation }) {
           {cancelable: false},
         );
       }
+>>>>>>> main
   };
 
   const saveToPhone = async (url) => {
@@ -152,7 +223,11 @@ export default function CameraScreen({ navigation }) {
     let dformat = `${d.getTime()}`;
     const downloadResumable = FileSystem.createDownloadResumable(
       url,
+<<<<<<< HEAD
+      FileSystem.documentDirectory + dformat + '.jpg',
+=======
       FileSystem.documentDirectory + dformat + '.png',
+>>>>>>> main
       {},
       callback
     );
@@ -163,19 +238,41 @@ export default function CameraScreen({ navigation }) {
     } catch (e) {
       Alert.alert('Error', 'Could not save the image')
     }
+<<<<<<< HEAD
+
+=======
     
+>>>>>>> main
   };
 
   const sendPicture = async (picture) => {
     // dispatch(removeClipItem());
+<<<<<<< HEAD
+    let localUri = picture;
+    let filename = localUri.split('/').pop();
+=======
     // let localUri = picture;
     let filename = picture.uri.split('/').pop();
+>>>>>>> main
 
     // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
 
     // Upload the image using the fetch and FormData APIs
+<<<<<<< HEAD
+    let formData = new FormData();
+    // "Image, name" is the name of the form field the server expects
+    // GpID ; inserted into url
+    formData.append('Image', localUri);
+    formData.append('name', userName);
+    formData.append('Description', 'static');
+
+    // Anyone can send a picture to the server, so no need to include token
+
+    try {
+      const response = await fetch(serverUrl + 'Images/process', {
+=======
     //let formData = new FormData();
     // "Image, name" is the name of the form field the server expects
     //formData.append('name', 'VeryDum');
@@ -203,6 +300,7 @@ export default function CameraScreen({ navigation }) {
     
     try {
       const response = await fetch(serverUrl + 'Images/' + groupId, {
+>>>>>>> main
         method: 'POST',
         //body: JSON.stringify(formData),
         // body:formData,//getFormData(formData),
@@ -214,12 +312,21 @@ export default function CameraScreen({ navigation }) {
         headers: {
           'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
         },
+<<<<<<< HEAD
+
+        redirect: 'follow'
+      });
+      const zipPhoto = await response.text();
+      console.log(zipPhoto);
+      setReturnImg(zipPhoto);
+=======
         redirect:'follow'
       });
       console.log(response);
       //const zipPhoto = await response.text();
       //console.log(zipPhoto);
       setReturnImg(response);
+>>>>>>> main
       Alert.alert('Success', 'The photo was successfully sent!');
     } catch (error) {
       console.log(error);
@@ -229,7 +336,11 @@ export default function CameraScreen({ navigation }) {
     }
   };
   return (
+<<<<<<< HEAD
+    <SafeAreaView style={{ flex: 1, paddingTop: (Platform.OS === 'ios') ? 0 : 20 }}>
+=======
     <SafeAreaView style={{ flex: 1, paddingTop: (Platform.OS === 'ios')? 0 : 20 }}>
+>>>>>>> main
       <Topbar title="Camera" navigation={navigation} />
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
@@ -247,7 +358,11 @@ export default function CameraScreen({ navigation }) {
               paddingHorizontal: 15,
               padding: 15,
             }}>
+<<<<<<< HEAD
+            <Text style={{ alignSelf: 'flex-end', width: 30 }}>{''}</Text>
+=======
             <Text style={{ alignSelf: 'flex-end', width:30 }}>{''}</Text>
+>>>>>>> main
             <TouchableOpacity
               style={{
                 alignSelf: 'flex-end',
@@ -257,7 +372,11 @@ export default function CameraScreen({ navigation }) {
                 if (cameraRef) {
                   let result = await cameraRef.takePictureAsync();
                   setIsCamera(true);
+<<<<<<< HEAD
+                  setPhoto(result.uri);
+=======
                   setPhoto(result);                  
+>>>>>>> main
                   // Alert.alert("","TakePicture");
                 }
               }}>
@@ -288,7 +407,11 @@ export default function CameraScreen({ navigation }) {
                 name="image-outline"
                 size={40}
                 onPress={() => pickImage()}
+<<<<<<< HEAD
+                style={{
+=======
                 style={{ 
+>>>>>>> main
                   alignSelf: 'flex-end',
                   alignItems: 'center',
                   color: 'black'
@@ -299,12 +422,21 @@ export default function CameraScreen({ navigation }) {
         </View>
       )}
       {!returnImg && photo && (
+<<<<<<< HEAD
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Image
+            source={{ uri: photo }}
+            style={{
+              width: width,
+              height: height - ((Platform.OS === 'ios') ? 45 + 60 : 60 + 80 + 20), //Topbar & footer, status height due to OS
+=======
         <View style={{ flex: 1, alignItems: 'center', justifyContent:  'center'}}>
           <Image
             source={{ uri: photo.uri }}
             style={{
               width: width,
               height: height - ((Platform.OS === 'ios') ? 45+60 : 60+80+20), //Topbar & footer, status height due to OS
+>>>>>>> main
               resizeMode: isCamera ? 'cover' : 'contain',
             }}
           />
@@ -313,7 +445,11 @@ export default function CameraScreen({ navigation }) {
               {/* onPress={sendPicture} */}
               <View style={styles.modalButton}>
                 <Text
+<<<<<<< HEAD
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems: 'center' }}>
+=======
                   style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
+>>>>>>> main
                   Accept
                 </Text>
               </View>
@@ -321,7 +457,11 @@ export default function CameraScreen({ navigation }) {
             <TouchableOpacity onPress={() => setPhoto(null)}>
               <View style={styles.modalButton}>
                 <Text
+<<<<<<< HEAD
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems: 'center' }}>
+=======
                   style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
+>>>>>>> main
                   Retake
                 </Text>
               </View>
@@ -334,15 +474,23 @@ export default function CameraScreen({ navigation }) {
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <View
             style={{
+<<<<<<< HEAD
+              width: '80%',
+=======
               width:'80%',
+>>>>>>> main
               alignItems: 'center',
               justifyContent: 'center',
               borderColor: 'red',
               borderWidth: 2,
             }}>
             <Image
+<<<<<<< HEAD
+              source={{ uri: returnImg }}
+=======
               // source={{ uri: returnImg }}
               source={{ uri: `${returnImg}` }}
+>>>>>>> main
               style={{ width: 200, height: 250, resizeMode: 'contain' }}
             />
             <View style={[styles.modalBottomContainer]}>
@@ -376,7 +524,11 @@ export default function CameraScreen({ navigation }) {
           </View>
         </View>
       )}
+<<<<<<< HEAD
+
+=======
     
+>>>>>>> main
     </SafeAreaView>
   );
 }
@@ -391,4 +543,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingHorizontal: 20,
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> main
