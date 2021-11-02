@@ -101,27 +101,27 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # Changed
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'project_db',
-        'USER': 'root',
-        'PASSWORD': 'janney006',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'django_data_base',
+#         'NAME': 'project_db',
 #         'USER': 'root',
-#         'PASSWORD': '990603qwerty',
+#         'PASSWORD': 'janney006',
 #         'HOST': 'localhost',
 #         'PORT': '3306',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'django_data_base',
+        'USER': 'root',
+        'PASSWORD': '990603qwerty',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
 
 
 # Password validation
