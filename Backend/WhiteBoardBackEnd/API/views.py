@@ -160,15 +160,11 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-<<<<<<< HEAD
-        zip_file = open("C:/Users/OREO/Documents/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
-=======
         path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print("OCR is: " + ocr_return)
->>>>>>> main
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
