@@ -4,7 +4,11 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+<<<<<<< HEAD
 import { createStackNavigator } from '@react-navigation/stack';
+=======
+import { createStackNavigator  } from '@react-navigation/stack';
+>>>>>>> main
 
 
 import userReducer from './shared/reducer/UserReducer';
