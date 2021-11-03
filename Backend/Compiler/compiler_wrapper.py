@@ -33,7 +33,6 @@ def compiler_wrapper(compiler_input, language):
 		except docker.errors.ContainerError as e:
 			error_r = True
 			out_text = str(e.stderr.decode())
-			print(out_text)
 		if not error_r:
 			out_text = str(container.decode())
 		out_text = out_text.replace("./compile_c.sh: 2: ./a.out: not found\n", "")
