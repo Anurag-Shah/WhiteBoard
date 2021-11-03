@@ -284,9 +284,13 @@ def login_view(request):
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
 def logout_view(request):
+    # user = request.user
+    # UserModel = get_user_model()
+    # user = UserModel.objects.get(pk=user.pk)
     if not request.user.is_authenticated:
         return JsonResponse({'code': -1, 'detail': 'You\'re not logged in.'}, status=400)
     logout(request)
+    Token.objects.get(user=user).delete()
     return JsonResponse({'code': 0, 'detail': 'Successfully logged out.'})
 
 
