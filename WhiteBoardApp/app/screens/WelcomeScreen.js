@@ -4,11 +4,7 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-<<<<<<< HEAD
-import { createStackNavigator } from '@react-navigation/stack';
-=======
 import { createStackNavigator  } from '@react-navigation/stack';
->>>>>>> main
 
 
 import userReducer from './shared/reducer/UserReducer';
@@ -19,6 +15,7 @@ import Library from './LibraryScreen';
 import Team from './TeamScreen';
 import Account from './AccountScreen';
 import LoginPage from './LoginPage';
+import TextEditorPage from './TextEditorPage';
 
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
@@ -42,7 +39,8 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
-      <Stack.Screen name="LoginPage" component={LoginPage}></Stack.Screen>
+      <Stack.Screen name="Login" component={LoginPage}></Stack.Screen>
+      <Stack.Screen name="TextEditorPage" component={TextEditorPage} options={{ title: 'WhiteBoard', headerShown: false }}></Stack.Screen>
     </Stack.Navigator>
   );
 }

@@ -12,9 +12,17 @@ export default class Topbar extends React.Component {
         </TouchableOpacity>
         
         <Text style={ styles.title }>{ this.props.title }</Text>
-        <TouchableOpacity>
-          <Ionicons name="document-text-outline" size={32} style={{ color: 'black' }} />
+        {this.props.title === 'Camera' ? (
+        <TouchableOpacity onPress={()=>this.props.navigation.push('TextEditorPage') }>
+          <Ionicons name="clipboard-outline" size={32} style={{ color: 'black' }} />
+        </TouchableOpacity> 
+        ) : (
+        <TouchableOpacity onPress={()=>this.props.navigation.push('Camera') }>
+          <Ionicons name="camera-outline" size={32} style={{ color: 'black' }} />
         </TouchableOpacity>
+        )
+
+        }
       </View>
     );
   }

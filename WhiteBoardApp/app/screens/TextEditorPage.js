@@ -6,16 +6,20 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TextInput,
+  Platform,
   View,
 } from "react-native";
 import { Header, Icon } from "react-native-elements";
 
-function TextEditorPage() {
+import Topbar from './shared/Topbar';
+
+function TextEditorPage({navigation}) {
   const [code, onChangeCode] = React.useState(null);
 
   return (
-    <SafeAreaView>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <SafeAreaView style={{ flex: 1, paddingTop: (Platform.OS === 'ios')? 0 : 20 }}>
+      <Topbar title="Text Editor" navigation={navigation} />
+      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View>
           <Header
             barStyle="dark-content"
@@ -38,7 +42,7 @@ function TextEditorPage() {
             }
           />
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback> */}
 
       <TextInput
         style={styles.input}
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    flex: 11,
+    flex: 1,
     fontSize: 16,
     padding: 10,
   },
