@@ -1,6 +1,5 @@
 import urls from "./urls";
 import storage from "../config/storage";
-import { get } from "react-native/Libraries/Utilities/PixelRatio";
 
 
 export const getToken = async () => {
@@ -21,7 +20,6 @@ export const getToken = async () => {
 };
 
 export const loginApi = async (username, pwd) => {
-    let token = getToken();
     try {
         const response = await fetch(urls.login, {
             method: 'POST',
@@ -29,11 +27,7 @@ export const loginApi = async (username, pwd) => {
                 token: '',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-<<<<<<< HEAD
                 // 'Authorization': token,
-=======
-                'Authorization': token,
->>>>>>> main
             },
             body: JSON.stringify({
                 username: username,
@@ -70,14 +64,12 @@ export const logoutApi = async () => {
 
 // No token needed to reset password since the user is not logged in
 export const resetPwdApi = async (email) => {
-    let token = await getToken();
     try {
         const response = await fetch(urls.resetPwd, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json/',
-                // 'Authorization': token,
             },
             body: JSON.stringify({
                 email: email,
@@ -90,7 +82,6 @@ export const resetPwdApi = async (email) => {
     }
 };
 
-<<<<<<< HEAD
 export const updateAccountApi = async (user, email) => {
     let token = await getToken();
     try {
@@ -179,8 +170,6 @@ export const sendPictureApi = async (url, formData) => {
     }
 };
 
-=======
->>>>>>> main
 
 const isResponseOk = (response) => {
     if (response.status >= 200 && response.status <= 299) {
@@ -188,8 +177,4 @@ const isResponseOk = (response) => {
     } else {
         throw Error(response.statusText);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main

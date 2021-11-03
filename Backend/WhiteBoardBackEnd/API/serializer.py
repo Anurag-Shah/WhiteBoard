@@ -11,6 +11,10 @@ class UserSerializer(serializers.ModelSerializer):
 class AvatarSerializer(serializers.Serializer):
         image = serializers.ImageField(use_url='Avatars')
 
+
+class ImageSerializer(serializers.Serializer):
+    image = serializers.ImageField(use_url='images')
+
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group

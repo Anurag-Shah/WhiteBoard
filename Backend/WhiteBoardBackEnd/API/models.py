@@ -21,6 +21,7 @@ class User(models.Model):
         return self.name
 
 
+
 # Modify default User Model in Django Authentication System
 # This model is for user authentication
 # class UserAuth(AbstractUser):

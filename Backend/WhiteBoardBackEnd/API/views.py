@@ -160,15 +160,11 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-<<<<<<< HEAD
-        zip_file = open("C:/Users/OREO/Documents/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path), 'rb')
-=======
         path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print("OCR is: " + ocr_return)
->>>>>>> main
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
@@ -201,6 +197,16 @@ def process_text(request):
     # If texted code is received, then the imageId field is null
     return Response
 
+# Function
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function receives image from the frontend and send it to ocr to process the image
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
+def process_text(request):
+    # If texted code is received, then the imageId field is null
+    return Response
 
 # Function sign_up
 # Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
@@ -215,7 +221,6 @@ def sign_up(request):
     name = data.get('username')
     password = data.get('password')
     email = data.get('email')
-    serializer = UserSerializer()
     UserModel = get_user_model()
     new_user = UserModel.objects.create_user(username=name, password=password)
     # If username or email already exists, django.db.IntegrityError will be raised when we try to save
@@ -244,6 +249,7 @@ def sign_up(request):
     # Each user belong to a default group
     my_user = User(name=name, email=email)
     my_user.save()
+    # my_user.group_set.get(isDefault=True)
     default_group = Group(Gname=name, GpDescription=name + "'s default group", isDefault=True)
     default_group.teamMember.add(my_user)
     # my_user.group_set.get(isDefault=True)
