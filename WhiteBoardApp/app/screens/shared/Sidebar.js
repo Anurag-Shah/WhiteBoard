@@ -20,20 +20,20 @@ export default class Sidebar extends React.Component {
         }
       ],
       routes_logged_in: [
-      //   {
-      //   name: "Save",
-      //   screen: "Save"
-      // },
-      {
-        name: "Library",
-        screen: "Library"
-      }, {
-        name: "Team",
-        screen: "Team"
-      }, {
-        name: "Account",
-        screen: "Account"
-      }],
+        //   {
+        //   name: "Save",
+        //   screen: "Save"
+        // },
+        {
+          name: "Library",
+          screen: "Library"
+        }, {
+          name: "Team",
+          screen: "Team"
+        }, {
+          name: "Account",
+          screen: "Account"
+        }],
       user: null,
     }
     this.retrieveData = this.retrieveData.bind(this);
@@ -43,8 +43,29 @@ export default class Sidebar extends React.Component {
     this.retrieveData();
   }
   logout = () => {
-    logoutApi();
-    this.props.navigation.navigate('Camera');
+    let new_user = user;
+    if (loginState) {
+      logoutApi().then((response) => {
+        if (response.code == 0) {
+          // Logout successfully
+          setLoginState(false);
+          new_user.logged_in = false;
+          setUser(new_user);
+          storage.save({
+            key: "login-session",
+            data: user,
+          });
+          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => this.props.navigation.navigate('Camera') }]);
+        } else if (response.code == -1) {
+          Alert.alert("Already Logged out!");
+        } else {
+          console.log(response.status);
+        }
+
+      });
+    } else {
+      Alert.alert("Already Logged out!");
+    }
   }
   retrieveData = async () => {
     try {
@@ -70,6 +91,7 @@ export default class Sidebar extends React.Component {
       return null;
     }
   };
+
 
   render() {
     const userId = "Yierpan42";
@@ -99,14 +121,14 @@ export default class Sidebar extends React.Component {
 
         {
           (this.state.user != null && this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} onPress={()=>this.logout()} >
+          <TouchableOpacity style={styles.button} onPress={() => this.logout()} >
             <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
             <Text style={styles.buttonTitle}>Logout</Text>
           </TouchableOpacity>
         }
         {
           (this.state.user == null || !this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} onPress={()=>this.props.navigation.navigate('Login')}>
+          <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Login')}>
             <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
             <Text style={styles.buttonTitle}>Login</Text>
           </TouchableOpacity>

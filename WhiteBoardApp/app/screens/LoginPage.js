@@ -37,9 +37,7 @@ function Prompt(props) {
           // Send successfully
           setSuccess(true);
           setFeedback("");
-          Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-            { text: 'OK' }]);
-          props.setVisible(false);
+          Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [{ text: 'OK', onPress: () => props.setVisible(false) }]);
         } else if (response.code == -1) {
           // Email has not been registered
           setSuccess(false);
