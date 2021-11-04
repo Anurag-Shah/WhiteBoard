@@ -10,7 +10,7 @@ from django.contrib.auth.models import AbstractUser
 class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
-    uid = models.AutoField(primary_key=True)
+    uid = models.IntegerField(primary_key=True)
     avatar = models.ImageField(upload_to='Avatars', default=None)
 
     class meta():
@@ -36,7 +36,7 @@ class Group(models.Model):
     GpID = models.AutoField(primary_key=True)
     GpDescription = models.TextField()
     isDefault = models.BooleanField(default=True)
-    leader_uid = models.IntegerField(unique=False, null=False)
+    leader_uid = models.IntegerField(unique=False, null=False, default=0)
     teamMember = models.ManyToManyField(User)
 
     class meta():

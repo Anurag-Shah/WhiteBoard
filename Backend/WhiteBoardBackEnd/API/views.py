@@ -10,6 +10,7 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
+from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, render
 from django.template.loader import render_to_string
@@ -137,8 +138,6 @@ class SpecificGroup(APIView):
 # for a group's image
 
 # Need to uncomment the following two lines to enable token based authentication
-# @permission_classes([IsAuthenticated])
-# @authentication_classes([TokenAuthentication])
 class ImageUpload(APIView):
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
@@ -215,9 +214,10 @@ def process_text(request):
 # Return value: JsonResponse
 # This function receives sign up request from the client and create a new user if
 # all fields are valid
-@require_POST
+@api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
-@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@transaction.atomic()
 def sign_up(request):
     data = JSONParser().parse(request)
     name = data.get('username')
@@ -249,10 +249,9 @@ def sign_up(request):
     new_user.save()
 
     # Each user belong to a default group
-    my_user = User(name=name, email=email)
+    my_user = User(name=name, email=email, pk=new_user.pk)
     my_user.save()
-    # my_user.group_set.get(isDefault=True)
-    default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True)
+    default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True, leader_uid=new_user.pk)
     # need to save the defalut_group to generate an id before linking it to a user
     default_group.save()
     default_group.teamMember.add(my_user)
@@ -269,6 +268,7 @@ def sign_up(request):
 @api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
+@transaction.atomic()
 def login_view(request):
     data = JSONParser().parse(request)
     username = data.get('username')
@@ -310,6 +310,7 @@ def logout_view(request):
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
+@transaction.atomic()
 def update_user(request):
     data = JSONParser().parse(request)
     uid = data.get('uid')
@@ -382,6 +383,7 @@ class UserGroups(APIView):
 
     def get(self, request):
         user = User.objects.get(pk=request.user.pk)
+        print(user)
         groups = user.group_set.all()
         default_group = self.get_default_group(request)
         serializer = GroupSerializer(groups, many=True)
@@ -398,7 +400,6 @@ class UserGroups(APIView):
 class GroupOperations(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
@@ -406,7 +407,8 @@ class GroupOperations(APIView):
     def get_group(self, id):
         return Group.objects.get(pk=id)
 
-    def create(self, request):
+    @transaction.atomic()
+    def post(self, request):
         user = self.get_user(request)
         data = JSONParser().parse(request)
         new_group = Group(Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
@@ -419,17 +421,30 @@ class GroupOperations(APIView):
         data = JSONParser().parse(request)
         GpID = data['groupId']
         group = self.get_group(GpID)
+        # check if the user is the group leader
+        if not group.leader_uid == request.user.pk:
+            return JsonResponse({"code": 0, "msg": "only group leader can delete this group"},
+                                status=status.HTTP_400_BAD_REQUEST)
         if group.isDefault:
             return JsonResponse({"code": -1, "msg": "Cannot delete a default group"},
                                 status=status.HTTP_400_BAD_REQUEST)
         group.delete()
         return JsonResponse({"code": 0, "msg": "Group successfully deleted"}, status=status.HTTP_200_OK)
 
-    def add_member(self, request):
+
+class GroupMemberOperations(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_user(self, request):
+        return User.objects.get(pk=request.user.pk)
+
+    @transaction.atomic()
+    def post(self, request):
         data = JSONParser().parse(request)
         email = data['email']
         GpID = data['groupId']
-        group = self.get_group(GpID)
+        group = Group.objects.get(pk=GpID)
         # check if the given email/uid exits
         try:
             user = User.objects.get(email=email)
@@ -440,14 +455,17 @@ class GroupOperations(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 group.teamMember.add(user)
+                return JsonResponse({"cide": 0, "msg": "User successfully addded to the team"},
+                                    status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return JsonResponse({"code": -1, "msg": "User does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def remove_member(self, request):
+    @transaction.atomic()
+    def delete(self, request):
         data = JSONParser().parse(request)
         email = data['email']
         GpID = data['groupId']
-        group = self.get_group(GpID)
+        group = Group.objects.get(pk=GpID)
         # check if the given email/uid exits
         try:
             User.objects.get(email=email)
@@ -461,14 +479,14 @@ class GroupOperations(APIView):
                 return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
                                     status=status.HTTP_404_NOT_FOUND)
             # Check if the user to delete is the team leader
-            if member.pk == self.get_user().pk:
+            if member.pk == self.get_user(request).pk:
                 return JsonResponse({"code": -2, "msg": "You cannot delete a team leader!"},
                                     status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
                                 status=status.HTTP_404_NOT_FOUND)
 
-        Group.objects.get(email=email).delete()
+        group.teamMember.get(email=email).delete()
         return JsonResponse({"code": 0, "msg": "User successfully removed from the team"}, status=status.HTTP_200_OK)
 
 

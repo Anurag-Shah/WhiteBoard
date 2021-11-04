@@ -152,7 +152,7 @@ export const setAvatarApi = async (formData) => {
 export const createGroupApi = async (Gpname, description) => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.create_group, {
+        const response = await fetch(urls.group_operations, {
             method: 'POST',
             headers: {
                 token: '',
@@ -176,8 +176,8 @@ export const createGroupApi = async (Gpname, description) => {
 export const deleteGroupApi = async (groupId) => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.delete_group, {
-            method: 'POST',
+        const response = await fetch(urls.group_operations, {
+            method: 'DELETE',
             headers: {
                 token: '',
                 'Accept': 'application/json',
@@ -200,7 +200,7 @@ export const deleteGroupApi = async (groupId) => {
 export const addMemeberApi = async (groupId, email) => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.add_memeber, {
+        const response = await fetch(urls.memeber_operations, {
             method: 'POST',
             headers: {
                 token: '',
@@ -225,8 +225,8 @@ export const addMemeberApi = async (groupId, email) => {
 export const removeMemberApi = async (groupId, email) => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.delete_member, {
-            method: 'POST',
+        const response = await fetch(urls.memeber_operations, {
+            method: 'DELETE',
             headers: {
                 token: '',
                 'Accept': 'application/json',
