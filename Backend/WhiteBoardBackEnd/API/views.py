@@ -261,6 +261,58 @@ def sign_up(request):
     return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
 
 
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+@transaction.atomic()
+def register(request):
+    user = JSONParser().parse(request)
+
+    username = user.get("username")
+    emailAdd = user.get("email")
+    pw = user.get("password")
+
+    usernameOK = False
+    emailOK = False
+    try:
+        User.objects.get(name=username)
+    except User.DoesNotExist:
+        usernameOK = True
+
+    try:
+        User.objects.get(email=emailAdd)
+    except User.DoesNotExist:
+        emailOK = True
+
+    if (usernameOK == False and emailOK == False):
+        response = {"code": -1,
+                    "msg": "Both username and email address already in use!"}
+    elif (usernameOK == False):
+        response = {"code": -2, "msg": "Username already in use!"}
+    elif (emailOK == False):
+        response = {"code": -3, "msg": "Email address already in use!"}
+    else:
+        UserModel = get_user_model()
+        user_auth = UserModel.objects.create_user(username=username, email=emailAdd, password=pw)
+        user_auth.save()
+
+        # Each user belong to a default group
+        user = User(name=username, email=emailAdd, pk=user_auth.pk)
+        user.save()
+        default_group = Group(Gpname=username, GpDescription=username + "'s default group", isDefault=True,
+                              leader_uid=user_auth.pk)
+        # need to save the defalut_group to generate an id before linking it to a user
+        default_group.save()
+        default_group.teamMember.add(user)
+        # my_user.group_set.get(isDefault=True)
+        default_group.save()
+
+        response = {"code": 0, "msg": "Registration success!"}
+
+    print(response)
+    return JsonResponse(response)
+
+
 # Function login_view
 # Author: Jenna Zhang
 # Return value: JsonResponse
