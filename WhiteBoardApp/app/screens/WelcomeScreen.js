@@ -13,6 +13,9 @@ import Save from "./SaveScreen";
 import Library from "./LibraryScreen";
 import Team from "./TeamScreen";
 import Account from "./AccountScreen";
+import LoginPage from "./LoginPage";
+import RegistrationPage from "./RegistrationPage";
+import TextEditorPage from "./TextEditorPage";
 
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
@@ -41,6 +44,13 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
+      <Stack.Screen name="Login" component={LoginPage}></Stack.Screen>
+      <Stack.Screen name="Register" component={RegistrationPage} />
+      <Stack.Screen
+        name="TextEditorPage"
+        component={TextEditorPage}
+        options={{ title: "WhiteBoard", headerShown: false }}
+      ></Stack.Screen>
     </Stack.Navigator>
   );
 };

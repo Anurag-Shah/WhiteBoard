@@ -26,6 +26,7 @@ def preprocess_image(image):
 	return image
 
 def preprocess_tesseract(image):
+	# Find min area rectangle of image
 	out = image
 	if image.size[0] > image.size[1]:
 		# width > height

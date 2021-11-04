@@ -8,15 +8,17 @@
 
 import React from "react";
 import {
+  SafeAreaView,
   Alert,
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
   TextInput,
+  Platform,
   View,
 } from "react-native";
 import { Header, Icon } from "react-native-elements";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import Topbar from "./shared/Topbar";
 
 // const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
 // const serverURL = "http://127.0.0.1:8000/";
@@ -56,31 +58,15 @@ export default class TextEditorPage extends React.Component {
 
   render() {
     return (
-      <SafeAreaProvider>
+      <SafeAreaView
+        style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View>
-            <Header
-              barStyle="dark-content"
-              backgroundColor="#fff"
-              leftComponent={{
-                icon: "menu",
-                color: "#000",
-                style: styles.menu,
-                onPress: () => console.log("Sidebar"), //TODO: sidebar
-              }}
-              centerComponent={{ text: "Text Editor", style: styles.text }}
-              rightComponent={
-                <Icon
-                  name="camera-outline"
-                  type="ionicon"
-                  color="#000"
-                  style={styles.camera}
-                  onPress={() => console.log("To camera page")} //TODO: redirect to camera page
-                />
-              }
-            />
+            <Topbar title="Text Editor" navigation={this.props.navigation} />
           </View>
         </TouchableWithoutFeedback>
+        {/* <SafeAreaProvider> */}
 
         <TextInput
           style={styles.input}
@@ -109,7 +95,8 @@ export default class TextEditorPage extends React.Component {
             }
           />
         </View>
-      </SafeAreaProvider>
+        {/* </SafeAreaProvider> */}
+      </SafeAreaView>
     );
   }
 }

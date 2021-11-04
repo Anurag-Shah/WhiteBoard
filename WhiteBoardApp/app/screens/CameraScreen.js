@@ -1,267 +1,393 @@
-import React  , { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet,Text, View, Image, Platform,TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  PermissionsAndroid,
+  Image,
+  Alert,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  SafeAreaView,
+} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import Topbar from './shared/Topbar';
-import Modal from 'react-native-modal';
 import { Camera } from 'expo-camera';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import Constants from 'expo-constants';
 
-const Server_url = 'http://localhost:8000';
+import * as FileSystem from 'expo-file-system';
 
-function CameraConnect(props) 
-{
+import * as MediaLibrary from 'expo-media-library';
+
+import storage from '../config/storage';
+import { sendPictureApi } from '../requests/api';
+import urls from '../requests/urls';
+// import { useDispatch } from 'react-redux';
+// import { addClipItem, removeClipItem } from './shared/actions';
+
+const { height, width } = Dimensions.get('window');
+
+//const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
+const serverUrl = urls.base;//'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
+
+const groupId = 1;
+
+export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
-  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
   const [cameraRef, setCameraRef] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [returnImg, setReturnImg] = useState(false);
+  const [isCamera, setIsCamera] = useState(false);
+  const [userName, setUserName] = useState('Yierpan42');
 
   useEffect(() => {
+    //getUserInfo();  
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
-      const  galleryStatus  = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setHasGalleryPermission(galleryStatus.status === 'granted')
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === 'granted');
     })();
   }, []);
+
+  const getUserInfo = () => {
+    storage
+      .load({
+        key: 'login-session',
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: true,
+        syncInBackground: true,
+      })
+      .then(ret => {
+        // found data go to then()
+        setUser(ret);
+        setUserName(ret.username);
+        console.log(ret);
+        if (ret.logged_in) {
+          setLoginState(true);
+        } else {
+          setLoginState(false);
+        }
+      })
+      .catch(err => {
+        // any exception including data not found
+        // goes to catch()
+        navigation.push('LoginPage');
+      });
+  };
 
   if (hasPermission === null || hasGalleryPermission === false) {
     return <View />;
   }
   if (hasPermission === false || hasGalleryPermission === false) {
-      return <Text>No access to camera</Text>;
+    return <>No access to camera or gallery</>;
   }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Image,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
+      noData: true,
+      aspect: [3, 4],
       quality: 1,
+      base64: true
     });
 
     if (!result.cancelled) {
-      props.setImage(result);
-      props.showModal(true);
+      setIsCamera(false);
+      setPhoto(result);
+      // Alert.alert('PickImage')
     }
   };
 
-  return (
-    <View style={styles.cameraContainer}>
-      <Camera style={styles.camera} type={type} ratio={'1:1'} ref={(ref) => {
-         setCameraRef(ref);
-       }}>        
-      </Camera>
-      <View style={[styles.bContainer, styles.bStatusBarMargin,{paddingBottom:24}]} >        
-          <Text style={{ width:50 }}></Text>          
-          <TouchableOpacity style = {{ alignSelf:'center' }} onPress = {async () => {
-               if (cameraRef) {
-                 let photo = await cameraRef.takePictureAsync(null);
-                 console.log(photo)
-                 props.setImage(photo);
-                 props.showModal(true);
-               }
-             }}>
-            <Ionicons name="radio-button-on" size={72} style={{ color: '#222' }} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => pickImage()}>
-            <Ionicons name="image-outline" size={40} style={{ color: 'black' }} />
-          </TouchableOpacity>
-        </View>
-    </View>
-  );
-}
+  const getPermissionAndroid = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      }
+      Alert.alert(
+        'Save remote Image',
+        'Grant Me Permission to save Image',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+        { cancelable: false },
+      );
+    } catch (err) {
+      Alert.alert(
+        'Save remote Image',
+        'Failed to save Image: ' + err.message,
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+        { cancelable: false },
+      );
+    }
+  };
 
-export default class CameraScreen extends React.Component {
-  
-  constructor (props) {
-    super (props); 
-    this.state = {
-      visibleModal: false,
-      cameraRef: null,
-      image: null
-    };  
-  }
-  
-  setImage = (img) => {
-    this.setState({image: img});
-  }
+  const saveToPhone = async (url) => {
+    if (Platform.OS === 'android') {
+      const granted = await getPermissionAndroid();
+      if (!granted) {
+        return;
+      }
+    }
 
-  showModal = ( isVisible ) => {
-    this.setState({ visibleModal: isVisible });
-  } 
+    const callback = downloadProgress => {
+      const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+      console.log('downloadProgress:' + progress)
+    };
 
-  takePicture = async () => {
+    let d = new Date();
+    let dformat = `${d.getTime()}`;
+    const downloadResumable = FileSystem.createDownloadResumable(
+      url,
+      FileSystem.documentDirectory + dformat + '.jpg',
+      {},
+      callback
+    );
+    try {
+      const { uri } = await downloadResumable.downloadAsync();
+      MediaLibrary.saveToLibraryAsync(uri)
+      Alert.alert('', 'Saved to photos successfully')
+    } catch (e) {
+      Alert.alert('Error', 'Could not save the image')
+    }
+  };
 
-    let localUri = this.state.image.uri;
-    let filename = localUri.split('/').pop();
+  const sendPicture = async (picture) => {
+    // dispatch(removeClipItem());
+    // let localUri = picture;
+    let filename = picture.uri.split('/').pop();
 
-    // Infer the type of the image
+    // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
 
     // Upload the image using the fetch and FormData APIs
-    let formData = new FormData();
-    // Assume "photo" is the name of the form field the server expects
-    formData.append('photo', { uri: localUri, name: filename, type });
+    //let formData = new FormData();
+    // "Image, name" is the name of the form field the server expects
+    //formData.append('name', 'VeryDum');
+    //formData.append('Image', localUri);    
+    //formData.append('Description', 'static');
+    //.append('Image', {uri: localUri,name: filename, filename :filename ,type:type});
+    //formData.append('Content-Type', type);
 
-    const { navigate } = this.props.navigation;
-    this.showModal(false);
-    navigate("Account");
+    const createFormData = (photo, body = {}) => {
+      const data = new FormData();
+      //console.log(photo.uri);
+      data.append('Image', photo.base64
+      // isCamera ? photo.uri : photo.base64
 
-    return;
+      // {
+      //   name: filename,
+      //   type: type,
+      //   uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+      //   data: photo.base64
+      // }
+      );
+    
+      Object.keys(body).forEach((key) => {
+        data.append(key, body[key]);
+      });
+      //console.log(data);
+      return data;
+    };
+    
     try {
-      //TODO: enabling loading mark
-      let ret = await fetch(Server_url+'/scan', {
+      const response = await fetch(serverUrl + 'Images/' + groupId, {
         method: 'POST',
-        body: formData,
+        body: createFormData(picture, { name: 'TestImage', description: 'picture' }),
         headers: {
-          'content-type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data',
         },
-      })
-      // analyse ret
-      // result
-      // TODO: if success, redirect, else error display and stay
-      
-      
+        redirect:'follow'
+      });
+      //console.log((response));
+      const result = await response.json();
+      if(result.status === 'success') {
+        Alert.alert('Success', 'The photo was successfully sent!');
+        setReturnImg(serverUrl+'media/'+result.image_uri);
+        console.log(serverUrl+'media/'+result.image_uri);
+      }
+      else {
+        Alert.alert('Error', 'Could not save image!');
+      }
+      // console.log(zipPhoto);
+      // setReturnImg(zipPhoto);
+      //  Alert.alert('Success', 'The photo was successfully sent!');
     } catch (error) {
       console.log(error);
+      console.log('Connection Error!');
+      setReturnImg(null);
+      Alert.alert('Error', 'Something went wrong!');
     }
-    //Todo: disable loading mark
+  };
+  function decode_base64(s) {
+    var b=l=0,
+    m='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    return decodeURIComponent(s.replace(/./g, function (v) {
+      b=(b<<6)+m.indexOf(v); l+=6;
+      return l<8?'':'%'+(0x100+((b>>>(l-=8))&0xff)).toString(16).slice(-2);
+    }));
+  }
+  return (
+    <SafeAreaView style={{ flex: 1, paddingTop: (Platform.OS === 'ios')? 0 : 20 }}>
+      <Topbar title="Camera" navigation={navigation} />
+      {!returnImg && !photo && (
+        <View style={{ flex: 1 }}>
+          <Camera
+            style={{ flex: 1 }}
+            type={type}            
+            ref={(ref) => {
+              setCameraRef(ref);
+            }}
+            autoFocus="on"></Camera>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 15,
+              padding: 15,
+            }}>
+            <Text style={{ alignSelf: 'flex-end', width:30 }}>{''}</Text>
+            <TouchableOpacity
+              style={{
+                alignSelf: 'flex-end',
+                alignItems: 'center',
+              }}
+              onPress={async () => {
+                if (cameraRef) {
+                  let result = await cameraRef.takePictureAsync({base64: true});
+                  setIsCamera(true);
+                  setPhoto(result);                  
+                  // Alert.alert("","TakePicture");
+                }
+              }}>
+              <View
+                style={{
+                  borderWidth: 2,
+                  borderRadius: 25,
+                  borderColor: 'black',
+                  height: 50,
+                  width: 50,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <View
+                  style={{
+                    borderWidth: 2,
+                    borderRadius: 20,
+                    borderColor: 'black',
+                    height: 40,
+                    width: 40,
+                    backgroundColor: 'black',
+                  }}></View>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Ionicons
+                name="image-outline"
+                size={40}
+                onPress={() => pickImage()}
+                style={{ 
+                  alignSelf: 'flex-end',
+                  alignItems: 'center',
+                  color: 'black'
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {!returnImg && photo && (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent:  'center'}}>
+          <Image
+            source={{ uri: photo.uri }}
+            style={{
+              width: width,
+              height: height - ((Platform.OS === 'ios') ? 45+80 : 60+80+20), //Topbar & footer, status height due to OS
+              resizeMode: isCamera ? 'cover' : 'contain',
+            }}
+          />
+          <View style={[styles.modalBottomContainer]}>
+            <TouchableOpacity onPress={() => sendPicture(photo)}>
+              {/* onPress={sendPicture} */}
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
+                  Accept
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setPhoto(null)}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
+                  Retake
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {returnImg && (
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          
+            <Image
+              // source={{ uri: returnImg }}
+              source={{ uri: `${returnImg}` }}
+              style={{ width: width, height: height - ((Platform.OS === 'ios') ? 45+80 : 60+80+20), 
+               resizeMode: 'contain' }}
+            />
+            <View style={[styles.modalBottomContainer]}>
+              <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
+                <View style={styles.modalButton}>
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
+                    Save
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {/* <Text style={{ width: 30 }}></Text> */}
+              <TouchableOpacity
+                onPress={() => {
+                  setPhoto(null);
+                  setReturnImg(null);
+                  // Alert.alert('Close')
+                }}>
+                <View style={styles.modalButton}>
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
+                    Close
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+        </View>
+      )}
     
-  }
-  _renderButton = () => (
-    <View style={[styles.modalBottomContainer, styles.modalBottomStatusBarMargin]}>
-      <TouchableOpacity onPress={this.takePicture}>
-        <View style={styles.modalButton}>
-          <Text style = {{fontSize:24, fontWeight:"bold", color:'green'}}>Accept</Text>
-        </View>
-      </TouchableOpacity>
-      <Text style={{ width:30 }}></Text>
-      <TouchableOpacity onPress={() => this.setState({ visibleModal: false })}>
-        <View style={styles.modalButton}>
-          <Text style={{fontSize:24, fontWeight:"bold",color:'red'}}>Retake</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
-
-  _renderModalContent = () => (
-    <View style={styles.modalContent}>
-      <View>
-        <Image 
-          style={{ width: 200, height: 400 }}
-          source={{ uri: this.state.image.uri }}
-          resizeMode="center"
-        />
-      </View>
-      {this._renderButton()}
-     
-    </View>
-  );
-  
-   
-
-  render() {  
-
-    return (
-      <SafeAreaView style={ styles.cameraContainer }>
-        <Topbar title="Camera" navigation={this.props.navigation}/>
-        { this.state.visibleModal &&
-        <View style={styles.container}>
-          <Modal isVisible={this.state.visibleModal === true}>
-            {this._renderModalContent()}
-          </Modal>
-        </View> }
-        {!this.state.visibleModal &&
-          <CameraConnect showModal={this.showModal} setImage={this.setImage}/>
-        }
-      </SafeAreaView>
-    );
-  }
 }
-
+// <StatusBar style="auto" />
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#e1dede',
-  },
-  main: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#e1dede',
-    alignItems: 'stretch',
-  },
-  list: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  bContainer: {
-    width:"100%",
-    height: (Platform.OS === 'ios') ? 60 : 80,
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center",
-    paddingHorizontal: 20,
-    backgroundColor: 'white'
-  },
-  bStatusBarMargin: {
-    paddingTop: (Platform.OS === 'ios') ? 0 : 24
-  },
-  cameraContainer: {
-    flex: 1,
-  },
-  camera: {
-    flex: 1,
-  },
-  camerabuttonContainer: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    margin: 20,
-  },
-  camerabutton: {
-    flex: 0.1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  cameratext: {
-    fontSize: 18,
-    color: 'white',
-  },
-  modalButton: {
-    backgroundColor: 'white',
-    
-    justifyContent: 'center',
-    alignItems: 'center',
-
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-  },
-  bottomModal: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
   modalBottomContainer: {
-    width:"100%",
-    height: (Platform.OS === 'ios') ? 60 : 80,
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center",
-    backgroundColor: 'white'
-  },
-  modalBottomStatusBarMargin: {
-    paddingTop: (Platform.OS === 'ios') ? 0 : 24
+    width: '100%',
+    //flex: 1,
+    height: Platform.OS === 'ios' ? 60 : 80,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
   },
 });
-

@@ -125,7 +125,7 @@ export default class RegistrationPage extends React.Component {
           "Success",
           "Your account has been successfully created!",
           [
-            { text: "OK", onPress: () => console.log("to login page") }, //TODO: redirect to login page
+            { text: "OK", onPress: () => this.props.navigation.push("Login") }, //TODO: redirect to login page
           ]
         );
       }
@@ -157,7 +157,7 @@ export default class RegistrationPage extends React.Component {
           name="arrow-undo-outline"
           type="ionicon"
           color="#000"
-          onPress={() => console.log("Back to login in page")} //TODO: redirect back to login page
+          onPress={() => this.props.navigation.push("Login")} //TODO: redirect back to login page
         />
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
