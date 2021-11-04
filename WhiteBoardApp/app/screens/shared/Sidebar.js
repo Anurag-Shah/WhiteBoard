@@ -4,6 +4,8 @@ import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, Sa
 import { AntDesign } from '@expo/vector-icons';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../../config/storage';
+import { logoutApi } from '../../requests/api';
 
 export default class Sidebar extends React.Component {
 
@@ -12,14 +14,17 @@ export default class Sidebar extends React.Component {
     this.state = {
       route_anonymous: [
         {
-          name: "Log In",
-          screen: "Login"
+          // name: "Log In",
+          // screen: "Login"
+          name: '',
         }
       ],
-      routes_logged_in: [{
-        name: "Save",
-        screen: "Save"
-      }, {
+      routes_logged_in: [
+      //   {
+      //   name: "Save",
+      //   screen: "Save"
+      // },
+      {
         name: "Library",
         screen: "Library"
       }, {
@@ -37,7 +42,10 @@ export default class Sidebar extends React.Component {
   componentDidMount() {
     this.retrieveData();
   }
-
+  logout = () => {
+    logoutApi();
+    this.props.navigation.navigate('Camera');
+  }
   retrieveData = async () => {
     try {
       let data = await storage.load({
@@ -55,6 +63,10 @@ export default class Sidebar extends React.Component {
       }
     } catch (error) {
       console.log(error);
+      // let user = {logged_in: true, name: 'Yierpan', token:'Token: 123'};
+      // this.setState({
+      //   user: user,
+      // });
       return null;
     }
   };
@@ -87,16 +99,16 @@ export default class Sidebar extends React.Component {
 
         {
           (this.state.user != null && this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} >
+          <TouchableOpacity style={styles.button} onPress={()=>this.logout()} >
             <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
-            <Text style={styles.buttonTitle}>Login</Text>
+            <Text style={styles.buttonTitle}>Logout</Text>
           </TouchableOpacity>
         }
         {
           (this.state.user == null || !this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} >
+          <TouchableOpacity style={styles.button} onPress={()=>this.props.navigation.navigate('Login')}>
             <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
-            <Text style={styles.buttonTitle}>Logout</Text>
+            <Text style={styles.buttonTitle}>Login</Text>
           </TouchableOpacity>
 
         }

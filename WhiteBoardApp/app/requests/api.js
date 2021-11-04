@@ -29,11 +29,7 @@ export const loginApi = async (username, pwd) => {
                 token: '',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-<<<<<<< HEAD
-                // 'Authorization': token,
-=======
                 'Authorization': token,
->>>>>>> main
             },
             body: JSON.stringify({
                 username: username,
@@ -90,7 +86,6 @@ export const resetPwdApi = async (email) => {
     }
 };
 
-<<<<<<< HEAD
 export const updateAccountApi = async (user, email) => {
     let token = await getToken();
     try {
@@ -179,8 +174,6 @@ export const sendPictureApi = async (url, formData) => {
     }
 };
 
-=======
->>>>>>> main
 
 const isResponseOk = (response) => {
     if (response.status >= 200 && response.status <= 299) {
@@ -188,8 +181,4 @@ const isResponseOk = (response) => {
     } else {
         throw Error(response.statusText);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main

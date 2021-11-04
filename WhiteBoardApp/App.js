@@ -5,13 +5,7 @@ import RegistrationPage from "./app/screens/RegistrationPage";
 // import TextEditorPage from "./app/screens/TextEditorPage.js";
 
 
-<<<<<<< HEAD
-export default function App() {
-  return <WelcomeScreen />;
-}
-=======
 export default function App() 
 {
   return <WelcomeScreen />;
 }
->>>>>>> main
