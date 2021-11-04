@@ -26,10 +26,18 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 import ocr
+import json
 from .models import User, Group, GroupImages
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
 from forms import SetPasswordForm
 
+from decode_base64_file import decoder
+import base64
+from pathlib import Path
+import urllib
+from urllib.request import urlopen
+from django.core.files.temp import NamedTemporaryFile
+from django.core.files.base import ContentFile
 
 # Create your views here.
 
@@ -42,9 +50,10 @@ from forms import SetPasswordForm
 # for all user's information
 
 # Need to uncomment the following two lines to enable token based authentication
-# @permission_classes([IsAuthenticated])
-# @authentication_classes([TokenAuthentication])
+# @permission_classes(AllowAny,)
+# @authentication_classes(AllowAny,)
 class AllUserList(APIView):
+    permission_classes = [AllowAny, ]
     def get(self, request):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
@@ -70,6 +79,7 @@ class AllUserList(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificUser(APIView):
+    permission_classes = [AllowAny, ]
     def get_user_object(self, id):
         try:
             return User.objects.get(pk=id)
@@ -105,6 +115,7 @@ class SpecificUser(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificGroup(APIView):
+    permission_classes = [AllowAny, ]
     def get_group_object(self, id):
         try:
             return Group.objects.get(pk=id)
@@ -140,6 +151,7 @@ class SpecificGroup(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class ImageUpload(APIView):
+    permission_classes = [AllowAny, ]
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
@@ -156,18 +168,26 @@ class ImageUpload(APIView):
 
     def post(self, request, GPid):
         file = request.data['Image']
+        print (file[0:100])
+        print (type(file))
         name = request.data['name']
+        custom_name = name + ":" + str(GPid) + ".jpg"
+        img = ContentFile(base64.b64decode(file), name=custom_name)
         group = self.get_group_object(GPid)
-        image = GroupImages.objects.create(Image=file, GpID=group, name=name)
+        image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
         path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
+        return_data = {}
+        return_data['status'] = 'success'
+        return_data['image_uri'] = str(image_path)
+        print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
-        print("OCR is: " + ocr_return)
-        response = HttpResponse(zip_file, content_type='application/force-download')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
+        print(ocr_return)
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
+
 
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
