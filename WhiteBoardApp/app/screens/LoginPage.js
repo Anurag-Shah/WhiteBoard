@@ -28,16 +28,6 @@ function Prompt(props) {
       setSuccess(false);
       setFeedback("Please enter a valid email...");
     } else {
-      // // Recieve success msg
-      // if (email == "admin@gmail.com") {
-      //   setSuccess(true);
-      //   setFeedback("");
-      //   Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-      //     { text: 'OK', onPress: () => props.setVisible(false) }]);
-      // } else {
-      //   setSuccess(false);
-      //   setFeedback("No account found!");
-      // }
 
       // Send Email to backend
       resetPwdApi(email).then((response) => {
@@ -100,7 +90,7 @@ function LoginPage({ navigation }) {
   }, []);
 
   const getUserInfo = () => {
-    // Store user account info in local storage
+    // Fetch user and login info in local storage
     storage
       .load({
         key: "login-session",
