@@ -26,6 +26,9 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# ALLOWED_HOSTS = [
+#     'ec2-3-144-80-126.us-east-2.compute.amazonaws.com', '127.0.0.1', '172.16.50.73']
+
 # ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 #                  "127.0.0.1",
 #                  "66.253.158.235",
@@ -39,6 +42,9 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  '66.253.158.235',
                  'ec2-3-138-112-15.us-east-2.compute.amazonaws.com',
                  'ip-172-31-32-112.us-east-2.compute.internal',
+                 'ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
+                 '127.0.0.1',
+                 '172.16.50.73'
                  ]
 
 # AWS SES settings
@@ -47,7 +53,8 @@ EMAIL_HOST = "janneyzay540@gmail.com"
 AWS_ACCESS_KEY_ID = ''  # hidden
 AWS_SECRET_ACCESS_KEY = ''  # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
-AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)
+# (ex: email.us-east-2.amazonaws.com)
+AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
 
 # Application definition
 
@@ -70,13 +77,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', 
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
 ]
 
 ROOT_URLCONF = 'WhiteBoardBackEnd.urls'
@@ -118,9 +130,9 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_data_base',
+        'NAME': 'whiteboard_db',
         'USER': 'root',
-        'PASSWORD': '990603qwerty',
+        'PASSWORD': 'michellezhe',
         'HOST': 'localhost',
         'PORT': '3306',
     }

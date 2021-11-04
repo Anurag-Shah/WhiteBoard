@@ -23,4 +23,6 @@ urlpatterns = [
          name='password_reset_confirm'),
     path('password_reset/done/', password_reset_done, name='password_reset_done'),
 
+    path('Register/', register),
+    # path('TypenCodes/<int:GPid>', ),    # TODO: view to handle typen code
 ]

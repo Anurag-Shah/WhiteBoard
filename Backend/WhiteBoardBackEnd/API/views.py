@@ -1,7 +1,7 @@
 #############################################################################
 # API/views.py
 #
-# Authors: Chunao Liu, Jenna Zhang
+# Authors: Chunao Liu, Jenna Zhang, Michelle He
 #
 # This is an django APIView that handles all the HTTP request received
 # by the backend. It support get, put and delete objects from the database
@@ -32,7 +32,9 @@ from .models import User, Group, GroupImages
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
 
 
-# Create your views here.
+from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
+from .models import User, Group, GroupImages
+
 
 # Class AllUserList
 # Author: Chunao Liu, Jenna Zhang
@@ -55,8 +57,10 @@ class AllUserList(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)  # HTTP 201: CREATED
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # HTTP 400: BAD REQUEST
+            # HTTP 201: CREATED
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # HTTP 400: BAD REQUEST
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Class SpecificUser
@@ -82,7 +86,8 @@ class SpecificUser(APIView):
         return Response(Serializer.data)
 
     def put(self, request, id):
-        Serializer = UserSerializer(self.get_user_object(id), data=request.data)
+        Serializer = UserSerializer(
+            self.get_user_object(id), data=request.data)
         if (Serializer.is_valid()):
             Serializer.save()
             return Response(Serializer.data)
@@ -117,7 +122,8 @@ class SpecificGroup(APIView):
         return Response(Serializer.data)
 
     def put(self, request, id):
-        Serializer = GroupSerializer(self.get_group_object(id), data=request.data)
+        Serializer = GroupSerializer(
+            self.get_group_object(id), data=request.data)
         if (Serializer.is_valid()):
             Serializer.save()
             return Response(Serializer.data)
@@ -142,6 +148,7 @@ class ImageUpload(APIView):
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
+
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
         print(aaa)
@@ -159,17 +166,20 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
+        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + \
+            str(image_path)
         zip_file = open(path, 'rb')
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
+
         print("OCR is: " + ocr_return)
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
 
     def get(self, request, GPid):
-        Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        Serializer = GroupImagesSerializer(
+            self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
 
 
@@ -251,14 +261,53 @@ def sign_up(request):
     # Each user belong to a default group
     my_user = User(name=name, email=email, pk=new_user.pk)
     my_user.save()
+
     default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True, leader_uid=new_user.pk)
     # need to save the defalut_group to generate an id before linking it to a user
     default_group.save()
+    
     default_group.teamMember.add(my_user)
     # my_user.group_set.get(isDefault=True)
     default_group.save()
 
     return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
+
+
+@api_view(['POST'])
+def register(request):
+    user = JSONParser().parse(request)
+
+    username = user.get("username")
+    emailAdd = user.get("email")
+    pw = user.get("password")
+
+    usernameOK = False
+    emailOK = False
+    try:
+        User.objects.get(name=username)
+    except User.DoesNotExist:
+        usernameOK = True
+
+    try:
+        User.objects.get(email=emailAdd)
+    except User.DoesNotExist:
+        emailOK = True
+
+    if (usernameOK == False and emailOK == False):
+        response = {"code": -1,
+                    "msg": "Both username and email address already in use!"}
+    elif (usernameOK == False):
+        response = {"code": -2, "msg": "Username already in use!"}
+    elif (emailOK == False):
+        response = {"code": -3, "msg": "Email address already in use!"}
+    else:
+        newUser = User(name=username, email=emailAdd,
+                       uid=User.objects.last().uid + 1, PW=pw)
+        newUser.save()
+        response = {"code": 0, "msg": "Registration success!"}
+
+    print(response)
+    return JsonResponse(response)
 
 
 # Function login_view
@@ -519,7 +568,8 @@ def pwd_reset(request):
         }
         email = render_to_string(email_template_name, c)
         try:
-            send_mail(subject, email, 'janneyzay540@gmail.com', [email_address], fail_silently=False)
+            send_mail(subject, email, 'janneyzay540@gmail.com',
+                      [email_address], fail_silently=False)
             # password_reset_form = PasswordResetForm()
             return JsonResponse({"code": 0, "msg": "Email successfully sent"})
         except BadHeaderError:
