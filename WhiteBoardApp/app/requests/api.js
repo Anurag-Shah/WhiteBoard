@@ -1,6 +1,5 @@
 import urls from "./urls";
 import storage from "../config/storage";
-import { get } from "react-native/Libraries/Utilities/PixelRatio";
 
 
 export const getToken = async () => {
@@ -21,7 +20,6 @@ export const getToken = async () => {
 };
 
 export const loginApi = async (username, pwd) => {
-    let token = getToken();
     try {
         const response = await fetch(urls.login, {
             method: 'POST',
@@ -29,7 +27,7 @@ export const loginApi = async (username, pwd) => {
                 token: '',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': token,
+                // 'Authorization': token,
             },
             body: JSON.stringify({
                 username: username,
@@ -66,14 +64,12 @@ export const logoutApi = async () => {
 
 // No token needed to reset password since the user is not logged in
 export const resetPwdApi = async (email) => {
-    let token = await getToken();
     try {
         const response = await fetch(urls.resetPwd, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json/',
-                // 'Authorization': token,
             },
             body: JSON.stringify({
                 email: email,
@@ -144,6 +140,104 @@ export const setAvatarApi = async (formData) => {
             },
             redirect: 'follow',
             body: formData
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const createGroupApi = async (Gpname, description) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.group_operations, {
+            method: 'POST',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                "Gpname": Gpname,
+                "description": description
+            })
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const deleteGroupApi = async (groupId) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.group_operations, {
+            method: 'DELETE',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data',
+                'Authorization': token,
+            },
+            redirect: 'follow',
+            body: JSON.stringify({
+                "groupId": groupId
+            })
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const addMemeberApi = async (groupId, email) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.memeber_operations, {
+            method: 'POST',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data',
+                'Authorization': token,
+            },
+            redirect: 'follow',
+            body: JSON.stringify({
+                "groupId": groupId,
+                "email": email
+            })
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const removeMemberApi = async (groupId, email) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.memeber_operations, {
+            method: 'DELETE',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data',
+                'Authorization': token,
+            },
+            redirect: 'follow',
+            body: JSON.stringify({
+                "groupId": groupId,
+                "email": email
+            })
         });
         console.log(response);
         let data = await response.json();
