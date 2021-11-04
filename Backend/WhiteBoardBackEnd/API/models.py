@@ -46,9 +46,9 @@ class Group(models.Model):
 
 
 class GroupImages(models.Model):
-    ImageID = models.CharField(max_length=100)
+    ImageID = models.CharField(max_length=255)
     name = models.CharField(max_length=50)
-    Image = models.ImageField(upload_to='images/', default='DefaultImages/default-image-620x600.jpg')
+    Image = models.ImageField(upload_to='images/', default='DefaultImages/default-image-620x600.jpg', max_length=500)
     GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
 
     class meta():
@@ -60,9 +60,9 @@ class GroupImages(models.Model):
 
 
 class GroupCode(models.Model):
-    CodeID = models.CharField(max_length=100)
+    CodeID = models.CharField(max_length=500)
     name = models.CharField(max_length=50)
-    Code = models.FileField(upload_to='Code/', default=None)
+    Code = models.FileField(upload_to='Code/', default=None, max_length=500)
     ImageID = models.OneToOneField(GroupImages, on_delete=CASCADE, null=True, blank=True)
     GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
 
