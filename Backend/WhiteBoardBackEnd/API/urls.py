@@ -1,7 +1,6 @@
 from django.urls import path
 
 from .views import *
-from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('Users/', AllUserList.as_view()),
@@ -11,6 +10,11 @@ urlpatterns = [
     path('User/logout/', logout_view, name='logout'),
     path('User/update/', update_user, name='account_update'),
     path('User/avatar/', Avatar.as_view(), name='get_or_set_avatar'),
+    path('User/groups/', UserGroups.as_view(), name='get_user_groups'),
+    path('User/group/create/', GroupOperations.create, name='create_a_team'),
+    path('User/group/delete/', GroupOperations.delete, name='delete_a_team'),
+    path('User/group/add_member/', GroupOperations.add_member, name='add_member'),
+    path('User/group/remove_member/', GroupOperations.remove_member, name='delete_member'),
     path('Group/<int:id>', SpecificGroup.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
     path('Images/process', process_image, name='process_image'),

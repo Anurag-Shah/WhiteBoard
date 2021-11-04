@@ -11,7 +11,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
 from django.http import JsonResponse
-from django.shortcuts import HttpResponse, redirect, render
+from django.shortcuts import HttpResponse, render
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -19,16 +19,16 @@ from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication
-from rest_framework.decorators import APIView, permission_classes, authentication_classes, api_view
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.parsers import *
-from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import APIView, permission_classes, authentication_classes, api_view
+from rest_framework.parsers import *
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 import ocr
+from forms import SetPasswordForm
 from .models import User, Group, GroupImages
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
-from forms import SetPasswordForm
 
 
 # Create your views here.
@@ -197,6 +197,7 @@ def process_text(request):
     # If texted code is received, then the imageId field is null
     return Response
 
+
 # Function
 # Author: Jenna Zhang
 # Return value: JsonResponse
@@ -207,6 +208,7 @@ def process_text(request):
 def process_text(request):
     # If texted code is received, then the imageId field is null
     return Response
+
 
 # Function sign_up
 # Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
@@ -250,7 +252,9 @@ def sign_up(request):
     my_user = User(name=name, email=email)
     my_user.save()
     # my_user.group_set.get(isDefault=True)
-    default_group = Group(Gname=name, GpDescription=name + "'s default group", isDefault=True)
+    default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True)
+    # need to save the defalut_group to generate an id before linking it to a user
+    default_group.save()
     default_group.teamMember.add(my_user)
     # my_user.group_set.get(isDefault=True)
     default_group.save()
@@ -290,12 +294,11 @@ def login_view(request):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function logs the user out
-@authentication_classes([TokenAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
-@api_view(['POST', 'GET'])
 def logout_view(request):
+    print(request.user)
     if not request.user.is_authenticated:
         return JsonResponse({'code': -1, 'detail': 'You\'re not logged in.'}, status=400)
+    Token.objects.get(user=request.user).delete()
     logout(request)
     return JsonResponse({'code': 0, 'detail': 'Successfully logged out.'})
 
@@ -362,6 +365,111 @@ class Avatar(APIView):
         avatar = {"image": user.avatar}
         seriliazer = AvatarSerializer(avatar)
         return JsonResponse({"code": 0, "avatar": seriliazer.data})
+
+
+# Class get all groups the user is in
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function logs the user out
+class UserGroups(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_default_group(self, request):
+        user = User.objects.get(pk=request.user.pk)
+        return user.group_set.get(isDefault=True)
+
+    def get(self, request):
+        user = User.objects.get(pk=request.user.pk)
+        groups = user.group_set.all()
+        default_group = self.get_default_group(request)
+        serializer = GroupSerializer(groups, many=True)
+        default_group_serializer = GroupSerializer(default_group)
+        return JsonResponse(
+            {"code": 0, "msg": "The teams the user is in are fetched!", "default_group": default_group_serializer.data,
+             "all groups": serializer.data})
+
+
+# Class
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function logs the user out
+class GroupOperations(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_user(self, request):
+        return User.objects.get(pk=request.user.pk)
+
+    def get_group(self, id):
+        return Group.objects.get(pk=id)
+
+    def create(self, request):
+        user = self.get_user(request)
+        data = JSONParser().parse(request)
+        new_group = Group(Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
+        new_group.save()
+        new_group.teamMember.add(user)
+        new_group.save()
+        return JsonResponse({"code": 0, "msg": "group created!"}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        data = JSONParser().parse(request)
+        GpID = data['groupId']
+        group = self.get_group(GpID)
+        if group.isDefault:
+            return JsonResponse({"code": -1, "msg": "Cannot delete a default group"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        group.delete()
+        return JsonResponse({"code": 0, "msg": "Group successfully deleted"}, status=status.HTTP_200_OK)
+
+    def add_member(self, request):
+        data = JSONParser().parse(request)
+        email = data['email']
+        GpID = data['groupId']
+        group = self.get_group(GpID)
+        # check if the given email/uid exits
+        try:
+            user = User.objects.get(email=email)
+            # check if the member is already in the group
+            try:
+                check_memeber = group.teamMember.get(email=email)
+                return JsonResponse({"code": -2, "msg": "This user is already in the team!"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+            except User.DoesNotExist:
+                group.teamMember.add(user)
+        except User.DoesNotExist:
+            return JsonResponse({"code": -1, "msg": "User does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def remove_member(self, request):
+        data = JSONParser().parse(request)
+        email = data['email']
+        GpID = data['groupId']
+        group = self.get_group(GpID)
+        # check if the given email/uid exits
+        try:
+            User.objects.get(email=email)
+        except User.DoesNotExist:
+            return JsonResponse({"code": -1, "msg": "email does not exist!"})
+
+        # Check if the user is in the group
+        try:
+            member = group.teamMember.get(email=email)
+            if member is None:
+                return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
+                                    status=status.HTTP_404_NOT_FOUND)
+            # Check if the user to delete is the team leader
+            if member.pk == self.get_user().pk:
+                return JsonResponse({"code": -2, "msg": "You cannot delete a team leader!"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
+                                status=status.HTTP_404_NOT_FOUND)
+
+        Group.objects.get(email=email).delete()
+        return JsonResponse({"code": 0, "msg": "User successfully removed from the team"}, status=status.HTTP_200_OK)
 
 
 # Function pwd_reset

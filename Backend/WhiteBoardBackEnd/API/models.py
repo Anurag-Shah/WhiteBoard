@@ -36,6 +36,7 @@ class Group(models.Model):
     GpID = models.AutoField(primary_key=True)
     GpDescription = models.TextField()
     isDefault = models.BooleanField(default=True)
+    leader_uid = models.IntegerField(unique=False, null=False)
     teamMember = models.ManyToManyField(User)
 
     class meta():
