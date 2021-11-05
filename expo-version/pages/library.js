@@ -16,13 +16,15 @@ class library extends Component {
       //data: [],
       data: [ {
         name: 'testing1',
-        avatar_url: require("../image/code_snip.jpg"),
-        email: '8/11/2021',
+        //Image: require("../image/code_snip.jpg"),
+        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
+        GpID: '8/11/2021',
       },
       {
         name: 'testing2',
-        avatar_url: require("../image/code_snip.jpg"),
-        email: '8/29/2021',
+        //Image: require("../image/code_snip.jpg"),
+        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
+        GpID: '8/29/2021',
       }],
       error: null,
     };
@@ -41,13 +43,17 @@ class library extends Component {
     /*server test*/
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
     /*local test*/
-    const url = '';
+    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
+    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Group/1';
 
     this.setState({ loading: true });
 
     fetch(url)
       .then(res => res.json())
       .then(res => {
+        console.log(res);
+        //console.log("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080" + res[1].Image);
+
         this.setState({
           //data: res.results,
           data: res,
@@ -116,6 +122,7 @@ class library extends Component {
       );
     }
     //console.log(this.state.data);
+    //<Avatar source={item.avatar_url} />
     return (
       <SafeAreaView style={{flex: 1}}>
         <FlatList
@@ -123,13 +130,10 @@ class library extends Component {
           keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider>
-              <Avatar source={item.avatar_url} />
+              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>
-              <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
-              </ListItem.Content>
-              <ListItem.Chevron 
-              onPress={() => this.setState({show:true})} />
+              <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
               <Modal
                transparent={true}
                visible={this.state.show}
@@ -139,7 +143,7 @@ class library extends Component {
                     <Image
                     style={{width: 500,
                         height: 500}}
-                    source={item.avatar_url}/>
+                    source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
                     <Button
                         title="close"
                         onPress={() => this.setState({show:false})}
@@ -147,6 +151,10 @@ class library extends Component {
                  </SafeAreaView>
 
               </Modal>
+              </ListItem.Content>
+              <ListItem.Chevron 
+              onPress={() => this.setState({show:true})} />
+              
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
               //<ListItem //style={{ height: 50 }}
