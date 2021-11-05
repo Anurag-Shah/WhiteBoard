@@ -20,9 +20,13 @@ import {
 import { Header, Icon } from "react-native-elements";
 import Topbar from "./shared/Topbar";
 
+import urls from "../requests/urls";
+
 // const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
-// const serverURL = "http://127.0.0.1:8000/";
 const serverURL = "http://172.16.50.73:8000/";
+
+const COMPILATIONERROR = -1;
+const RUNTIMEERROR = -2;
 
 export default class TextEditorPage extends React.Component {
   constructor(props) {
@@ -33,14 +37,10 @@ export default class TextEditorPage extends React.Component {
   }
 
   async sendCode() {
-    Alert.alert("Success", "Your code has been successfully sent!", [
-      { text: "OK" },
-    ]);
-
     // TODO: get groupID from local storage
     try {
       // TODO: request URL
-      const res = await fetch(serverURL + "TypenCodes/" + groupID, {
+      const res = await fetch(serverURL + "Text/process", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -49,8 +49,33 @@ export default class TextEditorPage extends React.Component {
         body: JSON.stringify({ typenCode: this.state.typenCode }),
       });
       const response = await res.json();
-
-      // TODO: response handling
+      Alert.alert("Success", "Your code has been successfully sent!", [
+        {
+          text: "OK",
+          onPress: () => {
+            code = Object.values(response)[0];
+            if (code == COMPILATIONERROR) {
+              return Alert.alert(
+                "Compilation Error",
+                "There are some compilation error occurred. The stack trace will be displayed.",
+                [{ text: "OK" }]
+              );
+            } else if (code == RUNTIMEERROR) {
+              return Alert.alert(
+                "Runtime Error",
+                "There are some runtime error occurred. The stack trace will be displayed.",
+                [{ text: "OK" }]
+              );
+            } else {
+              Alert.alert(
+                "Success",
+                "Your code runs successfully! The output of your code will be displayed.",
+                [{ text: "OK" }]
+              );
+            }
+          },
+        },
+      ]);
     } catch (error) {
       console.log(error);
     }

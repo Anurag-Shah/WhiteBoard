@@ -173,7 +173,8 @@ class ImageUpload(APIView):
         ocr_return = ocr.ocr(path)
 
         print("OCR is: " + ocr_return)
-        response = HttpResponse(zip_file, content_type='application/force-download')
+        response = HttpResponse(
+            zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
 
@@ -195,7 +196,7 @@ def process_image(request):
     return Response
 
 
-# Function process image
+# Function process text
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function receives image from the frontend and send it to ocr to process the image
@@ -204,76 +205,21 @@ def process_image(request):
 @api_view(['POST', 'GET'])
 def process_text(request):
     # If texted code is received, then the imageId field is null
-    return Response
+    response = {"code": -1, "msg": "Compilation error!"}
+    response = {"code": -2, "msg": "Runtime error!"}
+    response = {"code": 0, "msg": "Code successfully run!"}
+    return JsonResponse(response)
 
 
-# Function
-# Author: Jenna Zhang
-# Return value: JsonResponse
-# This function receives image from the frontend and send it to ocr to process the image
-@authentication_classes([TokenAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
-@api_view(['POST', 'GET'])
-def process_text(request):
-    # If texted code is received, then the imageId field is null
-    return Response
-
-
-# Function sign_up
-# Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
+# Function register
+# Author: Michelle He, Jenna Zhang
 # Return value: JsonResponse
 # This function receives sign up request from the client and create a new user if
 # all fields are valid
-@api_view(http_method_names=['POST'])
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
 @transaction.atomic()
-def sign_up(request):
-    data = JSONParser().parse(request)
-    name = data.get('username')
-    password = data.get('password')
-    email = data.get('email')
-    UserModel = get_user_model()
-    new_user = UserModel.objects.create_user(username=name, password=password)
-    # If username or email already exists, django.db.IntegrityError will be raised when we try to save
-    # But it does not indicate which field is duplicated, so we have to check manually
-
-    # Check email
-    try:
-        email_match = User.objects.get(email=email)
-        # if no exception raised, then the email already exists, return with error
-        return JsonResponse({"code": -1, "msg": "email already exists"})
-    except User.DoesNotExist:
-        # we are fine
-        new_user.email = email
-
-    # Check username
-    try:
-        name_match = User.objects.get(name=name)
-        # if no exception raised, then the username already exists, return with error
-        return JsonResponse({"code": -2, "msg": "username already exists"})
-    except User.DoesNotExist:
-        # we are fine
-        new_user.username = name
-
-    new_user.save()
-
-    # Each user belong to a default group
-    my_user = User(name=name, email=email, pk=new_user.pk)
-    my_user.save()
-
-    default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True, leader_uid=new_user.pk)
-    # need to save the defalut_group to generate an id before linking it to a user
-    default_group.save()
-    
-    default_group.teamMember.add(my_user)
-    # my_user.group_set.get(isDefault=True)
-    default_group.save()
-
-    return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
-
-
-@api_view(['POST'])
 def register(request):
     user = JSONParser().parse(request)
 
@@ -301,9 +247,22 @@ def register(request):
     elif (emailOK == False):
         response = {"code": -3, "msg": "Email address already in use!"}
     else:
-        newUser = User(name=username, email=emailAdd,
-                       uid=User.objects.last().uid + 1, PW=pw)
-        newUser.save()
+        UserModel = get_user_model()
+        user_auth = UserModel.objects.create_user(
+            username=username, email=emailAdd, password=pw)
+        user_auth.save()
+
+        # Each user belong to a default group
+        user = User(name=username, email=emailAdd, pk=user_auth.pk)
+        user.save()
+        default_group = Group(Gpname=username, GpDescription=username + "'s default group", isDefault=True,
+                              leader_uid=user_auth.pk)
+        # need to save the defalut_group to generate an id before linking it to a user
+        default_group.save()
+        default_group.teamMember.add(user)
+        # my_user.group_set.get(isDefault=True)
+        default_group.save()
+
         response = {"code": 0, "msg": "Registration success!"}
 
     print(response)
@@ -460,7 +419,8 @@ class GroupOperations(APIView):
     def post(self, request):
         user = self.get_user(request)
         data = JSONParser().parse(request)
-        new_group = Group(Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
+        new_group = Group(
+            Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
         new_group.save()
         new_group.teamMember.add(user)
         new_group.save()
