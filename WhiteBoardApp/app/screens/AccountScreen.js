@@ -1,11 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-<<<<<<< HEAD
-import { StyleSheet, View, Image, Text, Platform, TouchableOpacity } from 'react-native';
-import { setAvatarApi } from '../requests/api';
-=======
-import { TextInput, StyleSheet, View, FlatList, Image, Text, Platform, TouchableOpacity, SafeAreaView, Button, Alert } from 'react-native';
->>>>>>> main
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, View, Image, Text, Button, TextInput, Platform, TouchableOpacity } from 'react-native';
+import { setAvatarApi, getAvatarApi } from '../requests/api';
 
 import defAvatar from '../assets/avatar.png';
 
@@ -13,87 +9,68 @@ import defAvatar from '../assets/avatar.png';
 const onChangeText = () => {
   console.log('here');
 }
-
 function Account(props) {
-<<<<<<< HEAD
-  const userInfo = {
-    UserID: "member1",
-    Email: "member1@team18.com",
-=======
 
   let userInfo = {
     Avatar: null,
-    UserID:   "member1",
-    Email:  "member1@team18.com",
->>>>>>> main
+    UserID: "member1",
+    Email: "member1@team18.com",
     PhoneNum: "123456789",
     TeamID: "18",
     TeamName: "Team 18",
   }
 
-<<<<<<< HEAD
-  const setAvatar = () => {
-    // Upload the image using the fetch and FormData APIs
-    let formData = new FormData();
-    // "Image, name" is the name of the form field the server expects
-    // GpID ; inserted into url
-    // formData.append('Image', localUri);
-    formData.append('name', userName);
-    formData.append('Description', 'static');
-    setAvatarApi(formData).then((response) => {
-      // If on success, change the avatar on account page
-    })
-=======
-  const [userID, onChangeUserID] = React.useState(userInfo.UserID);
-  const [email, onChangeEmail] = React.useState(userInfo.Email);
-  const [phone, onChangePhone] = React.useState(userInfo.PhoneNum);
-  const [teamName, onChangeTeamName] = React.useState(userInfo.TeamName);
-  const [avatar, onChangeAvatar] = React.useState(userInfo.avatar);
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  const getUserInfo = () => {
+    // Store user account info in local storage
+    storage
+      .load({
+        key: 'login-session',
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: false,
+        syncInBackground: true,
+      })
+      .then(ret => {
+        // found data go to then()
+        setUser(ret)
+        console.log("Account Page found data!")
+
+      })
+      .catch(err => {
+        // any exception including data not found
+        // goes to catch()
+        console.log("User not found!")
+        setUsername('');
+        setPwd('');
+        setRememberMe(false);
+      });
+  };
+
+  const [user, setUser] = React.useState();
+  const [userID, onChangeUserID] = React.useState(user.UserID);
+  const [email, onChangeEmail] = React.useState(user.Email);
+  const [phone, onChangePhone] = React.useState(user.PhoneNum);
+  const [teamName, onChangeTeamName] = React.useState(userInfo);
+  const [avatar, onChangeAvatar] = React.useState(user.avatar);
 
   const discardChange = () => {
-    onChangeUserID(userInfo.UserID);
-    onChangeEmail(userInfo.Email);
+    onChangeUserID(user.user_info.uid);
+    onChangeEmail(user.user_info.email);
     onChangePhone(userInfo.PhoneNum);
     onChangeTeamName(userInfo.TeamName);
->>>>>>> main
   }
 
   const { navigate } = props.navigation;
-  
-  return (
-<<<<<<< HEAD
-    <View style={styles.container}>
-      <TouchableOpacity style={{ alignItems: "left" }}>
-        <Text style={{ color: '#888', fontSize: 18 }}>
-          Edit
-        </Text>
-      </TouchableOpacity>
-      <Image source={avatar} style={[styles.avatar]} />
-      <Text style={{ color: '#888', fontSize: 18 }}>
-        {userInfo.UserID}
-      </Text>
-      <Text style={{ color: '#888', fontSize: 18 }}>
-        {userInfo.Email}
-      </Text>
-      <Text style={{ color: '#888', fontSize: 18 }}>
-        {userInfo.PhoneNum}
-      </Text>
-      <TouchableOpacity onPress={() => navigate("Team")}>
-        <Text style={{ color: '#888', fontSize: 18 }}>
-          {userInfo.TeamName}
-        </Text>
-      </TouchableOpacity>
 
-      <Text style={{ color: '#888', fontSize: 18, height: "30%" }}>
-        {''}
-      </Text>
-      <StatusBar style="auto" />
-    </View>
-=======
+  return (
     <SafeAreaView style={styles.container}>
-      <View style={{flex:1,  justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Image
-          source={avatar?avatar:defAvatar} style={styles.avatar} 
+          source={avatar ? avatar : defAvatar} style={styles.avatar}
         />
         <Button
           title="Change"
@@ -104,29 +81,21 @@ function Account(props) {
         <View style={styles.item}>
           <Text style={styles.title}>UserID</Text>
           <TextInput
-              style={styles.input}
-              value={userID}
-              onChangeText={(text) => onChangeUserID(text)}
+            style={styles.input}
+            value={userID}
+            onChangeText={(text) => onChangeUserID(text)}
           />
         </View>
         <View style={styles.item}>
           <Text style={styles.title}>Email</Text>
           <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={text => onChangeEmail(text)}
-              keyboardType="email-address"
+            style={styles.input}
+            value={email}
+            onChangeText={text => onChangeEmail(text)}
+            keyboardType="email-address"
           />
         </View>
-        <View style={styles.item}>
-          <Text style={styles.title}>Phone</Text>
-          <TextInput
-              style={styles.input}
-              value={phone}
-              onChangeText={text => onChangePhone(text)}
-              keyboardType="phone-pad"
-          />
-        </View>
+        {/*         
         <View style={styles.item}>
           <Text style={styles.title}>Team</Text>
           <TextInput
@@ -134,7 +103,7 @@ function Account(props) {
               value={teamName}
               onChangeText={text => onChangeTeamName(text)}
           />
-        </View>
+        </View> */}
       </View>
       <View style={styles.fixToText}>
         <Button
@@ -146,34 +115,19 @@ function Account(props) {
           color="red"
           onPress={() => discardChange()}
         />
-      </View>      
+      </View>
     </SafeAreaView>
->>>>>>> main
   );
 }
 // <StatusBar style="auto" />
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-<<<<<<< HEAD
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 350,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    padding: 40,
-  },
-  avatar: {
-    width: 200,
-    height: 200,
-
-=======
   },
   item: {
     backgroundColor: 'rgb(248, 245, 249)',
     flexDirection: "row",
-    padding:15,
+    padding: 15,
     marginVertical: 10,
     marginHorizontal: 20,
   },
@@ -181,9 +135,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     flex: 0.25,
   },
-  avatar:{
-    width:150,
-    height:150,
+  avatar: {
+    width: 150,
+    height: 150,
   },
   fixToText: {
     flexDirection: 'row',
@@ -196,7 +150,6 @@ const styles = StyleSheet.create({
     flex: 0.7,
     fontSize: 18,
     borderWidth: 1,
->>>>>>> main
   }
 });
 export default Account;
