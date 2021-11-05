@@ -18,7 +18,7 @@ class ImageSerializer(serializers.Serializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['Gpname', 'GpID', 'GpDescription', 'isDefault', 'leader_uid']
+        fields = ['Gpname', 'GpID', 'GpDescription', 'isDefault']
 
     user = UserSerializer
 

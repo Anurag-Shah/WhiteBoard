@@ -1,7 +1,7 @@
 #############################################################################
 # API/views.py
 #
-# Authors: Chunao Liu, Jenna Zhang, Michelle He
+# Authors: Chunao Liu, Jenna Zhang
 #
 # This is an django APIView that handles all the HTTP request received
 # by the backend. It support get, put and delete objects from the database
@@ -32,14 +32,12 @@ from .models import User, Group, GroupImages
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
 
 
-from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
-from .models import User, Group, GroupImages
-
+# Create your views here.
 
 # Class AllUserList
 # Author: Chunao Liu, Jenna Zhang
 # Return value: JsonResponse
-# Inheritence:
+# Inheritence: 
 #       APIView
 # This class respond to HTTP request
 # for all user's information
@@ -57,16 +55,14 @@ class AllUserList(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            # HTTP 201: CREATED
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # HTTP 400: BAD REQUEST
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # HTTP 201: CREATED
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # HTTP 400: BAD REQUEST
 
 
 # Class SpecificUser
 # Author: Chunao Liu
 # Return value: JsonResponse
-# Inheritence:
+# Inheritence: 
 #       APIView
 # This class respond to HTTP request
 # for a specific user ID
@@ -86,8 +82,7 @@ class SpecificUser(APIView):
         return Response(Serializer.data)
 
     def put(self, request, id):
-        Serializer = UserSerializer(
-            self.get_user_object(id), data=request.data)
+        Serializer = UserSerializer(self.get_user_object(id), data=request.data)
         if (Serializer.is_valid()):
             Serializer.save()
             return Response(Serializer.data)
@@ -102,7 +97,7 @@ class SpecificUser(APIView):
 # Class SpecificGroup
 # Author: Chunao Liu
 # Return value: JsonResponse
-# Inheritence:
+# Inheritence: 
 #       APIView
 # This class respond to HTTP request
 # for a specific Group ID
@@ -122,8 +117,7 @@ class SpecificGroup(APIView):
         return Response(Serializer.data)
 
     def put(self, request, id):
-        Serializer = GroupSerializer(
-            self.get_group_object(id), data=request.data)
+        Serializer = GroupSerializer(self.get_group_object(id), data=request.data)
         if (Serializer.is_valid()):
             Serializer.save()
             return Response(Serializer.data)
@@ -138,7 +132,7 @@ class SpecificGroup(APIView):
 # Class ImageUpload
 # Author: Chunao Liu
 # Return value: JsonResponse
-# Inheritence:
+# Inheritence: 
 #       APIView
 # This class respond to HTTP request
 # for a group's image
@@ -148,7 +142,6 @@ class ImageUpload(APIView):
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
-
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
         print(aaa)
@@ -166,20 +159,17 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=file, GpID=group, name=name)
         image_path = image.Image
-        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + \
-            str(image_path)
+        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
-
         print("OCR is: " + ocr_return)
         response = HttpResponse(zip_file, content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
         return response
 
     def get(self, request, GPid):
-        Serializer = GroupImagesSerializer(
-            self.get_Group_image(GPid), many=True)
+        Serializer = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
 
 
@@ -219,106 +209,56 @@ def process_text(request):
     return Response
 
 
-@api_view(['POST'])
+# Function sign_up
+# Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
+# Return value: JsonResponse
+# This function receives sign up request from the client and create a new user if
+# all fields are valid
+@api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
 @transaction.atomic()
-def register(request):
-    user = JSONParser().parse(request)
-    username = user.get("username")
-    emailAdd = user.get("email")
-    pw = user.get("password")
+def sign_up(request):
+    data = JSONParser().parse(request)
+    name = data.get('username')
+    password = data.get('password')
+    email = data.get('email')
+    UserModel = get_user_model()
+    new_user = UserModel.objects.create_user(username=name, password=password)
+    # If username or email already exists, django.db.IntegrityError will be raised when we try to save
+    # But it does not indicate which field is duplicated, so we have to check manually
 
-    usernameOK = False
-    emailOK = False
+    # Check email
     try:
-        User.objects.get(name=username)
+        email_match = User.objects.get(email=email)
+        # if no exception raised, then the email already exists, return with error
+        return JsonResponse({"code": -1, "msg": "email already exists"})
     except User.DoesNotExist:
-        usernameOK = True
+        # we are fine
+        new_user.email = email
 
+    # Check username
     try:
-        User.objects.get(email=emailAdd)
+        name_match = User.objects.get(name=name)
+        # if no exception raised, then the username already exists, return with error
+        return JsonResponse({"code": -2, "msg": "username already exists"})
     except User.DoesNotExist:
-        emailOK = True
+        # we are fine
+        new_user.username = name
 
-    if (usernameOK == False and emailOK == False):
-        response = {"code": -1,
-                    "msg": "Both username and email address already in use!"}
-    elif (usernameOK == False):
-        response = {"code": -2, "msg": "Username already in use!"}
-    elif (emailOK == False):
-        response = {"code": -3, "msg": "Email address already in use!"}
-    else:
-        UserModel = get_user_model()
-        user_auth = UserModel.objects.create_user(username=username, email=emailAdd, password=pw)
-        user_auth.save()
+    new_user.save()
 
-        # Each user belong to a default group
-        user = User(name=username, email=emailAdd, pk=user_auth.pk)
-        user.save()
-        default_group = Group(Gpname=username, GpDescription=username + "'s default group", isDefault=True,
-                              leader_uid=user_auth.pk)
-        # need to save the defalut_group to generate an id before linking it to a user
-        default_group.save()
-        default_group.teamMember.add(user)
-        # my_user.group_set.get(isDefault=True)
-        default_group.save()
+    # Each user belong to a default group
+    my_user = User(name=name, email=email, pk=new_user.pk)
+    my_user.save()
+    default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True, leader_uid=new_user.pk)
+    # need to save the defalut_group to generate an id before linking it to a user
+    default_group.save()
+    default_group.teamMember.add(my_user)
+    # my_user.group_set.get(isDefault=True)
+    default_group.save()
 
-        response = {"code": 0, "msg": "Registration success!"}
-
-    print(response)
-    return JsonResponse(response)
-
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-@authentication_classes([TokenAuthentication])
-@transaction.atomic()
-def register(request):
-    user = JSONParser().parse(request)
-
-    username = user.get("username")
-    emailAdd = user.get("email")
-    pw = user.get("password")
-
-    usernameOK = False
-    emailOK = False
-    try:
-        User.objects.get(name=username)
-    except User.DoesNotExist:
-        usernameOK = True
-
-    try:
-        User.objects.get(email=emailAdd)
-    except User.DoesNotExist:
-        emailOK = True
-
-    if (usernameOK == False and emailOK == False):
-        response = {"code": -1,
-                    "msg": "Both username and email address already in use!"}
-    elif (usernameOK == False):
-        response = {"code": -2, "msg": "Username already in use!"}
-    elif (emailOK == False):
-        response = {"code": -3, "msg": "Email address already in use!"}
-    else:
-        UserModel = get_user_model()
-        user_auth = UserModel.objects.create_user(username=username, email=emailAdd, password=pw)
-        user_auth.save()
-
-        # Each user belong to a default group
-        user = User(name=username, email=emailAdd, pk=user_auth.pk)
-        user.save()
-        default_group = Group(Gpname=username, GpDescription=username + "'s default group", isDefault=True,
-                              leader_uid=user_auth.pk)
-        # need to save the defalut_group to generate an id before linking it to a user
-        default_group.save()
-        default_group.teamMember.add(user)
-        # my_user.group_set.get(isDefault=True)
-        default_group.save()
-
-        response = {"code": 0, "msg": "Registration success!"}
-
-    print(response)
-    return JsonResponse(response)
+    return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
 
 
 # Function login_view
@@ -579,8 +519,7 @@ def pwd_reset(request):
         }
         email = render_to_string(email_template_name, c)
         try:
-            send_mail(subject, email, 'janneyzay540@gmail.com',
-                      [email_address], fail_silently=False)
+            send_mail(subject, email, 'janneyzay540@gmail.com', [email_address], fail_silently=False)
             # password_reset_form = PasswordResetForm()
             return JsonResponse({"code": 0, "msg": "Email successfully sent"})
         except BadHeaderError:

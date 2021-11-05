@@ -49,8 +49,8 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
-      <Stack.Screen name="Login" component={LoginPage}></Stack.Screen>
-      <Stack.Screen name="Register" component={RegistrationPage} />
+      <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}></Stack.Screen>
+      <Stack.Screen name="Register" component={RegistrationPage} options={{ headerShown: false }} />
       <Stack.Screen
         name="TextEditorPage"
         component={TextEditorPage}
