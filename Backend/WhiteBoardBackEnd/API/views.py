@@ -243,67 +243,12 @@ def process_text(request):
     return Response
 
 
-# # Function sign_up
-# # Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
-# # Return value: JsonResponse
-# # This function receives sign up request from the client and create a new user if
-# # all fields are valid
-# @api_view(http_method_names=['POST'])
-# @permission_classes((AllowAny,))
-# @authentication_classes([TokenAuthentication])
-# @transaction.atomic()
-# def sign_up(request):
-#     data = JSONParser().parse(request)
-#     name = data.get('username')
-#     password = data.get('password')
-#     email = data.get('email')
-#     UserModel = get_user_model()
-#     new_user = UserModel.objects.create_user(username=name, password=password)
-#     # If username or email already exists, django.db.IntegrityError will be raised when we try to save
-#     # But it does not indicate which field is duplicated, so we have to check manually
-#
-#     # Check email
-#     try:
-#         email_match = User.objects.get(email=email)
-#         # if no exception raised, then the email already exists, return with error
-#         return JsonResponse({"code": -1, "msg": "email already exists"})
-#     except User.DoesNotExist:
-#         # we are fine
-#         new_user.email = email
-#
-#     # Check username
-#     try:
-#         name_match = User.objects.get(name=name)
-#         # if no exception raised, then the username already exists, return with error
-#         return JsonResponse({"code": -2, "msg": "username already exists"})
-#     except User.DoesNotExist:
-#         # we are fine
-#         new_user.username = name
-#
-#     new_user.save()
-#
-#     # Each user belong to a default group
-#     my_user = User(name=name, email=email, pk=new_user.pk)
-#     my_user.save()
-#
-#     default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True, leader_uid=new_user.pk)
-#     # need to save the defalut_group to generate an id before linking it to a user
-#     default_group.save()
-#
-#     default_group.teamMember.add(my_user)
-#     # my_user.group_set.get(isDefault=True)
-#     default_group.save()
-#
-#     return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
-
-
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
 @transaction.atomic()
 def register(request):
     user = JSONParser().parse(request)
-
     username = user.get("username")
     emailAdd = user.get("email")
     pw = user.get("password")

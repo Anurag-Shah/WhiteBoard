@@ -1,6 +1,7 @@
-const base_url = "http://66.253.158.235:8000/"
+const base_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/"
 
 export default {
+    base_url: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/",
     login: base_url + "User/login/",
     logout: base_url + "User/logout/",
     resetPwd: base_url + "password_reset",

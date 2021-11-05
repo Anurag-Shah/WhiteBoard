@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, LogBox } from "react-native";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { NavigationContainer } from "@react-navigation/native";
@@ -17,9 +17,12 @@ import LoginPage from "./LoginPage";
 import RegistrationPage from "./RegistrationPage";
 import TextEditorPage from "./TextEditorPage";
 
+
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
+
+LogBox.ignoreAllLogs();
 
 const screenOptionStyle = {
   headerStyle: {
@@ -28,6 +31,7 @@ const screenOptionStyle = {
   headerTintColor: "white",
   headerBackTitle: "Back",
 };
+
 
 const HomeStackNavigator = () => {
   return (
@@ -40,6 +44,7 @@ const HomeStackNavigator = () => {
         component={CameraScreen}
         options={{ title: "WhiteBoard", headerShown: false }}
       />
+      <Stack.Screen name="Drawer" component={MyDrawer} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Screen name="Save" component={Save}></Stack.Screen>
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
@@ -54,6 +59,8 @@ const HomeStackNavigator = () => {
     </Stack.Navigator>
   );
 };
+
+
 
 function MyDrawer() {
   return (
@@ -73,11 +80,11 @@ function MyDrawer() {
   );
 }
 
-function WelcomeScreen() {
+function WelcomeScreen({ navigation }) {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <MyDrawer />
+        <MyDrawer navigation={navigation} />
       </NavigationContainer>
     </Provider>
   );

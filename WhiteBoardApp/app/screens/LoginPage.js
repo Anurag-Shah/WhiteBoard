@@ -39,9 +39,8 @@ function Prompt(props) {
           Alert.alert(
             "Reset password link sent!",
             'A reset password link has been sent to "' + email + '"',
-            [{ text: "OK" }]
+            [{ text: "OK", onPress: () => { props.setVisible(false); } }]
           );
-          props.setVisible(false);
         } else if (response.code == -1) {
           // Email has not been registered
           setSuccess(false);
@@ -142,7 +141,7 @@ function LoginPage({ navigation }) {
       logged_in: false,
     };
     loginApi(username, password).then((response) => {
-      if (response.code == 0) {
+      if (response && response.code == 0) {
         // If Login successfully
         user.logged_in = true;
         user.token = response.token;
@@ -151,10 +150,13 @@ function LoginPage({ navigation }) {
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
-          user.rememberMe = false;
-          console.log(user);
+          user.rememberMe = true;
         } else {
           user.rememberMe = false;
+          setTimeout(() => {
+            setUsername("");
+            setPwd("");
+          }, 3000);
         }
         storage.save({
           key: "login-session",
@@ -162,7 +164,7 @@ function LoginPage({ navigation }) {
         });
         // Redirecting to Camera Page
         Alert.alert("", "Logged in Successfully!", [
-          { text: "OK", onPress: () => navigation.push("Camera") },
+          { text: "OK", onPress: () => { navigation.push("Camera"); navigation.push("Drawer"); } },
         ]);
       } else {
         setWrongInfo(true);
