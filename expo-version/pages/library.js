@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { Icon } from "react-native-elements";
 
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
+LogBox.ignoreAllLogs();//Ignore all log notifications
+const image_url = "";
 
 class library extends Component {
   constructor(props) {
@@ -44,7 +46,7 @@ class library extends Component {
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
     /*local test*/
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
-    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Group/1';
+    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Images/1';
 
     this.setState({ loading: true });
 
@@ -127,13 +129,21 @@ class library extends Component {
       <SafeAreaView style={{flex: 1}}>
         <FlatList
           data={this.state.data}
-          keyExtractor={item => item.name.toString()}
+          //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider>
               <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>
               <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
+              
+              </ListItem.Content>
+              <ListItem.Chevron 
+              onPress={() => {
+                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image;
+                console.log(this.image_url);
+                this.setState({show:true});
+                }} />
               <Modal
                transparent={true}
                visible={this.state.show}
@@ -143,18 +153,13 @@ class library extends Component {
                     <Image
                     style={{width: 500,
                         height: 500}}
-                    source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
+                    source={{uri: this.image_url}}/>
                     <Button
                         title="close"
                         onPress={() => this.setState({show:false})}
                     />
                  </SafeAreaView>
-
               </Modal>
-              </ListItem.Content>
-              <ListItem.Chevron 
-              onPress={() => this.setState({show:true})} />
-              
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
               //<ListItem //style={{ height: 50 }}
