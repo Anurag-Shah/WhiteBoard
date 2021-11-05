@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SafeAreaView, StyleSheet, View, Image, Text, Button, TextInput, Platform, TouchableOpacity } from 'react-native';
-import { setAvatarApi, getAvatarApi } from '../requests/api';
+import { setAvatarApi } from '../requests/api';
 
 import defAvatar from '../assets/avatar.png';
 
@@ -65,7 +65,6 @@ function Account(props) {
   }
 
   const { navigate } = props.navigation;
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

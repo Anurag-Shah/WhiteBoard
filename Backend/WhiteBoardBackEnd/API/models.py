@@ -10,7 +10,7 @@ from django.contrib.auth.models import AbstractUser
 class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
-    uid = models.IntegerField(primary_key=True)
+    uid = models.IntegerField(primary_key=True, default=0)
     avatar = models.ImageField(upload_to='Avatars', default=None)
 
     class meta():
