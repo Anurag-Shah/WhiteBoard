@@ -34,6 +34,13 @@ from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, 
 
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
 from .models import User, Group, GroupImages
+from django.core.files.base import ContentFile
+import base64
+from pathlib import Path
+import urllib
+from urllib.request import urlopen
+from django.core.files.temp import NamedTemporaryFile
+
 
 
 # Class AllUserList
@@ -111,6 +118,7 @@ class SpecificUser(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificGroup(APIView):
+    permission_classes = [AllowAny,]
     def get_group_object(self, id):
         try:
             return Group.objects.get(pk=id)
@@ -141,13 +149,13 @@ class SpecificGroup(APIView):
 # Inheritence:
 #       APIView
 # This class respond to HTTP request
-# for a group's image
+# for a group's imag
 
 # Need to uncomment the following two lines to enable token based authentication
 class ImageUpload(APIView):
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny,]
 
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
@@ -162,25 +170,40 @@ class ImageUpload(APIView):
 
     def post(self, request, GPid):
         file = request.data['Image']
+        print (type(file))
         name = request.data['name']
+        custom_name = name + ":" + str(GPid) + ".jpg"
+        try:
+            img = ContentFile(base64.b64decode(file), name=custom_name)
+        except:
+            img = file
         group = self.get_group_object(GPid)
-        image = GroupImages.objects.create(Image=file, GpID=group, name=name)
+        image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
-        path = "/home/chunao/WhiteBoardWork/Backend/WhiteBoardBackEnd/media/" + \
-            str(image_path)
+        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
+        return_data = {}
+        return_data['status'] = 'success'
+        return_data['image_uri'] = str(image_path)
+        print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
-
-        print("OCR is: " + ocr_return)
-        response = HttpResponse(zip_file, content_type='application/force-download')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % 'CDX_COMPOSITES_20140626.zip'
+        print(ocr_return)
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(
             self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
+    
+    def delete(self, request, GPid):
+        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        try:
+            ImageObject.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 # Function process image
@@ -204,6 +227,7 @@ def process_image(request):
 @api_view(['POST', 'GET'])
 def process_text(request):
     # If texted code is received, then the imageId field is null
+    
     return Response
 
 

@@ -14,6 +14,10 @@ import os
 from pathlib import Path
 from decouple import config
 
+import sys
+
+print (sys.path)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -50,8 +54,8 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 # AWS SES settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
-AWS_ACCESS_KEY_ID = ''  # hidden
-AWS_SECRET_ACCESS_KEY = ''  # hidden
+AWS_ACCESS_KEY_ID = 'AKIAZG5TX5PYO7HOJFBH'  # hidden
+AWS_SECRET_ACCESS_KEY = '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'  # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
 # (ex: email.us-east-2.amazonaws.com)
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
@@ -74,6 +78,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'API',
     'crispy_forms',
+    'django_extensions',
+    'WhiteBoardBackEnd',
 ]
 
 MIDDLEWARE = [
@@ -130,9 +136,9 @@ WSGI_APPLICATION = 'WhiteBoardBackEnd.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'whiteboard_db',
-        'USER': 'root',
-        'PASSWORD': 'michellezhe',
+        'NAME': 'django_data_base',
+        'USER': 'chunao',
+        'PASSWORD': '990603qwerty',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -175,6 +181,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = '/var/www/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

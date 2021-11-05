@@ -6,7 +6,6 @@ urlpatterns = [
     path('Users/', AllUserList.as_view()),
     path('Users/<int:id>', SpecificUser.as_view()),
     path('User/login/', login_view, name='login'),
-    path('User/register/', sign_up, name='register'),
     path('User/logout/', logout_view, name='logout'),
     path('User/update/', update_user, name='account_update'),
     path('User/avatar/', Avatar.as_view(), name='get_or_set_avatar'),
