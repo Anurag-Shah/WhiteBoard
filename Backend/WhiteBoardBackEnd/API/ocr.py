@@ -46,8 +46,10 @@ def ocr(image_file_name, input_text=None):
 	if image_file_name != None:
 		image = Image.open(image_file_name).convert('RGB')
 		ocr_out, imlang, outimage, imtype = ocr_wrapper(image)
+		while "\n\n" in ocr_out:
+			ocr_out = ocr_out.replace("\n\n", "\n")
 		compiler_out, line_numbers = compiler_wrapper(ocr_out, imlang)
-		post_image, left_coords = ocr_postprocess_image(outimage, line_numbers)
+		outimage, left_coords = ocr_postprocess_image(outimage, line_numbers)
 	else:
 		# Raw text input
 		imlang = ocr_lang_detect.detect(input_text)
@@ -64,5 +66,7 @@ if __name__ == "__main__":
 	test_im_path = "../../OCR/images/tesseract_tests/"
 	test_im = "test3"
 	imsuffix = ".png"
-	print(ocr(test_im_path + test_im + imsuffix))
-	print(ocr(None, "hello"))
+	out = ocr(test_im_path + test_im + imsuffix)
+	print(out)
+	out[0].save("result.png")
+	print(ocr(None, '#include<stdio.h>\nint main() {printf("Hello World");}'))

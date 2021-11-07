@@ -55,6 +55,7 @@ from django.core.files.temp import NamedTemporaryFile
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class AllUserList(APIView):
+    permission_classes = [AllowAny,]
     def get(self, request):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
@@ -82,6 +83,7 @@ class AllUserList(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificUser(APIView):
+    permission_classes = [AllowAny,]
     def get_user_object(self, id):
         try:
             return User.objects.get(pk=id)

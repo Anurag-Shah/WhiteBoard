@@ -48,7 +48,8 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  'ip-172-31-32-112.us-east-2.compute.internal',
                  'ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  '127.0.0.1',
-                 '172.16.50.73'
+                 '172.16.50.73',
+                 '3.138.112.15',
                  ]
 
 # AWS SES settings
