@@ -447,4 +447,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# SSH private key files
+.pem
+
 # End of https://www.toptal.com/developers/gitignore/api/python,reactnative
