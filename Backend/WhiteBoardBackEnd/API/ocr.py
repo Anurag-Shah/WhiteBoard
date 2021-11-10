@@ -30,11 +30,12 @@ def ocr(image_file_name, input_text=None):
 
 	# Output:
 	# 1. Postprocessed image
-	# 2. Text output
-	# 3. Result
+	# 2. Text output (OCR Output)
+	# 3. Result (Execution result / Stack trace / Compilation errors)
 	# 4. Image Type (Typeform / Handwritten / Text [non-image])
 	# 5. Image Programming Language
 	# 6. Error line y-coordinates
+	# 7. Error Line Numbers
 
 	outimage = None
 	ocr_out = ""
@@ -42,6 +43,7 @@ def ocr(image_file_name, input_text=None):
 	imtype = ""
 	imlang = ""
 	left_coords = None
+	line_numbers = []
 
 	if image_file_name != None:
 		image = Image.open(image_file_name).convert('RGB')
@@ -57,7 +59,7 @@ def ocr(image_file_name, input_text=None):
 		imtype = "Text"
 		ocr_out = None
 	imtype = "Typeform"
-	return outimage, ocr_out, compiler_out, imtype, imlang, left_coords
+	return outimage, ocr_out, compiler_out, imtype, imlang, left_coords, line_numbers
 
 if __name__ == "__main__":
 	sys.path.insert(1, os.path.abspath("../../Compiler"))
