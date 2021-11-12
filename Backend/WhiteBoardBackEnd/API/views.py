@@ -7,6 +7,7 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
+import os
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
@@ -182,6 +183,7 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
+        ImageID = image.pk
         path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
         return_data = {}
@@ -191,6 +193,7 @@ class ImageUpload(APIView):
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print(ocr_return)
+        return_data['ocr_compile_return'] = ocr_return[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -207,6 +210,58 @@ class ImageUpload(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+class ImageDeleteWithID(APIView):
+    permission_classes = [AllowAny,]
+
+    def delete(self, request, ImageID):
+        ImageObject = GroupImagesSerializer()
+
+# Class TempImageUpload
+# Author: Chunao Liu
+# Return value: JsonResponse
+# Inheritence:
+#       APIView
+# This class respond to HTTP request
+# for a group's image and it needs no
+# authentication! It won't save the
+# image, eigher.
+
+class TempImageUpload(APIView):
+    permission_classes = [AllowAny,]
+
+    def post(self, request):
+        file = request.data['Image']
+        print (type(file))
+        name = request.data['name']
+        custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + name + ".jpg"
+        temp_file = open(custom_name, "wb")
+        try:
+            temp_file.write(base64.b64decode(file))
+        except:
+            temp_file.write(file.read())
+        temp_file.close()
+        path = custom_name
+        zip_file = open(path, 'rb')
+        return_data = {}
+        return_data['status'] = 'success'
+        return_data['image_uri'] = str(custom_name)
+        print(Path(path).as_uri())
+        # ocr_return should have the stack trace so far
+        ocr_return = ocr.ocr(path)
+        print(ocr_return)
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        if os.path.isfile(custom_name):
+            print("Removing!")
+            os.remove(custom_name)
+        return response
+    
+    def delete(self, request, GPid):
+        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        try:
+            ImageObject.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 # Function process image
 # Author: Jenna Zhang
