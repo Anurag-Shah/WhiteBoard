@@ -12,7 +12,7 @@ import CameraScreen from './CameraScreen';
 import Sidebar from './shared/Sidebar';
 import Save from './SaveScreen';
 import Library from './LibraryScreen';
-import Team from './TeamScreen';
+import Team from './Team/TeamScreen';
 import Account from './AccountScreen';
 
 const store = createStore(userReducer);

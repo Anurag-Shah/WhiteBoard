@@ -374,7 +374,8 @@ class Avatar(APIView):
 # This function logs the user out
 class UserGroups(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def get_default_group(self, request):
@@ -399,13 +400,24 @@ class UserGroups(APIView):
 # This function logs the user out
 class GroupOperations(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
 
     def get_group(self, id):
         return Group.objects.get(pk=id)
+
+    # get all team members
+    def get(self, request):
+        data = JSONParser().parse(request)
+        groupId = data.get("groupId")
+        group = Group.Object.get(GpID=groupId)
+        query = group.teamMember
+        serializer = UserSerializer(query, many=True)
+        return JsonResponse({"code": 0, "msg": "Team member fetched", "members": serializer})
+
 
     @transaction.atomic()
     def post(self, request):

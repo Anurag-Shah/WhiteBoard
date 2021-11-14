@@ -16,7 +16,7 @@ import {
   Platform,
 } from "react-native";
 import Dialog from "react-native-dialog";
-import { loginApi, resetPwdApi, helloApi } from "../requests/api";
+import { loginApi, resetPwdApi } from "../requests/api";
 
 function Prompt(props) {
   const [email, setEmail] = React.useState("");
@@ -139,6 +139,7 @@ function LoginPage({ navigation }) {
       token: "",
       rememberMe: true,
       logged_in: false,
+      user_info: [],
     };
     loginApi(username, password).then((response) => {
       if (response && response.code == 0) {

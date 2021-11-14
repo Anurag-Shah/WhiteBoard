@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,8 +37,8 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 # Need to Request production access to move out of the sandbox
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
-AWS_ACCESS_KEY_ID = ''  # hidden
-AWS_SECRET_ACCESS_KEY = ''  # hidden
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")  # hidden
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")  # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)
 

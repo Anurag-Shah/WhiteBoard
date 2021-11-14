@@ -11,7 +11,8 @@ import CameraScreen from "./CameraScreen";
 import Sidebar from "./shared/Sidebar";
 import Save from "./SaveScreen";
 import Library from "./LibraryScreen";
-import Team from "./TeamScreen";
+import Team from './Team/TeamScreen';
+import TeamMember from './Team/TeamMember';
 import Account from "./AccountScreen";
 import LoginPage from "./LoginPage";
 import RegistrationPage from "./RegistrationPage";
@@ -30,6 +31,7 @@ const screenOptionStyle = {
   },
   headerTintColor: "white",
   headerBackTitle: "Back",
+  headerShown: false,
 };
 
 
@@ -48,6 +50,7 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="Save" component={Save}></Stack.Screen>
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
+      <Stack.Screen name="TeamMember" component={TeamMember}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
       <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Screen name="Register" component={RegistrationPage} options={{ headerShown: false }} />
