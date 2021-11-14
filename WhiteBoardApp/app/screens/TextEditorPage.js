@@ -16,8 +16,10 @@ import {
   TextInput,
   Platform,
   View,
+  ScrollView,
+  Text,
 } from "react-native";
-import { Header, Icon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 import Topbar from "./shared/Topbar";
 
 import urls from "../requests/urls";
@@ -25,59 +27,97 @@ import urls from "../requests/urls";
 // const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
 const serverURL = "http://172.16.50.73:8000/";
 
-const COMPILATIONERROR = -1;
-const RUNTIMEERROR = -2;
-
 export default class TextEditorPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       typenCode: "",
+      returnValue: 1,
+      returnMessage: "",
     };
   }
 
   async sendCode() {
-    // TODO: get groupID from local storage
     try {
-      // TODO: request URL
-      const res = await fetch(serverURL + "Text/process", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ typenCode: this.state.typenCode }),
-      });
+      // const res = await fetch(serverURL + "Text/process", {
+      //   method: "POST",
+      //   headers: {
+      //     Accept: "application/json",
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ typenCode: this.state.typenCode }),
+      // });
+      const res = await fetch(
+        "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TextUpload/",
+        {
+          method: "GET", // TODO: need to be "POST" since need to send the code, group num, and file name
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          //body: JSON.stringify({ typenCode: this.state.typenCode }),
+        }
+      );
       const response = await res.json();
-      Alert.alert("Success", "Your code has been successfully sent!", [
+      Alert.alert("Code Sent", "Your code has been successfully sent!", [
         {
           text: "OK",
           onPress: () => {
-            code = Object.values(response)[0];
-            if (code == COMPILATIONERROR) {
-              return Alert.alert(
-                "Compilation Error",
-                "There are some compilation error occurred. The stack trace will be displayed.",
+            //console.log(response);
+            const terminalOutput = response.terminal_output; // might need to change the name of the key, depending on backend implementation
+            if (terminalOutput == null) {
+              this.setState({ returnValue: -1 });
+              Alert.alert(
+                "Error",
+                "There are some error occurred. The stack trace will be displayed.",
                 [{ text: "OK" }]
               );
-            } else if (code == RUNTIMEERROR) {
-              return Alert.alert(
-                "Runtime Error",
-                "There are some runtime error occurred. The stack trace will be displayed.",
-                [{ text: "OK" }]
-              );
-            } else {
+            }
+            // else if (code == RUNTIMEERROR) {
+            //   return Alert.alert(
+            //     "Runtime Error",
+            //     "There are some runtime error occurred. The stack trace will be displayed.",
+            //     [{ text: "OK" }]
+            //   );
+            // }
+            else {
+              this.setState({ returnValue: 0 });
               Alert.alert(
                 "Success",
                 "Your code runs successfully! The output of your code will be displayed.",
                 [{ text: "OK" }]
               );
             }
+
+            const compileResult = response.compile_result;
+            this.setState({
+              returnMessage: compileResult,
+            });
           },
         },
       ]);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  displayConsoleLog() {
+    if (this.state.returnValue == 0) {
+      return (
+        <View style={styles.consolelog}>
+          <ScrollView style={styles.scroll}>
+            <Text>{this.state.returnMessage}</Text>
+          </ScrollView>
+        </View>
+      );
+    } else if (this.state.returnValue == -1) {
+      return (
+        <View style={styles.consolelog}>
+          <ScrollView style={styles.scroll}>
+            <Text style={styles.errorMessage}>{this.state.returnMessage}</Text>
+          </ScrollView>
+        </View>
+      );
     }
   }
 
@@ -114,12 +154,15 @@ export default class TextEditorPage extends React.Component {
                   text: "Submit",
                   style: "destructive",
                   onPress: () => this.sendCode(),
-                  // console.log(this.state.typenCode),
-                }, //TODO: send code to backend for compilation
+                },
               ])
             }
           />
         </View>
+
+        <View>{this.displayConsoleLog()}</View>
+
+        {/* TODO: add buttons for accept & discard */}
         {/* </SafeAreaProvider> */}
       </SafeAreaView>
     );
@@ -155,5 +198,18 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 15,
     alignItems: "flex-end",
+  },
+
+  consolelog: {
+    height: 200,
+  },
+
+  scroll: {
+    marginLeft: 20,
+    marginRight: 20,
+  },
+
+  errorMessage: {
+    color: "red",
   },
 });

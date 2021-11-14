@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, LogBox } from "react-native";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { NavigationContainer } from "@react-navigation/native";
@@ -20,6 +20,8 @@ import TextEditorPage from "./TextEditorPage";
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
+
+LogBox.ignoreAllLogs();
 
 const screenOptionStyle = {
   headerStyle: {
