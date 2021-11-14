@@ -187,6 +187,7 @@ class TeamScreen extends Component {
       data: filtered,
       groups: filtered,
     });
+    this.arrayholder = filtered;
   }
 
 
@@ -220,7 +221,6 @@ class TeamScreen extends Component {
         error: res.error || null,
         loading: false,
       });
-      this.arrayholder = res;
     })
   };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Component } from "react";
 import { SafeAreaView, Text, Button, StyleSheet, Dimensions, FlatList, View, ActivityIndicator, Alert } from "react-native";
-import { ListItem, Avatar, SearchBar, List, Icon } from 'react-native-elements';
+import { ListItem, Avatar, SearchBar, List, Icon, Badge } from 'react-native-elements';
 import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAllTeamMemebersApi, addMemberApi, removeMemberApi } from "../../requests/api";
 import Topbar from '../shared/Topbar';
@@ -86,7 +86,14 @@ class TeamMemeber extends Component {
         this.state = {
             loading: true,
             visible: false,
-            group: {},
+            group: {
+                Gpname: 'Group 1',
+                // avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+                GpID: 1,
+                leader_uid: 1,
+                GpDescription: 'yang1773@purdue.edu',
+                isDefault: false,
+            },
             user: {},
             members: [
                 {
@@ -102,12 +109,12 @@ class TeamMemeber extends Component {
                     name: 'Amy Farha',
                     uid: 1,
                     email: 'yang1773@purdue.edu',
-                    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+                    avatar: 'https://randomuser.me/api/portraits/women/40.jpg',
                 },
                 {
                     name: 'Chris Jackson',
                     uid: 2,
-                    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+                    avatar: 'https://randomuser.me/api/portraits/men/41.jpg',
                     email: 'yang1773@purdue.edu'
                 },
             ],
@@ -122,8 +129,6 @@ class TeamMemeber extends Component {
 
     reload = () => {
         //this.state.group = this.props.route.params.group;
-        this.state.members = this.state.data;
-        this.arrayholder = this.state.data;
         // getAllTeamMemebersApi(groupId).then((res) => {
         //     console.log(res);
         //     if (res && res.code == 0) {
@@ -131,14 +136,35 @@ class TeamMemeber extends Component {
         //         this.state.members = res.members;
         //         this.state.data = res.members;
         //         this.state.user = this.props.route.params.user;
-        //         this.setState({ loading: false });
-        //         this.arrayholder = res.members;
         //         if (this.state.group.leader_uid == this.state.user.uid) {
         //             this.state.isLeader = true;
         //         }
+        //         var filtered = this.state.data.filter(function (value) {
+        //             return value.uid != this.state.group.leader_uid;
+        //         });
+        //         var leader = this.state.data.find(e => e.uid == this.state.group.leader_uid)
+        //         filtered.unshift(leader);
+        //         this.setState({
+        //             data: filtered,
+        //             members: filtered,
+        //         });
+        //     } else if (!res) {
+        //         // Somehing went wrong
         //     }
         // });
-
+        let leader_id = this.state.group.leader_uid;
+        function my_filter(value, index, array) {
+            return value.uid != leader_id;
+        }
+        var filtered = this.state.data.filter(my_filter);
+        var leader = this.state.data.find(e => e.uid == this.state.group.leader_uid)
+        console.log("I am here");
+        filtered.unshift(leader);
+        this.setState({
+            data: filtered,
+            members: filtered,
+        });
+        this.arrayholder = this.state.data;
         this.setState({ loading: false });
         console.log("Page reloaded!");
     }
@@ -188,14 +214,27 @@ class TeamMemeber extends Component {
         );
     };
 
-    renderItem = ({ item }) => (
+    renderItem = ({ item, index }) => (
         <ListItem bottomDivider >
-            <Avatar source={{ uri: item.avatar }} />
+            <Avatar
+                rounded
+                size={58}
+                title={item.name[0]}
+                source={{ uri: item.avatar }}
+                containerStyle={{ borderColor: index == 0 ? "red" : "white", borderWidth: 0 }}>
+            </Avatar>
+            {item.uid == this.state.group.leader_uid ? <Badge
+                status="primary"
+                value="  Leader "
+                containerStyle={{ position: 'absolute', top: 10, left: 50 }}
+            /> : null}
             <ListItem.Content>
                 <ListItem.Title>{item.name} </ListItem.Title>
                 <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
             </ListItem.Content>
-            {this.state.isLeader ? <AntDesign name="minuscircleo" size={24} color="red" onPress={() => this.deleteGroup(item.GpID)} /> : null}
+            <AntDesign name="minuscircleo" size={24}
+                color={this.state.isLeader ? "red" : "grey"}
+                onPress={() => { this.state.isLeader ? this.deleteGroup(item.GpID) : Alert.alert("Only the group leader can remove members from the team!") }} />
         </ListItem>
     )
 
@@ -230,7 +269,10 @@ class TeamMemeber extends Component {
                     />
                 </View>
                 <View style={styles.bottom_bar}>
-                    <Ionicons name="person-add" size={50} color="green" style={{ top: 10 }} onPress={() => this.setVisible()} />
+                    <Ionicons name="person-add" size={50}
+                        color={this.state.isLeader ? "green" : "grey"}
+                        style={{ top: 10 }}
+                        onPress={() => { this.state.isLeader ? this.setVisible() : Alert.alert("Only group leader can add people to the team!") }} />
                     {/* <Text style={{ marginTop: 10, color: "green" }}>Add</Text> */}
                 </View>
                 {this.state.visible ? (
