@@ -18,6 +18,7 @@ import {
   View,
   ScrollView,
   Text,
+  Button,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import Topbar from "./shared/Topbar";
@@ -32,6 +33,7 @@ export default class TextEditorPage extends React.Component {
     super(props);
     this.state = {
       typenCode: "",
+      responseReceived: false,
       returnValue: 1,
       returnMessage: "",
     };
@@ -48,7 +50,7 @@ export default class TextEditorPage extends React.Component {
       //   body: JSON.stringify({ typenCode: this.state.typenCode }),
       // });
       const res = await fetch(
-        "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TextUpload/",
+        "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com/TextUpload/",
         {
           method: "GET", // TODO: need to be "POST" since need to send the code, group num, and file name
           headers: {
@@ -63,6 +65,8 @@ export default class TextEditorPage extends React.Component {
         {
           text: "OK",
           onPress: () => {
+            this.setState({ responseReceived: true });
+
             //console.log(response);
             const terminalOutput = response.terminal_output; // might need to change the name of the key, depending on backend implementation
             if (terminalOutput == null) {
@@ -102,20 +106,63 @@ export default class TextEditorPage extends React.Component {
   }
 
   displayConsoleLog() {
-    if (this.state.returnValue == 0) {
+    if (this.state.responseReceived) {
+      if (this.state.returnValue == 0) {
+        return (
+          <View style={styles.consolelog}>
+            <ScrollView style={styles.scroll}>
+              <Text>{this.state.returnMessage}</Text>
+            </ScrollView>
+          </View>
+        );
+      } else if (this.state.returnValue == -1) {
+        return (
+          <View style={styles.consolelog}>
+            <ScrollView style={styles.scroll}>
+              <Text style={styles.errorMessage}>
+                {this.state.returnMessage}
+              </Text>
+            </ScrollView>
+          </View>
+        );
+      }
+    }
+  }
+
+  saveOrDiscard() {
+    if (this.state.responseReceived) {
       return (
-        <View style={styles.consolelog}>
-          <ScrollView style={styles.scroll}>
-            <Text>{this.state.returnMessage}</Text>
-          </ScrollView>
-        </View>
-      );
-    } else if (this.state.returnValue == -1) {
-      return (
-        <View style={styles.consolelog}>
-          <ScrollView style={styles.scroll}>
-            <Text style={styles.errorMessage}>{this.state.returnMessage}</Text>
-          </ScrollView>
+        <View style={styles.saveDiscard}>
+          <View style={styles.button}>
+            <Button
+              title="Save"
+              onPress={() => {
+                // TODO: popup window to choose a group and name the code file
+              }}
+            />
+          </View>
+          <View style={styles.button}>
+            <Button
+              title="Discard"
+              color="red"
+              onPress={() => {
+                Alert.alert(
+                  "Are you sure to discard?",
+                  "Discarding will not save the code just compiled. You will not be able to see the code anymore after discarding.",
+                  [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                      text: "Discard",
+                      style: "destructive",
+                      onPress: () => {
+                        this.setState({ responseReceived: false });
+                      },
+                    },
+                  ]
+                );
+              }}
+            />
+          </View>
         </View>
       );
     }
@@ -162,7 +209,8 @@ export default class TextEditorPage extends React.Component {
 
         <View>{this.displayConsoleLog()}</View>
 
-        {/* TODO: add buttons for accept & discard */}
+        <View>{this.saveOrDiscard()}</View>
+
         {/* </SafeAreaProvider> */}
       </SafeAreaView>
     );
@@ -211,5 +259,17 @@ const styles = StyleSheet.create({
 
   errorMessage: {
     color: "red",
+  },
+
+  saveDiscard: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    marginTop: 15,
+  },
+
+  button: {
+    marginLeft: 45,
+    marginRight: 30,
   },
 });
