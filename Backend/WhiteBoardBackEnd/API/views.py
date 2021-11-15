@@ -41,6 +41,9 @@ from pathlib import Path
 import urllib
 from urllib.request import urlopen
 from django.core.files.temp import NamedTemporaryFile
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 
@@ -139,11 +142,29 @@ class SpecificGroup(APIView):
             Serializer.save()
             return Response(Serializer.data)
         return Response(HttpResponse.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request, id):
+        serializer = GroupSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            # HTTP 201: CREATED
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # HTTP 400: BAD REQUEST
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id):
         GroupObject = self.get_group_object(id)
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
+
+class TextUpload(APIView):
+    permission_classes = [AllowAny,]
+    def get(self, request):
+        return_data = {}
+        return_data['compile_result'] = "compile.c: In function 'main':\ncompile.c:4:1: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]\n 4 | exit(@)5\n | ^~~~\ncompile.c:4:1: warning: incompatible implicit declaration of built-in function 'exit'\ncompile.c:2:1: note: include '' or provide a declaration of 'exit'\n 1 | #include \n +++ |+#include \n 2 | int main() {\ncompile.c:4:6: error: stray '@' in program\n 4 | exit(@)5\n | ^\ncompile.c:4:1: error: too few arguments to function 'exit'\n 4 | exit(@)5\n | ^~~~\ncompile.c:4:8: error: expected ';' before numeric constant\n 4 | exit(@)5\n | ^\n | ;\n"
+        return_data['terminal_output'] = None
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        return response
 
 
 # Class ImageUpload
@@ -173,7 +194,6 @@ class ImageUpload(APIView):
 
     def post(self, request, GPid):
         file = request.data['Image']
-        print (type(file))
         name = request.data['name']
         custom_name = name + ":" + str(GPid) + ".jpg"
         try:
@@ -184,6 +204,7 @@ class ImageUpload(APIView):
         image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
         ImageID = image.pk
+        print ("ID is: " + str(ImageID))
         path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path)
         zip_file = open(path, 'rb')
         return_data = {}
@@ -193,7 +214,18 @@ class ImageUpload(APIView):
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print(ocr_return)
+        print(type(ocr_return[0]))
+        img_pil = ocr_return[0]
+        buffer = BytesIO()
+        img_pil.save(fp=buffer, format="PNG")
+        pil_file = ContentFile(buffer.getvalue(), name=request.data['name'] + "OCR_Return")
+        ImageObject = GroupImages.objects.filter(pk=ImageID)
+        print(ImageObject)
+        ImageObject.update(Image_after=pil_file)
+        ImageObject.update(name="Should-Work")
         return_data['ocr_compile_return'] = ocr_return[1]
+        image_path = image.Image_after
+        return_data['image_after_uri'] = str(image_path)
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -249,6 +281,7 @@ class TempImageUpload(APIView):
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print(ocr_return)
+        return_data['ocr_return'] = ocr_return[2]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         if os.path.isfile(custom_name):
             print("Removing!")

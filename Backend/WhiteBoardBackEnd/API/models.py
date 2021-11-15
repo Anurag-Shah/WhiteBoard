@@ -61,18 +61,3 @@ class GroupImages(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class GroupCode(models.Model):
-    CodeID = models.CharField(max_length=100)
-    name = models.CharField(max_length=50)
-    Code = models.FileField(upload_to='Code/', default=None)
-    ImageID = models.OneToOneField(GroupImages, on_delete=CASCADE, null=True, blank=True)
-    GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
-
-    class meta():
-        db_table = 'GroupCode'
-        ordering = ['CodeID']
-
-    def __str__(self):
-        return self.name
