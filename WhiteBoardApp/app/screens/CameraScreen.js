@@ -30,15 +30,16 @@ import storage from '../config/storage';
 
 const { height, width } = Dimensions.get('window');
 
-//const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
+
 const serverUrl = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
+//const serverUrl = 'http://127.0.0.1:8000'
 
 const groupId = 0;
 
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.front);
+  const [type, setType] = useState(Camera.Constants.Type.back);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [returnImg, setReturnImg] = useState(false);
@@ -93,15 +94,12 @@ export default function CameraScreen({ navigation }) {
       noData: true,
       aspect: [3, 4],
       quality: 1,
+      base64: true
     });
 
     if (!result.cancelled) {
       setPhoto(result);
       setIsCamera(false);  
-      console.log(result);
-      console.log(result.uri);
-      console.log(result.data);    
-      // Alert.alert('PickImage')
     }
   };
 
@@ -163,57 +161,71 @@ export default function CameraScreen({ navigation }) {
   const sendPicture = async (picture) => {
     // dispatch(removeClipItem());
     // let localUri = picture;
-    let filename = picture.uri.split('/').pop();
+    // let filename = picture.uri.split('/').pop();
 
-    // // Infer the type of the image
-    let match = /\.(\w+)$/.exec(filename);
-    let type = match ? `image/${match[1]}` : `image`;
+    // // // Infer the type of the image
+    // let match = /\.(\w+)$/.exec(filename);
+    // let type = match ? `image/${match[1]}` : `image`;
 
     // Upload the image using the fetch and FormData APIs
-    //let formData = new FormData();
+    // let formData = new FormData();
     // "Image, name" is the name of the form field the server expects
-    //formData.append('name', 'VeryDum');
-    //formData.append('Image', localUri);    
-    //formData.append('Description', 'static');
+    // formData.append('name', 'VeryDum');
+    // formData.append('Image', isCamera?picture.uri:picture.base64);    
+    // formData.append('Description', 'static');
     //.append('Image', {uri: localUri,name: filename, filename :filename ,type:type});
     //formData.append('Content-Type', type);
 
     const createFormData = (photo, body = {}) => {
       const data = new FormData();
     
-      data.append('Image', {
-        name: filename,
-        type: type,
-        uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
-        data: photo.base64
-      });
+      data.append('Image', //isCamera?photo.uri:photo.base64
+      
+        {
+          name: 'filename',
+          type: 'type',
+          uri: Platform.OS === 'ios' ? (isCamera?photo.uri.replace('file://', '') : photo.base64.replace('file://', '') ): (isCamera?photo.uri:photo.base64),
+          //data: isCamera?photo.uri:photo.base64
+        }
+      );
     
       Object.keys(body).forEach((key) => {
         data.append(key, body[key]);
       });
-      console.log(data);
+      //console.log(data);
       return data;
     };
     
     try {
       const response = await fetch(serverUrl + 'Images/' + groupId, {
-        method: 'POST',
-        //body: JSON.stringify(formData),
-        // body:formData,//getFormData(formData),
+        // method: 'POST',
+        // //body: JSON.stringify(formData),
+        // // body:formData,//getFormData(formData),
         // headers: {
-        //   //token: '',
-        //   'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
+        // //   //token: '',
+        //    'Content-Type': 'multipart/form-data; ',
         // },
-        body: createFormData(picture, { name: 'TestY', description: 'picture' }),
-        headers: {
-          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
-        },
-        redirect:'follow'
+        // body: createFormData(picture, { name: 'testUpload', description: 'picture' }),
+        // //headers: {
+        // //  'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
+        // //},
+        // redirect:'follow'
+        method: 'POST',
+					headers: {
+						//Accept: 'application/json',
+						'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+					},
+					// send our base64 string as POST request
+					body: JSON.stringify({
+						Image: picture.base64,
+            name:'testA',
+					}),
       });
-      console.log(response);
-      //const zipPhoto = await response.text();
-      //console.log(zipPhoto);
-      setReturnImg(response);
+      //console.log(response.code);
+      const zipPhoto = await response.text();
+      console.log(zipPhoto);
+      return;
+      setReturnImg(zipPhoto);
       Alert.alert('Success', 'The photo was successfully sent!');
     } catch (error) {
       console.log(error);
