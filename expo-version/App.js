@@ -15,7 +15,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Startup" >
           <Stack.Screen name="Startup" component={Startup} options={{headerShown: false}}/>
-          <Stack.Screen name="library" component={library} options={{headerShown: false}}/>
+          <Stack.Screen name="FlatListDemo" component={FlatListDemo} options={{headerShown: false}}/>
          </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="auto" />

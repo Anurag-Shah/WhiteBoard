@@ -1,30 +1,32 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { Icon } from "react-native-elements";
 
-
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
+LogBox.ignoreAllLogs();//Ignore all log notifications
+const image_url = "";
 
-class FlatListDemo extends Component {
+class grouplist extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       loading: false,
+      show: false,
       //data: [],
       data: [ {
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President',
-        email: 'yang1773@purdue.edu'
+        name: 'group 1',
+        //Image: require("../image/code_snip.jpg"),
+        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
+        GpID: '1',
       },
       {
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman',
-        email: 'kang1773@purdue.edu'
+        name: 'group 2',
+        //Image: require("../image/code_snip.jpg"),
+        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
+        GpID: '2',
       }],
       error: null,
     };
@@ -34,12 +36,17 @@ class FlatListDemo extends Component {
 
   componentDidMount() {
     //this.getData();
+
     this.makeRemoteRequest();
   }
 
   makeRemoteRequest = () => {
     //const url = `https://randomuser.me/api/?&results=20`;
-    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Users/';
+    /*server test*/
+    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
+    /*local test*/
+    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
+    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Images/1';
 
     this.setState({ loading: true });
 
@@ -47,6 +54,8 @@ class FlatListDemo extends Component {
       .then(res => res.json())
       .then(res => {
         console.log(res);
+        //console.log("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080" + res[1].Image);
+
         this.setState({
           //data: res.results,
           data: res,
@@ -58,6 +67,7 @@ class FlatListDemo extends Component {
       })
       .catch(error => {
         this.setState({ error, loading: false });
+        this.arrayholder = this.state.data;
       });
   };
 
@@ -93,24 +103,14 @@ class FlatListDemo extends Component {
 
   renderHeader = () => {
     return (
-      /*<SearchBar
+      <SearchBar
         placeholder="Type Here..."
         lightTheme
         round
         onChangeText={text => this.searchFilterFunction(text)}
         autoCorrect={false}
         value={this.state.value}
-      />*/
-      <View style={{alignItems: 'flex-end'}}>
-
-      <Icon
-          name="adduser"
-          type="ant-design"
-          color="#149052"
-          size="35"
-          onPress={() => Alert.alert('adduser Button pressed')} 
-        />
-      </View>
+      />
       
     );
   };
@@ -124,19 +124,42 @@ class FlatListDemo extends Component {
       );
     }
     //console.log(this.state.data);
+    //<Avatar source={item.avatar_url} />
     return (
       <SafeAreaView style={{flex: 1}}>
         <FlatList
           data={this.state.data}
-          keyExtractor={item => item.name.toString()}
+          //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider>
+              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>
-              <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
+              <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
+              
               </ListItem.Content>
               <ListItem.Chevron 
-              onPress={() => Alert.alert('Do you want to remove this user?')} />
+              onPress={() => {
+                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image;
+                console.log(this.image_url);
+                this.setState({show:true});
+                }} />
+              <Modal
+               transparent={true}
+               visible={this.state.show}
+               >
+                 <SafeAreaView style={{backgroundColor:"#CED0CE", flex:1}}>
+                    <Text>{item.name}</Text>
+                    <Image
+                    style={{width: 500,
+                        height: 500}}
+                    source={{uri: this.image_url}}/>
+                    <Button
+                        title="close"
+                        onPress={() => this.setState({show:false})}
+                    />
+                 </SafeAreaView>
+              </Modal>
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
               //<ListItem //style={{ height: 50 }}
@@ -151,7 +174,7 @@ class FlatListDemo extends Component {
           //keyExtractor={item => item.email}
 
           ItemSeparatorComponent={this.renderSeparator}
-          ListHeaderComponent={this.renderHeader}
+          //ListHeaderComponent={this.renderHeader}
         />
       </SafeAreaView>
     );
@@ -177,4 +200,4 @@ const styles = StyleSheet.create({
    
   });
 
-export default FlatListDemo;
+export default grouplist;
