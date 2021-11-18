@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +31,7 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  'ec2-18-218-227-246.us-east-2.compute.amazonaws.com',
                  'ec2-3-15-170-72.us-east-2.compute.amazonaws.com',
                  'ec2-3-144-142-207.us-east-2.compute.amazonaws.com',
-                 '127.0.0.1',
+                 '10.182.17.199',
                  ]
 
 # AWS SES settings
@@ -38,7 +39,7 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 # Need to Request production access to move out of the sandbox
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")  # hidden
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY")  # hidden
 AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")  # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)

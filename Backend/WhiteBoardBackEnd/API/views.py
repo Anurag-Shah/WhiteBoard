@@ -7,6 +7,7 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
+import ocr
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
@@ -18,6 +19,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
+from forms import SetPasswordForm
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication
 from rest_framework.authtoken.models import Token
@@ -26,8 +28,6 @@ from rest_framework.parsers import *
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-import ocr
-from forms import SetPasswordForm
 from .models import User, Group, GroupImages
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
 
@@ -313,10 +313,11 @@ def logout_view(request):
 @transaction.atomic()
 def update_user(request):
     data = JSONParser().parse(request)
-    uid = data.get('uid')
-    user = User.objects.get(pk=uid)
+    user = User.objects.get(pk=request.user.pk)
     name = data.get('username')
     email = data.get('email')
+    nameDup = false
+    emailDup = false
 
     # check if the username is duplicated
     try:
@@ -324,8 +325,9 @@ def update_user(request):
         if name_match.pk == uid:
             pass
         else:
-            return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+            nameDup = true
     except User.DoesNotExist:
+        nameDup = false
         user.name = name
         request.user.username = name
 
@@ -335,14 +337,25 @@ def update_user(request):
         if email_match.pk == uid:
             pass
         else:
-            return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+            emailDup = true
     except User.DoesNotExist:
+        emailDup = false
         user.email = email
         request.user.email = email
 
+    if nameDup and not emailDup:
+        return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+
+    if not nameDup and emailDup:
+        return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+
+    if nameDup and emailDup:
+        return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
+
     user.save()
     request.user.save()
-    return JsonResponse({"code": 0, "msg": "Account info successfully updated!"})
+    serializer = UserSerializer(user)
+    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer})
 
 
 class Avatar(APIView):

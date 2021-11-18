@@ -14,6 +14,7 @@ import Save from './SaveScreen';
 import Library from './LibraryScreen';
 import Team from './Team/TeamScreen';
 import Account from './AccountScreen';
+import storage from '../config/storage';
 
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
@@ -42,11 +43,36 @@ const HomeStackNavigator = () => {
 }
 
 function MyDrawer() {
+  useEffect(() => {
+    console.log("MyDrawer Use effect");
+    getUserInfo();
+  }, []);
+  const getUserInfo = () => {
+    // Fetch user and login info in local storage
+    storage
+      .load({
+        key: "login-session",
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: false,
+        syncInBackground: true,
+      })
+      .then((ret) => {
+        // found data go to then()
+        setUser(ret.userInfo);
+      })
+      .catch((err) => {
+        // any exception including data not found
+        // goes to catch()
+        console.log("User not found!");
+      });
+  };
+  const [user, setUser] = React.useState(null);
   return (
     <Drawer.Navigator
       initialRouteName="Stack"
       headerMode="none"
-      drawerContent={(props) => <Sidebar {...props} />}
+      drawerContent={(props) => <Sidebar {...props} user={user} />}
       drawerPosition="left"
       drawerStyle={{ width: '35%' }}
       edgeWidth={200}

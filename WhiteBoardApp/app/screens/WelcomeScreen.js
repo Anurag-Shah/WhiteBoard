@@ -1,9 +1,13 @@
-import React from "react";
-import { StyleSheet, Text, View, LogBox } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, LogBox, Button } from "react-native";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { NavigationContainer } from "@react-navigation/native";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import {
+  createDrawerNavigator, DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import userReducer from "./shared/reducer/UserReducer";
@@ -17,6 +21,7 @@ import Account from "./AccountScreen";
 import LoginPage from "./LoginPage";
 import RegistrationPage from "./RegistrationPage";
 import TextEditorPage from "./TextEditorPage";
+import storage from "../config/storage";
 
 
 const store = createStore(userReducer);
@@ -27,7 +32,7 @@ LogBox.ignoreAllLogs();
 
 const screenOptionStyle = {
   headerStyle: {
-    backgroundColor: "#e36f2c",
+    backgroundColor: "green",
   },
   headerTintColor: "white",
   headerBackTitle: "Back",
@@ -47,6 +52,7 @@ const HomeStackNavigator = () => {
         options={{ title: "WhiteBoard", headerShown: false }}
       />
       <Stack.Screen name="Drawer" component={MyDrawer} options={{ headerShown: false }}></Stack.Screen>
+      <Stack.Screen name="SideBar" component={Sidebar} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Screen name="Save" component={Save}></Stack.Screen>
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
@@ -66,11 +72,16 @@ const HomeStackNavigator = () => {
 
 
 function MyDrawer() {
+  useEffect(() => {
+    console.log("drawer updated!");
+    setChange(!change);
+  }, []);
+  const [change, setChange] = useState(false);
   return (
     <Drawer.Navigator
       initialRouteName="Stack"
       headerMode="none"
-      drawerContent={(props) => <Sidebar {...props} />}
+      drawerContent={(props) => <Sidebar {...props} chang={change} setChange={setChange} />}
       drawerPosition="left"
       drawerStyle={{ width: "35%" }}
       edgeWidth={200}
@@ -83,11 +94,14 @@ function MyDrawer() {
   );
 }
 
-function WelcomeScreen({ navigation }) {
+
+function WelcomeScreen(props) {
+  useEffect(() => {
+  })
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <MyDrawer navigation={navigation} />
+        <MyDrawer />
       </NavigationContainer>
     </Provider>
   );
@@ -96,7 +110,7 @@ function WelcomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },

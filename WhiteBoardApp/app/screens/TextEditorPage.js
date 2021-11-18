@@ -59,10 +59,10 @@ export default class TextEditorPage extends React.Component {
   render() {
     return (
       <SafeAreaView
-        style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
+        style={{ backgroundColor: "white", flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Topbar title="Text Editor" navigation={this.props.navigation} />
           </View>
         </TouchableWithoutFeedback>
@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
+    backgroundColor: "#d3dae6",
     flex: 11,
     fontSize: 16,
     padding: 10,

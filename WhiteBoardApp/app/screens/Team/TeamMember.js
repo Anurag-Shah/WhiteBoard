@@ -64,7 +64,7 @@ function Prompt(props) {
                     Add New Member:
                 </Dialog.Description>
             )}
-            <Dialog.Input value={email} onChangeText={setEmail} placeholder="Email" />
+            <Dialog.Input value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
             <Text
                 style={{
                     color: success ? "black" : "red",

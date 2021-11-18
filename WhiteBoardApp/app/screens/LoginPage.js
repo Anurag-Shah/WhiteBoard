@@ -84,7 +84,6 @@ function LoginPage({ navigation }) {
   };
 
   useEffect(() => {
-    console.log("I am useEffect!");
     getUserInfo();
   }, []);
 
@@ -132,21 +131,23 @@ function LoginPage({ navigation }) {
 
   const login = () => {
     console.log("Login Clicked");
-    // login Api communicates with the backend
+    //navigation.reset("SideBar");
+    //navigation.navigate("Drawer");
+    // loginApi communicates with the backend
     let user = {
       username: username,
       password: password,
       token: "",
       rememberMe: true,
       logged_in: false,
-      user_info: [],
+      userInfo: [],
     };
     loginApi(username, password).then((response) => {
       if (response && response.code == 0) {
         // If Login successfully
         user.logged_in = true;
         user.token = response.token;
-        user.user_info = response.user;
+        user.userInfo = response.user;
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
@@ -164,7 +165,7 @@ function LoginPage({ navigation }) {
         });
         // Redirecting to Camera Page
         Alert.alert("", "Logged in Successfully!", [
-          { text: "OK", onPress: () => { navigation.push("Camera"); navigation.push("Drawer"); } },
+          { text: "OK", onPress: () => { navigation.push("Camera"); } },
         ]);
       } else {
         setWrongInfo(true);
@@ -418,10 +419,7 @@ const styles = StyleSheet.create({
     height: "100%",
     position: "absolute",
     left: 50,
-    //top: 5,
     width: "80%",
-    //margin: 12,
-    //paddingLeft: 30,
   },
 
   input_box: {
@@ -429,14 +427,12 @@ const styles = StyleSheet.create({
     margin: 10,
     height: 50,
     width: "90%",
-    //flex:1,
-    //justifyContent: "center",
+
   },
 
   sub_container: {
     alignItems: "center",
-    //justifyContent: "flex-end",
-    //justifyContent: "center",
+    top: 100,
   },
 });
 

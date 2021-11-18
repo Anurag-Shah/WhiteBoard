@@ -177,7 +177,7 @@ class TeamScreen extends Component {
   }
 
   componentDidMount() {
-    //this.makeRemoteRequest();
+    console.log("team mount!");
     this.getUserInfo();
     var filtered = this.state.data.filter(function (value) {
       return !value.isDefault;
@@ -203,7 +203,7 @@ class TeamScreen extends Component {
       .then((ret) => {
         // console.log(ret)
         this.setState({
-          user: ret.userInfo || ret.user_info,
+          user: ret.userInfo || ret.userInfo,
           loading: false,
         })
       })
@@ -328,7 +328,7 @@ class TeamScreen extends Component {
     }
     //console.log(this.state.data);
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{ backgroundColor: "white" }}>
         <Topbar title="My Teams" navigation={this.props.navigation} />
         <SearchBar
           placeholder="Search Here..."
@@ -395,7 +395,6 @@ const styles = StyleSheet.create({
   },
 
   bottom_bar: {
-    // position: "absolute",
     justifyContent: "center",
     alignItems: "center",
     bottom: 0,

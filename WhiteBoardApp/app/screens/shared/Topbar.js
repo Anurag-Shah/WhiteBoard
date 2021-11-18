@@ -1,23 +1,31 @@
 import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { DrawerActions } from '@react-navigation/native';
+import { DrawerActions, NavigationActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
+
 export default class Topbar extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  handleClick = () => {
+    this.props.navigation.dispatch(DrawerActions.openDrawer());
+  };
   render() {
     return (
       <View style={[styles.container, styles.statusBarMargin]} >
-        <TouchableOpacity onPress={() => { this.props.navigation.dispatch(DrawerActions.openDrawer()) }}>
+        <TouchableOpacity onPress={() => this.handleClick()}>
           <Ionicons name="ios-list" size={32} style={{ color: 'black' }} />
         </TouchableOpacity>
 
         <Text style={styles.title}>{this.props.title}</Text>
         {this.props.title === 'Camera' ? (
-          <TouchableOpacity onPress={() => this.props.navigation.push('TextEditorPage')}>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('TextEditorPage')}>
             <Ionicons name="clipboard-outline" size={32} style={{ color: 'black' }} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={() => this.props.navigation.push('Camera')}>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('Camera')}>
             <Ionicons name="camera-outline" size={32} style={{ color: 'black' }} />
           </TouchableOpacity>
         )

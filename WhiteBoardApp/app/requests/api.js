@@ -92,7 +92,7 @@ export const resetPwdApi = async (email) => {
     }
 };
 
-export const updateAccountApi = async (user, email) => {
+export const updateAccountApi = async (username, email) => {
     let token = await getToken();
     try {
         const response = await fetch(urls.updateAccount, {
@@ -104,7 +104,6 @@ export const updateAccountApi = async (user, email) => {
                 'Authorization': token,
             },
             body: JSON.stringify({
-                uid: user.uid,
                 username: username,
                 email: email,
             })
