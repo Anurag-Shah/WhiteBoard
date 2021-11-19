@@ -24,7 +24,8 @@ import docker
 def compiler_wrapper(compiler_input, language):
 	line_numbers = []
 	if language == "C":
-		dockerCommand = ["/bin/sh", "-c", ("echo '" + compiler_input + "' > compile.c && gcc compile.c && ./a.out")]
+		# Chunao: I've changed echo to printf cuz printf will parse \n literally without actual line break, causing compilation to fail
+		dockerCommand = ["/bin/sh", "-c", ("printf '" + compiler_input + "' > compile.c && gcc compile.c && ./a.out")]
 		client = docker.from_env()
 		error_r = False
 		out_text = ""
@@ -35,6 +36,7 @@ def compiler_wrapper(compiler_input, language):
 			out_text = str(e.stderr.decode())
 		if not error_r:
 			out_text = str(container.decode())
+		print ("\n" + out_text + "\n")
 		out_text = out_text.replace("./compile_c.sh: 2: ./a.out: not found\n", "")
 		matches = re.findall("compile\.c:[0-9]+:[0-9]+:", out_text)
 		for match in matches:

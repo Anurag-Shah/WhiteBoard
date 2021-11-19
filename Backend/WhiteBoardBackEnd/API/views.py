@@ -7,6 +7,7 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
+import os
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
@@ -40,6 +41,17 @@ from pathlib import Path
 import urllib
 from urllib.request import urlopen
 from django.core.files.temp import NamedTemporaryFile
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
+import threading
+import time
+import sys
+
+sys.path.insert(1, os.path.abspath("../../Compiler"))
+
+import compiler_wrapper
 
 
 
@@ -55,6 +67,7 @@ from django.core.files.temp import NamedTemporaryFile
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class AllUserList(APIView):
+    permission_classes = [AllowAny,]
     def get(self, request):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
@@ -82,6 +95,7 @@ class AllUserList(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificUser(APIView):
+    permission_classes = [AllowAny,]
     def get_user_object(self, id):
         try:
             return User.objects.get(pk=id)
@@ -136,11 +150,44 @@ class SpecificGroup(APIView):
             Serializer.save()
             return Response(Serializer.data)
         return Response(HttpResponse.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request, id):
+        serializer = GroupSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            # HTTP 201: CREATED
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # HTTP 400: BAD REQUEST
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id):
         GroupObject = self.get_group_object(id)
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
+
+class TextUpload(APIView):
+    permission_classes = [AllowAny,]
+
+    def get_group_object(self, id):
+        try:
+            return Group.objects.get(pk=id)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, id):
+        text = request.data["compile_text"]
+        compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+        while (compile_result[0] == None):
+            compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+        print(compile_result)
+        return_data = {}
+        return_data['compile_result'] = compile_result[0]
+        return_data['terminal_output'] = compile_result[0]
+        return_data['problem_line'] = compile_result[1]
+        group = self.get_group_object(id)
+        image = GroupImages.objects.create(GpID = group, Code = text)
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        return response
 
 
 # Class ImageUpload
@@ -170,7 +217,6 @@ class ImageUpload(APIView):
 
     def post(self, request, GPid):
         file = request.data['Image']
-        print (type(file))
         name = request.data['name']
         custom_name = name + ":" + str(GPid) + ".jpg"
         try:
@@ -180,8 +226,10 @@ class ImageUpload(APIView):
         group = self.get_group_object(GPid)
         image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
+        ImageID = image.pk
+        print ("ID is: " + str(ImageID))
         path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path)
-        zip_file = open(path, 'rb')
+        path_after = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/AfterImages/"
         return_data = {}
         return_data['status'] = 'success'
         return_data['image_uri'] = str(image_path)
@@ -189,6 +237,15 @@ class ImageUpload(APIView):
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
         print(ocr_return)
+        print(type(ocr_return[0]))
+        img_pil = ocr_return[0]
+        CVImageOut = path_after + str(GPid) + ":" + str(ImageID) + ".png"
+        img_pil.save(CVImageOut, format="PNG")
+        image.Image_after = CVImageOut
+        image.save()
+        return_data['ocr_compile_return'] = ocr_return[1]
+        image_path = image.Image_after
+        return_data['image_after_uri'] = str(image_path)
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -196,7 +253,7 @@ class ImageUpload(APIView):
         Serializer = GroupImagesSerializer(
             self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
-    
+        
     def delete(self, request, GPid):
         ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
         try:
@@ -205,6 +262,68 @@ class ImageUpload(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+class ImageDeleteWithID(APIView):
+    permission_classes = [AllowAny,]
+
+    def delete(self, request, ImageID):
+        ImageObject = GroupImagesSerializer()
+
+# Class TempImageUpload
+# Author: Chunao Liu
+# Return value: JsonResponse
+# Inheritence:
+#       APIView
+# This class respond to HTTP request
+# for a group's image and it needs no
+# authentication! It won't save the
+# image, eigher.
+
+class TempImageUpload(APIView):
+    permission_classes = [AllowAny,]
+
+    def sleep_and_kill(self, path):
+        time.sleep(150)
+        if os.path.isfile(path):
+            print("Removing!")
+            os.remove(path)
+
+    def post(self, request):
+        file = request.data['Image']
+        name = request.data['name']
+        custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + name + ".png"
+        CVImageOut = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + name + ".png"
+        temp_file = open(custom_name, "wb")
+        try:
+            temp_file.write(base64.b64decode(file))
+        except:
+            temp_file.write(file.read())
+        temp_file.close()
+        path = custom_name
+        return_data = {}
+        return_data['status'] = 'success'
+        return_data['image_uri'] = str(custom_name)
+        print(Path(path).as_uri())
+        # ocr_return should have the stack trace so far
+        ocr_return = ocr.ocr("/home/chunao/WhiteBoard/Backend/OCR/images/tesseract_tests/test3.png")
+        print(ocr_return)
+        img_pil = ocr_return[0]
+        img_pil.save(CVImageOut, format="PNG")
+        return_data['ocr_return'] = ocr_return[2]
+        return_data['CV_return'] = CVImageOut
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
+        hired_gun.start()
+        hired_CV_gun = threading.Thread(target=self.sleep_and_kill, args=[CVImageOut])
+        hired_CV_gun.start()
+        return response
+    
+    def delete(self, request, GPid):
+        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        try:
+            ImageObject.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 # Function process image
 # Author: Jenna Zhang
