@@ -243,6 +243,13 @@ class ImageUpload(APIView):
         img_pil.save(CVImageOut, format="PNG")
         image.Image_after = CVImageOut
         image.save()
+        buffer = BytesIO()
+        img_pil.save(fp=buffer, format="PNG")
+        pil_file = ContentFile(buffer.getvalue(), name=request.data['name'] + "OCR_Return")
+        ImageObject = GroupImages.objects.filter(pk=ImageID)
+        print(ImageObject)
+        ImageObject.update(Image_after=pil_file)
+        ImageObject.update(name="Should-Work")
         return_data['ocr_compile_return'] = ocr_return[1]
         image_path = image.Image_after
         return_data['image_after_uri'] = str(image_path)
@@ -304,7 +311,7 @@ class TempImageUpload(APIView):
         return_data['image_uri'] = str(custom_name)
         print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
-        ocr_return = ocr.ocr("/home/chunao/WhiteBoard/Backend/OCR/images/tesseract_tests/test3.png")
+        ocr_return = ocr.ocr(custom_name)
         print(ocr_return)
         img_pil = ocr_return[0]
         img_pil.save(CVImageOut, format="PNG")

@@ -14,6 +14,7 @@ urlpatterns = [
     path('User/group/member/', GroupMemberOperations.as_view(), name='add_or_delete_member'),
     path('Group/<int:id>', SpecificGroup.as_view()),
     path('TextUpload/<int:id>', TextUpload.as_view()),
+    path('TextUpload/', TextUpload.as_view()),
     path('TempImages/', TempImageUpload.as_view()),
     path('ImageDeleteByID/', ImageDeleteWithID.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
