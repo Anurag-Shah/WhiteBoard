@@ -471,53 +471,73 @@ def logout_view(request):
 @transaction.atomic()
 def update_user(request):
     data = JSONParser().parse(request)
-    uid = data.get('uid')
-    user = User.objects.get(pk=uid)
+    user = User.objects.get(pk=request.user.pk)
     name = data.get('username')
     email = data.get('email')
+    nameDup = 0
+    emailDup = 0
 
     # check if the username is duplicated
     try:
         name_match = User.objects.get(name=name)
-        if name_match.pk == uid:
+        if name_match.pk == user.pk:
             pass
         else:
-            return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+            nameDup = 1
     except User.DoesNotExist:
+        nameDup = 0
         user.name = name
         request.user.username = name
 
     # check if the email is duplicated
     try:
         email_match = User.objects.get(email=email)
-        if email_match.pk == uid:
+        if email_match.pk == user.pk:
             pass
         else:
-            return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+            emailDup = 1
     except User.DoesNotExist:
+        emailDup = 0
         user.email = email
         request.user.email = email
 
+    if nameDup == 1 and emailDup == 0:
+        return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+
+    if nameDup == 0 and emailDup == 1:
+        return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+
+    if nameDup == 1 and emailDup == 1:
+        return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
+
     user.save()
     request.user.save()
-    return JsonResponse({"code": 0, "msg": "Account info successfully updated!"})
+    serializer = UserSerializer(user)
+    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
 
 
 class Avatar(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
 
     def post(self, request):
-        print(request.data)
         user = self.get_user(request)
         file = request.data['Image']
-        user.avatar = file
-        user.save()
-        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!"})
+        custom_name = user.name + str(user.pk) + "Avatar" + ".jpg"
+        try:
+            img = ContentFile(base64.b64decode(file), name=custom_name)
+        except:
+            img = file
+
+        user.avatar.delete(save=True)
+        user.avatar.save(custom_name, img, save=True)
+        serializer = UserSerializer(user)
+        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!", "user": serializer.data})
 
     def get(self, request):
         user = self.get_user(request)
@@ -530,25 +550,61 @@ class Avatar(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function logs the user out
+# class UserGroups(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     # permission_classes = [IsAuthenticated]
+#     permission_classes = [AllowAny]
+#     parser_classes = [MultiPartParser, FormParser]
+#
+#     def get_default_group(self, request):
+#         user = User.objects.get(pk=request.user.pk)
+#         return user.group_set.get(isDefault=True)
+#
+#     def get(self, request):
+#         user = User.objects.get(pk=request.user.pk)
+#         groups = user.group_set.all()
+#         default_group = self.get_default_group(request)
+#         serializer = GroupSerializer(groups, many=True)
+#         default_group_serializer = GroupSerializer(default_group)
+#         return JsonResponse(
+#             {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+#              "all_groups": serializer.data})
+
+# Class get all groups of a certain user without authentication
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function logs the user out
 class UserGroups(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_default_group(self, request):
-        user = User.objects.get(pk=request.user.pk)
+    def get_default_group(self, request, uid):
+        user = User.objects.get(pk=uid)
         return user.group_set.get(isDefault=True)
 
-    def get(self, request):
-        user = User.objects.get(pk=request.user.pk)
-        print(user)
+    def get(self, request, uid):
+        user = User.objects.get(pk=uid)
         groups = user.group_set.all()
-        default_group = self.get_default_group(request)
+        default_group = self.get_default_group(request, uid)
         serializer = GroupSerializer(groups, many=True)
         default_group_serializer = GroupSerializer(default_group)
         return JsonResponse(
-            {"code": 0, "msg": "The teams the user is in are fetched!", "default_group": default_group_serializer.data,
-             "all groups": serializer.data})
+            {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+             "all_groups": serializer.data})
+
+# get all team members
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def allMembers(request):
+    data = JSONParser().parse(request)
+    groupId = data.get("groupId")
+    group = Group.objects.get(GpID=groupId)
+    query = group.teamMember
+    serializer = UserSerializer(query, many=True)
+    return JsonResponse({"code": 0, "msg": "Team member fetched", "members": serializer.data})
 
 
 # Class
@@ -557,7 +613,8 @@ class UserGroups(APIView):
 # This function logs the user out
 class GroupOperations(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
@@ -575,13 +632,14 @@ class GroupOperations(APIView):
         new_group.save()
         return JsonResponse({"code": 0, "msg": "group created!"}, status=status.HTTP_201_CREATED)
 
+    @transaction.atomic()
     def delete(self, request):
         data = JSONParser().parse(request)
         GpID = data['groupId']
         group = self.get_group(GpID)
         # check if the user is the group leader
         if not group.leader_uid == request.user.pk:
-            return JsonResponse({"code": 0, "msg": "only group leader can delete this group"},
+            return JsonResponse({"code": -2, "msg": "only group leader can delete this group"},
                                 status=status.HTTP_400_BAD_REQUEST)
         if group.isDefault:
             return JsonResponse({"code": -1, "msg": "Cannot delete a default group"},
@@ -613,7 +671,7 @@ class GroupMemberOperations(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 group.teamMember.add(user)
-                return JsonResponse({"cide": 0, "msg": "User successfully addded to the team"},
+                return JsonResponse({"code": 0, "msg": "User successfully addded to the team"},
                                     status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return JsonResponse({"code": -1, "msg": "User does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -628,24 +686,21 @@ class GroupMemberOperations(APIView):
         try:
             User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({"code": -1, "msg": "email does not exist!"})
+            return JsonResponse({"code": -1, "msg": "user does not exist!"})
 
         # Check if the user is in the group
         try:
             member = group.teamMember.get(email=email)
-            if member is None:
-                return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
-                                    status=status.HTTP_404_NOT_FOUND)
             # Check if the user to delete is the team leader
             if member.pk == self.get_user(request).pk:
                 return JsonResponse({"code": -2, "msg": "You cannot delete a team leader!"},
                                     status=status.HTTP_400_BAD_REQUEST)
+            group.teamMember.remove(member)
+            return JsonResponse({"code": 0, "msg": "User successfully removed from the team"},
+                                    status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
+            return JsonResponse({"code": -1, "msg": "You cannot delete someone not in the team!"},
                                 status=status.HTTP_404_NOT_FOUND)
-
-        group.teamMember.get(email=email).delete()
-        return JsonResponse({"code": 0, "msg": "User successfully removed from the team"}, status=status.HTTP_200_OK)
 
 
 # Function pwd_reset
