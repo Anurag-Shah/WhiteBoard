@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,reactnative
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,reactnative
 
+# Custom Ignore by Chunao
+**/media/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -446,5 +449,8 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# SSH private key files
+.pem
 
 # End of https://www.toptal.com/developers/gitignore/api/python,reactnative

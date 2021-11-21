@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView } from 'react-native';
+import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import storage from '../../config/storage';
 import { logoutApi } from '../../requests/api';
 
@@ -20,20 +19,20 @@ export default class Sidebar extends React.Component {
         }
       ],
       routes_logged_in: [
-      //   {
-      //   name: "Save",
-      //   screen: "Save"
-      // },
-      {
-        name: "Library",
-        screen: "Library"
-      }, {
-        name: "Team",
-        screen: "Team"
-      }, {
-        name: "Account",
-        screen: "Account"
-      }],
+        //   {
+        //   name: "Save",
+        //   screen: "Save"
+        // },
+        {
+          name: "Library",
+          screen: "Library"
+        }, {
+          name: "Team",
+          screen: "Team"
+        }, {
+          name: "Account",
+          screen: "Account"
+        }],
       user: null,
     }
     this.retrieveData = this.retrieveData.bind(this);
@@ -43,8 +42,26 @@ export default class Sidebar extends React.Component {
     this.retrieveData();
   }
   logout = () => {
-    logoutApi();
-    this.props.navigation.navigate('Camera');
+    if (this.state.user.logged_in) {
+      logoutApi().then((response) => {
+        if (response.code == 0) {
+          // Logout successfully
+          this.state.user.logged_in = false;
+          storage.save({
+            key: "login-session",
+            data: this.state.user,
+          });
+          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => this.props.navigation.navigate('Camera') }]);
+        } else if (response.code == -1) {
+          Alert.alert("Already Logged out!");
+        } else {
+          console.log(response.status);
+        }
+
+      });
+    } else {
+      Alert.alert("Already Logged out!");
+    }
   }
   retrieveData = async () => {
     try {
@@ -71,6 +88,10 @@ export default class Sidebar extends React.Component {
     }
   };
 
+  login = () => {
+    this.props.navigation.navigate('Login');
+  }
+
   render() {
     const userId = "Yierpan42";
     const loggedIn = 'true';
@@ -88,7 +109,7 @@ export default class Sidebar extends React.Component {
       <SafeAreaView style={[styles.container, styles.statusBarMargin]}>
 
         {(this.state.user != null && this.state.user.logged_in) &&
-          <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white' }}>Welcome back, {this.state.name}</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white' }}> {this.state.user.username}</Text>
         }
         <FlatList
           data={this.state.user != null && this.state.user.logged_in ? this.state.routes_logged_in : this.state.route_anonymous}
@@ -99,14 +120,14 @@ export default class Sidebar extends React.Component {
 
         {
           (this.state.user != null && this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} onPress={()=>this.logout()} >
+          <TouchableOpacity style={styles.button} onPress={() => this.logout()} >
             <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
             <Text style={styles.buttonTitle}>Logout</Text>
           </TouchableOpacity>
         }
         {
           (this.state.user == null || !this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} onPress={()=>this.props.navigation.navigate('Login')}>
+          <TouchableOpacity style={styles.button} onPress={() => this.login()}>
             <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
             <Text style={styles.buttonTitle}>Login</Text>
           </TouchableOpacity>

@@ -17,6 +17,7 @@ import LoginPage from "./LoginPage";
 import RegistrationPage from "./RegistrationPage";
 import TextEditorPage from "./TextEditorPage";
 
+
 const store = createStore(userReducer);
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -31,6 +32,7 @@ const screenOptionStyle = {
   headerBackTitle: "Back",
 };
 
+
 const HomeStackNavigator = () => {
   return (
     <Stack.Navigator
@@ -42,6 +44,7 @@ const HomeStackNavigator = () => {
         component={CameraScreen}
         options={{ title: "WhiteBoard", headerShown: false }}
       />
+      <Stack.Screen name="Drawer" component={MyDrawer} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Screen name="Save" component={Save}></Stack.Screen>
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
@@ -56,6 +59,8 @@ const HomeStackNavigator = () => {
     </Stack.Navigator>
   );
 };
+
+
 
 function MyDrawer() {
   return (
@@ -75,11 +80,11 @@ function MyDrawer() {
   );
 }
 
-function WelcomeScreen() {
+function WelcomeScreen({ navigation }) {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <MyDrawer />
+        <MyDrawer navigation={navigation} />
       </NavigationContainer>
     </Provider>
   );

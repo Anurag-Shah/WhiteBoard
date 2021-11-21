@@ -31,7 +31,7 @@ import urls from '../requests/urls';
 const { height, width } = Dimensions.get('window');
 
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = urls.base;//'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
+const serverUrl = urls.base_url;//'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
 
 const groupId = 1;
 
@@ -55,33 +55,6 @@ export default function CameraScreen({ navigation }) {
       setHasGalleryPermission(galleryStatus.status === 'granted');
     })();
   }, []);
-
-  const getUserInfo = () => {
-    storage
-      .load({
-        key: 'login-session',
-        // autoSync (default: true) means if data is not found or has expired,
-        // then invoke the corresponding sync method
-        autoSync: true,
-        syncInBackground: true,
-      })
-      .then(ret => {
-        // found data go to then()
-        setUser(ret);
-        setUserName(ret.username);
-        console.log(ret);
-        if (ret.logged_in) {
-          setLoginState(true);
-        } else {
-          setLoginState(false);
-        }
-      })
-      .catch(err => {
-        // any exception including data not found
-        // goes to catch()
-        navigation.push('LoginPage');
-      });
-  };
 
   if (hasPermission === null || hasGalleryPermission === false) {
     return <View />;
@@ -183,23 +156,23 @@ export default function CameraScreen({ navigation }) {
       const data = new FormData();
       //console.log(photo.uri);
       data.append('Image', photo.base64
-      // isCamera ? photo.uri : photo.base64
+        // isCamera ? photo.uri : photo.base64
 
-      // {
-      //   name: filename,
-      //   type: type,
-      //   uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
-      //   data: photo.base64
-      // }
+        // {
+        //   name: filename,
+        //   type: type,
+        //   uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+        //   data: photo.base64
+        // }
       );
-    
+
       Object.keys(body).forEach((key) => {
         data.append(key, body[key]);
       });
       //console.log(data);
       return data;
     };
-    
+
     try {
       const response = await fetch(serverUrl + 'Images/' + groupId, {
         method: 'POST',
@@ -207,14 +180,14 @@ export default function CameraScreen({ navigation }) {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        redirect:'follow'
+        redirect: 'follow'
       });
       //console.log((response));
       const result = await response.json();
-      if(result.status === 'success') {
+      if (result.status === 'success') {
         Alert.alert('Success', 'The photo was successfully sent!');
-        setReturnImg(serverUrl+'media/'+result.image_uri);
-        console.log(serverUrl+'media/'+result.image_uri);
+        setReturnImg(serverUrl + 'media/' + result.image_uri);
+        console.log(serverUrl + 'media/' + result.image_uri);
       }
       else {
         Alert.alert('Error', 'Could not save image!');
@@ -230,21 +203,21 @@ export default function CameraScreen({ navigation }) {
     }
   };
   function decode_base64(s) {
-    var b=l=0,
-    m='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    var b = l = 0,
+      m = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     return decodeURIComponent(s.replace(/./g, function (v) {
-      b=(b<<6)+m.indexOf(v); l+=6;
-      return l<8?'':'%'+(0x100+((b>>>(l-=8))&0xff)).toString(16).slice(-2);
+      b = (b << 6) + m.indexOf(v); l += 6;
+      return l < 8 ? '' : '%' + (0x100 + ((b >>> (l -= 8)) & 0xff)).toString(16).slice(-2);
     }));
   }
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: (Platform.OS === 'ios')? 0 : 20 }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: (Platform.OS === 'ios') ? 0 : 20 }}>
       <Topbar title="Camera" navigation={navigation} />
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
           <Camera
             style={{ flex: 1 }}
-            type={type}            
+            type={type}
             ref={(ref) => {
               setCameraRef(ref);
             }}
@@ -256,7 +229,7 @@ export default function CameraScreen({ navigation }) {
               paddingHorizontal: 15,
               padding: 15,
             }}>
-            <Text style={{ alignSelf: 'flex-end', width:30 }}>{''}</Text>
+            <Text style={{ alignSelf: 'flex-end', width: 30 }}>{''}</Text>
             <TouchableOpacity
               style={{
                 alignSelf: 'flex-end',
@@ -264,9 +237,9 @@ export default function CameraScreen({ navigation }) {
               }}
               onPress={async () => {
                 if (cameraRef) {
-                  let result = await cameraRef.takePictureAsync({base64: true});
+                  let result = await cameraRef.takePictureAsync({ base64: true });
                   setIsCamera(true);
-                  setPhoto(result);                  
+                  setPhoto(result);
                   // Alert.alert("","TakePicture");
                 }
               }}>
@@ -297,7 +270,7 @@ export default function CameraScreen({ navigation }) {
                 name="image-outline"
                 size={40}
                 onPress={() => pickImage()}
-                style={{ 
+                style={{
                   alignSelf: 'flex-end',
                   alignItems: 'center',
                   color: 'black'
@@ -308,12 +281,12 @@ export default function CameraScreen({ navigation }) {
         </View>
       )}
       {!returnImg && photo && (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent:  'center'}}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Image
             source={{ uri: photo.uri }}
             style={{
               width: width,
-              height: height - ((Platform.OS === 'ios') ? 45+80 : 60+80+20), //Topbar & footer, status height due to OS
+              height: height - ((Platform.OS === 'ios') ? 45 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
               resizeMode: isCamera ? 'cover' : 'contain',
             }}
           />
@@ -322,7 +295,7 @@ export default function CameraScreen({ navigation }) {
               {/* onPress={sendPicture} */}
               <View style={styles.modalButton}>
                 <Text
-                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems: 'center' }}>
                   Accept
                 </Text>
               </View>
@@ -330,7 +303,7 @@ export default function CameraScreen({ navigation }) {
             <TouchableOpacity onPress={() => setPhoto(null)}>
               <View style={styles.modalButton}>
                 <Text
-                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems: 'center' }}>
                   Retake
                 </Text>
               </View>
@@ -341,40 +314,42 @@ export default function CameraScreen({ navigation }) {
       {returnImg && (
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          
-            <Image
-              // source={{ uri: returnImg }}
-              source={{ uri: `${returnImg}` }}
-              style={{ width: width, height: height - ((Platform.OS === 'ios') ? 45+80 : 60+80+20), 
-               resizeMode: 'contain' }}
-            />
-            <View style={[styles.modalBottomContainer]}>
-              <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
-                    Save
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              {/* <Text style={{ width: 30 }}></Text> */}
-              <TouchableOpacity
-                onPress={() => {
-                  setPhoto(null);
-                  setReturnImg(null);
-                  // Alert.alert('Close')
-                }}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
-                    Close
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+
+          <Image
+            // source={{ uri: returnImg }}
+            source={{ uri: `${returnImg}` }}
+            style={{
+              width: width, height: height - ((Platform.OS === 'ios') ? 45 + 80 : 60 + 80 + 20),
+              resizeMode: 'contain'
+            }}
+          />
+          <View style={[styles.modalBottomContainer]}>
+            <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems: 'center' }}>
+                  Save
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {/* <Text style={{ width: 30 }}></Text> */}
+            <TouchableOpacity
+              onPress={() => {
+                setPhoto(null);
+                setReturnImg(null);
+                // Alert.alert('Close')
+              }}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems: 'center' }}>
+                  Close
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
-    
+
     </SafeAreaView>
   );
 }
