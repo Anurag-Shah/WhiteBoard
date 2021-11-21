@@ -32,7 +32,7 @@ export default class TextEditorPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      typenCode: "",
+      typedCode: "",
       responseReceived: false,
       returnValue: 1,
       returnMessage: "",
@@ -41,6 +41,11 @@ export default class TextEditorPage extends React.Component {
 
   async sendCode() {
     try {
+      const text = {
+        compile_text: this.state.typedCode,
+        language: "C",
+      };
+
       // const res = await fetch(serverURL + "Text/process", {
       //   method: "POST",
       //   headers: {
@@ -50,17 +55,18 @@ export default class TextEditorPage extends React.Component {
       //   body: JSON.stringify({ typenCode: this.state.typenCode }),
       // });
       const res = await fetch(
-        "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com/TextUpload/",
+        "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TextUpload/1",
         {
-          method: "GET", // TODO: need to be "POST" since need to send the code, group num, and file name
+          method: "POST",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          //body: JSON.stringify({ typenCode: this.state.typenCode }),
+          body: JSON.stringify(text),
         }
       );
       const response = await res.json();
+      //console.log(response);
       Alert.alert("Code Sent", "Your code has been successfully sent!", [
         {
           text: "OK",
@@ -68,23 +74,16 @@ export default class TextEditorPage extends React.Component {
             this.setState({ responseReceived: true });
 
             //console.log(response);
-            const terminalOutput = response.terminal_output; // might need to change the name of the key, depending on backend implementation
-            if (terminalOutput == null) {
+            const terminalOutput = response.problem_line; // might need to change the name of the key, depending on backend implementation
+            console.log(terminalOutput);
+            if (terminalOutput[0] != null) {
               this.setState({ returnValue: -1 });
               Alert.alert(
                 "Error",
                 "There are some error occurred. The stack trace will be displayed.",
                 [{ text: "OK" }]
               );
-            }
-            // else if (code == RUNTIMEERROR) {
-            //   return Alert.alert(
-            //     "Runtime Error",
-            //     "There are some runtime error occurred. The stack trace will be displayed.",
-            //     [{ text: "OK" }]
-            //   );
-            // }
-            else {
+            } else {
               this.setState({ returnValue: 0 });
               Alert.alert(
                 "Success",
@@ -94,6 +93,7 @@ export default class TextEditorPage extends React.Component {
             }
 
             const compileResult = response.compile_result;
+            console.log(compileResult);
             this.setState({
               returnMessage: compileResult,
             });
@@ -184,7 +184,7 @@ export default class TextEditorPage extends React.Component {
           style={styles.input}
           placeholder="Start typying your code here..."
           multiline={true}
-          onChangeText={(typenCode) => this.setState({ typenCode })}
+          onChangeText={(typedCode) => this.setState({ typedCode })}
         />
 
         <View style={styles.view}>
@@ -259,6 +259,7 @@ const styles = StyleSheet.create({
 
   errorMessage: {
     color: "red",
+    fontFamily: "Courier", //TODO
   },
 
   saveDiscard: {
