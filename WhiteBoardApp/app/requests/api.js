@@ -139,8 +139,8 @@ export const getAllGroupsApi = async () => {
 export const getAllTeamMemebersApi = async (id) => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.group_operations, {
-            method: 'GET',
+        const response = await fetch(urls.getAllMembers, {
+            method: 'POST',
             headers: {
                 token: '',
                 'Accept': 'application/json',
@@ -214,7 +214,7 @@ export const createGroupApi = async (Gpname, description) => {
                 'Authorization': token,
             },
             body: JSON.stringify({
-                "Gpname": Gpname,
+                "name": Gpname,
                 "description": description
             })
         });

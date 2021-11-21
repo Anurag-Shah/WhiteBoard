@@ -5,6 +5,7 @@ import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAllTeamMemebersApi, addMemberApi, removeMemberApi } from "../../requests/api";
 import Topbar from '../shared/Topbar';
 import Dialog from "react-native-dialog";
+import urls from "../../requests/urls";
 
 function Prompt(props) {
     const addMember = (email) => {
@@ -13,43 +14,40 @@ function Prompt(props) {
             setSuccess(false);
             setFeedback("Please enter a valid email...");
         } else {
-            if (code == 0) {
-                //props.setVisible();
-                Alert.alert(
-                    "User successfully added to the team!", "",
-                    [{ text: "OK", onPress: () => { props.setVisible(); props.reload() } }]
-                );
-            } else if (code == -1) {
-                Alert.alert(
-                    "User does not exist!", ""
-                );
-            } else if (code == -2) {
-                Alert.alert(
-                    "User Already in the Team", "",
-                );
-            }
+            // if (code == 0) {
+            //     //props.setVisible();
+            //     Alert.alert(
+            //         "User successfully added to the team!", "",
+            //         [{ text: "OK", onPress: () => { props.setVisible(); props.reload() } }]
+            //     );
+            // } else if (code == -1) {
+            //     Alert.alert(
+            //         "User does not exist!", ""
+            //     );
+            // } else if (code == -2) {
+            //     Alert.alert(
+            //         "User Already in the Team", "",
+            //     );
+            // }
 
-            // addMemberApi(email).then((res) => {
-            //     if (ret && ret.code == 0) {
-            //         Alert.alert(
-            //             "User successfully added to the team!", "",
-            //             [{ text: "OK", onPress: () => { props.setVisible(); props.reload() } }]
-            //         );
-            //     } else if (ret && ret.code == -1) {
-            //         // User does not exist
-            //         Alert.alert(
-            //             "User does not exist!", "",
-            //             [{ text: "OK", onPress: () => { props.setVisible(); } }]
-            //         );
-            //     } else if (ret && ret.code == -2) {
-            //         // User already in the team
-            //         Alert.alert(
-            //             "User Already in the Team", "",
-            //             [{ text: "OK", onPress: () => { props.setVisible(); } }]
-            //         );
-            //     }
-            // });
-
+            addMemberApi(props.groupId, email).then((ret) => {
+                console.log(ret);
+                if (ret && ret.code == 0) {
+                    Alert.alert(
+                        "User successfully added to the team!", "",
+                        [{ text: "OK", onPress: () => { props.setVisible(); props.reload() } }]
+                    );
+                } else if (ret && ret.code == -1) {
+                    // User does not exist
+                    Alert.alert("User does not exist!")
+                } else if (ret && ret.code == -2) {
+                    // User already in the team
+                    Alert.alert(
+                        "User Already in the Team", "",
+                        [{ text: "OK", onPress: () => { props.setVisible(); } }]
+                    );
+                }
+            });
         }
     }
     const [email, setEmail] = React.useState("");
@@ -95,29 +93,22 @@ class TeamMemeber extends Component {
                 isDefault: false,
             },
             user: {},
-            members: [
-                {
-                    name: 'Amy Farha',
-                    uid: 1,
-                    email: 'yang1773@purdue.edu',
-                    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-                },
-            ],
+            members: [],
             isLeader: false,
-            data: [
-                {
-                    name: 'Amy Farha',
-                    uid: 1,
-                    email: 'yang1773@purdue.edu',
-                    avatar: 'https://randomuser.me/api/portraits/women/40.jpg',
-                },
-                {
-                    name: 'Chris Jackson',
-                    uid: 2,
-                    avatar: 'https://randomuser.me/api/portraits/men/41.jpg',
-                    email: 'yang1773@purdue.edu'
-                },
-            ],
+            // data: [
+            //     {
+            //         name: 'Amy Farha',
+            //         uid: 1,
+            //         email: 'yang1773@purdue.edu',
+            //         avatar: 'https://randomuser.me/api/portraits/women/40.jpg',
+            //     },
+            //     {
+            //         name: 'Chris Jackson',
+            //         uid: 2,
+            //         avatar: 'https://randomuser.me/api/portraits/men/41.jpg',
+            //         email: 'yang1773@purdue.edu'
+            //     },
+            // ],
             value: "",
         }
         this.arrayholder = [];
@@ -128,52 +119,34 @@ class TeamMemeber extends Component {
     };
 
     reload = () => {
-        //this.state.group = this.props.route.params.group;
-        // getAllTeamMemebersApi(groupId).then((res) => {
-        //     console.log(res);
-        //     if (res && res.code == 0) {
-        //         this.state.group = this.props.route.params.group;
-        //         this.state.members = res.members;
-        //         this.state.data = res.members;
-        //         this.state.user = this.props.route.params.user;
-        //         if (this.state.group.leader_uid == this.state.user.uid) {
-        //             this.state.isLeader = true;
-        //         }
-        //         var filtered = this.state.data.filter(function (value) {
-        //             return value.uid != this.state.group.leader_uid;
-        //         });
-        //         var leader = this.state.data.find(e => e.uid == this.state.group.leader_uid)
-        //         filtered.unshift(leader);
-        //         this.setState({
-        //             data: filtered,
-        //             members: filtered,
-        //         });
-        //     } else if (!res) {
-        //         // Somehing went wrong
-        //     }
-        // });
-        let leader_id = this.state.group.leader_uid;
-        function my_filter(value, index, array) {
-            return value.uid != leader_id;
-        }
-        var filtered = this.state.data.filter(my_filter);
-        var leader = this.state.data.find(e => e.uid == this.state.group.leader_uid)
-        console.log("I am here");
-        filtered.unshift(leader);
-        this.setState({
-            data: filtered,
-            members: filtered,
+        this.state.group = this.props.route.params.group;
+        getAllTeamMemebersApi(this.state.group.GpID).then((res) => {
+            if (res && res.code == 0) {
+                this.state.members = res.members;
+                this.state.data = res.members;
+                this.state.user = this.props.route.params.user;
+                if (this.state.group.leader_uid == this.state.user.uid) {
+                    this.state.isLeader = true;
+                }
+                let leader_uid = this.state.group.leader_uid;
+                var filtered = this.state.data.filter(function (value) {
+                    return value.uid != leader_uid;
+                });
+                var leader = this.state.data.find(e => e.uid == leader_uid);
+                filtered.unshift(leader);
+                this.state.members = filtered;
+                this.state.data = filtered;
+                this.setState({ loading: false });
+                console.log("Page reloaded!");
+            } else if (!res) {
+                // Somehing went wrong
+                Alert.alert("Opps...Something went wrong! Please try again later...")
+            }
         });
-        this.arrayholder = this.state.data;
-        this.setState({ loading: false });
-        console.log("Page reloaded!");
     }
 
     setVisible = () => {
-        console.log("setVisible Clicked!");
-        this.setState({
-            visible: !this.state.visible,
-        })
+        this.setState({ visible: !this.state.visible });
     }
 
 
@@ -201,6 +174,19 @@ class TeamMemeber extends Component {
         console.log(this.state.data);
     };
 
+    removeMember = (member) => {
+        console.log("Trying to remove " + member.email);
+        removeMemberApi(this.state.group.GpID, member.email).then((res) => {
+            console.log(res);
+            if (res && res.code == 0) {
+                Alert.alert("Successfully removed " + member.name);
+                this.reload();
+            } else {
+                Alert.alert("Opps, something went wrong! Please try again later...");
+            }
+        })
+    }
+
     renderSeparator = () => {
         return (
             <View
@@ -220,7 +206,7 @@ class TeamMemeber extends Component {
                 rounded
                 size={58}
                 title={item.name[0]}
-                source={{ uri: item.avatar }}
+                source={{ uri: urls.base_url.slice(0, -1) + item.avatar }}
                 containerStyle={{ borderColor: index == 0 ? "red" : "white", borderWidth: 0 }}>
             </Avatar>
             {item.uid == this.state.group.leader_uid ? <Badge
@@ -232,9 +218,9 @@ class TeamMemeber extends Component {
                 <ListItem.Title>{item.name} </ListItem.Title>
                 <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
             </ListItem.Content>
-            <AntDesign name="minuscircleo" size={24}
+            {item.uid != this.state.user.uid && (<AntDesign name="minuscircleo" size={24}
                 color={this.state.isLeader ? "red" : "grey"}
-                onPress={() => { this.state.isLeader ? this.deleteGroup(item.GpID) : Alert.alert("Only the group leader can remove members from the team!") }} />
+                onPress={() => { this.state.isLeader ? this.removeMember(item) : Alert.alert("Only the group leader can remove members from the team!") }} />)}
         </ListItem>
     )
 
@@ -248,7 +234,7 @@ class TeamMemeber extends Component {
             );
         }
         return (
-            <SafeAreaView>
+            <SafeAreaView style={{ backgroundColor: "white", height: "100%" }}>
                 <Topbar title={this.state.group.Gpname} navigation={this.props.navigation} />
                 <SearchBar
                     placeholder="Search Here..."
@@ -275,10 +261,9 @@ class TeamMemeber extends Component {
                         onPress={() => { this.state.isLeader ? this.setVisible() : Alert.alert("Only group leader can add people to the team!") }} />
                     {/* <Text style={{ marginTop: 10, color: "green" }}>Add</Text> */}
                 </View>
-                {this.state.visible ? (
-                    <Prompt visible={this.state.visible} setVisible={this.setVisible} reload={this.reload}></Prompt>
-                ) : null}
-            </SafeAreaView>
+                <Prompt groupId={this.state.group.GpID} visible={this.state.visible} setVisible={this.setVisible} reload={this.reload}></Prompt>
+
+            </ SafeAreaView>
         );
     }
 }
@@ -289,7 +274,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "center",
         flex: 1,
-        margin: 10
+        margin: 10,
     },
 
     searchBar: {

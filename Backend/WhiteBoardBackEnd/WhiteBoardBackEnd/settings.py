@@ -31,8 +31,10 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  'ec2-18-218-227-246.us-east-2.compute.amazonaws.com',
                  'ec2-3-15-170-72.us-east-2.compute.amazonaws.com',
                  'ec2-3-144-142-207.us-east-2.compute.amazonaws.com',
-                 '10.182.17.199',
+                 '10.186.69.143',
                  ]
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 
 # AWS SES settings
 # Currently, email can only be sent to authorized email address

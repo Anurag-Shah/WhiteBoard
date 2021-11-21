@@ -7,9 +7,12 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
+import base64
+
 import ocr
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail, BadHeaderError
 from django.db import transaction
 from django.http import JsonResponse
@@ -210,55 +213,59 @@ def process_text(request):
 
 
 # Function sign_up
-# Author: Jenna Zhang (Michelle may modify this fuction to work with her frontend api)
+# Author: Michelle
 # Return value: JsonResponse
 # This function receives sign up request from the client and create a new user if
 # all fields are valid
-@api_view(http_method_names=['POST'])
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
 @transaction.atomic()
-def sign_up(request):
-    data = JSONParser().parse(request)
-    name = data.get('username')
-    password = data.get('password')
-    email = data.get('email')
-    UserModel = get_user_model()
-    new_user = UserModel.objects.create_user(username=name, password=password)
-    # If username or email already exists, django.db.IntegrityError will be raised when we try to save
-    # But it does not indicate which field is duplicated, so we have to check manually
+def register(request):
+    user = JSONParser().parse(request)
+    username = user.get("username")
+    emailAdd = user.get("email")
+    pw = user.get("password")
 
-    # Check email
+    usernameOK = False
+    emailOK = False
     try:
-        email_match = User.objects.get(email=email)
-        # if no exception raised, then the email already exists, return with error
-        return JsonResponse({"code": -1, "msg": "email already exists"})
+        User.objects.get(name=username)
     except User.DoesNotExist:
-        # we are fine
-        new_user.email = email
+        usernameOK = True
 
-    # Check username
     try:
-        name_match = User.objects.get(name=name)
-        # if no exception raised, then the username already exists, return with error
-        return JsonResponse({"code": -2, "msg": "username already exists"})
+        User.objects.get(email=emailAdd)
     except User.DoesNotExist:
-        # we are fine
-        new_user.username = name
+        emailOK = True
 
-    new_user.save()
+    if (usernameOK == False and emailOK == False):
+        response = {"code": -1,
+                    "msg": "Both username and email address already in use!"}
+    elif (usernameOK == False):
+        response = {"code": -2, "msg": "Username already in use!"}
+    elif (emailOK == False):
+        response = {"code": -3, "msg": "Email address already in use!"}
+    else:
+        UserModel = get_user_model()
+        user_auth = UserModel.objects.create_user(username=username, email=emailAdd, password=pw)
+        user_auth.save()
 
-    # Each user belong to a default group
-    my_user = User(name=name, email=email, pk=new_user.pk)
-    my_user.save()
-    default_group = Group(Gpname=name, GpDescription=name + "'s default group", isDefault=True, leader_uid=new_user.pk)
-    # need to save the defalut_group to generate an id before linking it to a user
-    default_group.save()
-    default_group.teamMember.add(my_user)
-    # my_user.group_set.get(isDefault=True)
-    default_group.save()
+        # Each user belong to a default group
+        user = User(name=username, email=emailAdd, pk=user_auth.pk)
+        user.save()
+        default_group = Group(Gpname=username, GpDescription=username + "'s default group", isDefault=True,
+                              leader_uid=user_auth.pk)
+        # need to save the defalut_group to generate an id before linking it to a user
+        default_group.save()
+        default_group.teamMember.add(user)
+        # my_user.group_set.get(isDefault=True)
+        default_group.save()
 
-    return JsonResponse({"code": 0, "msg": "Successfully signed up!"})
+        response = {"code": 0, "msg": "Registration success!"}
+
+    print(response)
+    return JsonResponse(response)
 
 
 # Function login_view
@@ -316,69 +323,101 @@ def update_user(request):
     user = User.objects.get(pk=request.user.pk)
     name = data.get('username')
     email = data.get('email')
-    nameDup = false
-    emailDup = false
+    nameDup = 0
+    emailDup = 0
 
     # check if the username is duplicated
     try:
         name_match = User.objects.get(name=name)
-        if name_match.pk == uid:
+        if name_match.pk == user.pk:
             pass
         else:
-            nameDup = true
+            nameDup = 1
     except User.DoesNotExist:
-        nameDup = false
+        nameDup = 0
         user.name = name
         request.user.username = name
 
     # check if the email is duplicated
     try:
         email_match = User.objects.get(email=email)
-        if email_match.pk == uid:
+        if email_match.pk == user.pk:
             pass
         else:
-            emailDup = true
+            emailDup = 1
     except User.DoesNotExist:
-        emailDup = false
+        emailDup = 0
         user.email = email
         request.user.email = email
 
-    if nameDup and not emailDup:
+    if nameDup == 1 and emailDup == 0:
         return JsonResponse({"code": -1, "msg": "Duplicate Username"})
 
-    if not nameDup and emailDup:
+    if nameDup == 0 and emailDup == 1:
         return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
 
-    if nameDup and emailDup:
+    if nameDup == 1 and emailDup == 1:
         return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
 
     user.save()
     request.user.save()
     serializer = UserSerializer(user)
-    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer})
-
+    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
 
 class Avatar(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
 
     def post(self, request):
-        print(request.data)
         user = self.get_user(request)
         file = request.data['Image']
-        user.avatar = file
-        user.save()
-        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!"})
+        custom_name = user.name + str(user.pk) + "Avatar" + ".jpg"
+        try:
+            img = ContentFile(base64.b64decode(file), name=custom_name)
+        except:
+            img = file
+
+        user.avatar.delete(save=True)
+        user.avatar.save(custom_name, img, save=True)
+        serializer = UserSerializer(user)
+        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!", "user": serializer.data})
 
     def get(self, request):
         user = self.get_user(request)
         avatar = {"image": user.avatar}
         seriliazer = AvatarSerializer(avatar)
         return JsonResponse({"code": 0, "avatar": seriliazer.data})
+
+
+class AddImage(APIView):
+    authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_user(self, request):
+        return User.objects.get(pk=request.user.pk)
+
+    def post(self, request):
+        file = request.data['Image']
+        GPid = request.data['GPid']
+        user = self.get_user(request)
+        custom_name = user.name + ":" + str(GPid) + ".jpg"
+        try:
+            img = ContentFile(base64.b64decode(file), name=custom_name)
+        except:
+            img = file
+
+        group = Group.objects.get(pk=GPid)
+        # image = GroupImages.objects.create(Image=img, GpID=group, name=custom_name)
+        groupSerializer = GroupSerializer(group)
+
+        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!", "groups": groupSerializer.data})
 
 
 # Class get all groups the user is in
@@ -397,14 +436,26 @@ class UserGroups(APIView):
 
     def get(self, request):
         user = User.objects.get(pk=request.user.pk)
-        print(user)
         groups = user.group_set.all()
         default_group = self.get_default_group(request)
         serializer = GroupSerializer(groups, many=True)
         default_group_serializer = GroupSerializer(default_group)
         return JsonResponse(
-            {"code": 0, "msg": "The teams the user is in are fetched!", "default_group": default_group_serializer.data,
-             "all groups": serializer.data})
+            {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+             "all_groups": serializer.data})
+
+
+# get all team members
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def allMembers(request):
+    data = JSONParser().parse(request)
+    groupId = data.get("groupId")
+    group = Group.objects.get(GpID=groupId)
+    query = group.teamMember
+    serializer = UserSerializer(query, many=True)
+    return JsonResponse({"code": 0, "msg": "Team member fetched", "members": serializer.data})
 
 
 # Class
@@ -422,16 +473,6 @@ class GroupOperations(APIView):
     def get_group(self, id):
         return Group.objects.get(pk=id)
 
-    # get all team members
-    def get(self, request):
-        data = JSONParser().parse(request)
-        groupId = data.get("groupId")
-        group = Group.Object.get(GpID=groupId)
-        query = group.teamMember
-        serializer = UserSerializer(query, many=True)
-        return JsonResponse({"code": 0, "msg": "Team member fetched", "members": serializer})
-
-
     @transaction.atomic()
     def post(self, request):
         user = self.get_user(request)
@@ -442,13 +483,14 @@ class GroupOperations(APIView):
         new_group.save()
         return JsonResponse({"code": 0, "msg": "group created!"}, status=status.HTTP_201_CREATED)
 
+    @transaction.atomic()
     def delete(self, request):
         data = JSONParser().parse(request)
         GpID = data['groupId']
         group = self.get_group(GpID)
         # check if the user is the group leader
         if not group.leader_uid == request.user.pk:
-            return JsonResponse({"code": 0, "msg": "only group leader can delete this group"},
+            return JsonResponse({"code": -2, "msg": "only group leader can delete this group"},
                                 status=status.HTTP_400_BAD_REQUEST)
         if group.isDefault:
             return JsonResponse({"code": -1, "msg": "Cannot delete a default group"},
@@ -480,7 +522,7 @@ class GroupMemberOperations(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 group.teamMember.add(user)
-                return JsonResponse({"cide": 0, "msg": "User successfully addded to the team"},
+                return JsonResponse({"code": 0, "msg": "User successfully addded to the team"},
                                     status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return JsonResponse({"code": -1, "msg": "User does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -495,24 +537,23 @@ class GroupMemberOperations(APIView):
         try:
             User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({"code": -1, "msg": "email does not exist!"})
+            return JsonResponse({"code": -1, "msg": "user does not exist!"})
 
         # Check if the user is in the group
         try:
             member = group.teamMember.get(email=email)
-            if member is None:
-                return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
-                                    status=status.HTTP_404_NOT_FOUND)
             # Check if the user to delete is the team leader
             if member.pk == self.get_user(request).pk:
                 return JsonResponse({"code": -2, "msg": "You cannot delete a team leader!"},
                                     status=status.HTTP_400_BAD_REQUEST)
+            group.teamMember.remove(member)
+            return JsonResponse({"code": 0, "msg": "User successfully removed from the team"},
+                                    status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
+            return JsonResponse({"code": -1, "msg": "You cannot delete someone not in the team!"},
                                 status=status.HTTP_404_NOT_FOUND)
 
-        group.teamMember.get(email=email).delete()
-        return JsonResponse({"code": 0, "msg": "User successfully removed from the team"}, status=status.HTTP_200_OK)
+
 
 
 # Function pwd_reset

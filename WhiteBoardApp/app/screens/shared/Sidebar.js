@@ -38,7 +38,7 @@ function Sidebar({ navigation }) {
   }, [drawerOpen]);
 
   const retrieveData = async () => {
-    console.log("Side bar retrieving data");
+    // console.log("Side bar retrieving data");
     try {
       let data = await storage.load({
         key: 'login-session',

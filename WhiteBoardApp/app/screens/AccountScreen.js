@@ -10,7 +10,8 @@ import {
   Button,
   Text,
   Alert,
-  StatusBar
+  StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { setAvatarApi, updateAccountApi } from '../requests/api';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,6 +20,7 @@ import defAvatar from '../assets/avatar.png';
 import { set } from 'react-native-reanimated';
 import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
 import urls from '../requests/urls';
+import Topbar from './shared/Topbar';
 
 const onChangeText = () => {
   console.log('here');
@@ -42,11 +44,13 @@ function Account({ navigation }) {
       })
       .then(ret => {
         // found data go to then()
+        console.log(ret);
         setUser(ret);
         setUsername(ret.userInfo.name);
         setEmail(ret.userInfo.email);
         setUid(ret.userInfo.uid + "");
         setUri(ret.userInfo.avatar);
+        // console.log(avatarUri);
         console.log("Account Page found data!");
       })
       .catch(err => {
@@ -71,16 +75,17 @@ function Account({ navigation }) {
       quality: 1,
       base64: true
     });
+    // console.log(result);
     if (!result.cancelled) {
-      SetAvatar(result);
+      // setAvatar(result);
       sendPicture(result);
-      Alert.alert('PickImage')
+      setUploading(true);
     }
   };
 
-  const sendPicture = async (picture) => {
-    let filename = avatar.uri.split('/').pop();
 
+  const sendPicture = (picture) => {
+    let filename = picture.uri.split('/').pop();
     // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
@@ -89,13 +94,13 @@ function Account({ navigation }) {
 
     const createFormData = (photo, body = {}) => {
       const data = new FormData();
-      //console.log(photo.uri);
+      var uri = Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri;
       data.append('Image', photo.base64);
 
       Object.keys(body).forEach((key) => {
         data.append(key, body[key]);
       });
-      console.log(data);
+      // console.log('I am in formdata', data._parts[0])
       return data;
     };
 
@@ -103,12 +108,14 @@ function Account({ navigation }) {
     setAvatarApi(data).then((res) => {
       if (res && res.code == 0) {
         update_user(res);
+        setUri(urls.base_url.slice(0, -1) + res.user.avatar);
+        setAvatar(picture);
+        setUploading(false);
         Alert.alert('Success', 'The avatar was successfully changed!');
-        setUri(urls.base_url + 'media/' + res.user.avatar);
-        console.log(urls.base_url + 'media/' + res.user.avatar);
       } else {
         console.log('Connection Error!');
         Alert.alert('Error', 'Something went wrong!');
+        setUploading(false);
       }
     });
   };
@@ -159,27 +166,24 @@ function Account({ navigation }) {
   const [nameDup, setNameDup] = useState(false);
   const [email, setEmail] = useState(user.email);
   const [emailDup, setEmailDup] = useState(false);
-  const [avatar, SetAvatar] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [avatarUri, setUri] = useState(null);
-  const [phoneNum, setPhoneNum] = useState("12345678");
+  const [isUploading, setUploading] = useState(false);
+  // const [phoneNum, setPhoneNum] = useState("12345678");
   const [edit, SetEdit] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      {!edit ? <View style={{ alignItems: "flex-end", paddingRight: 40 }}>
-        <Button
-          title="Edit"
-          onPress={() => SetEdit(!edit)}
-        />
-      </View> : null}
+      <Topbar title="My Account" navigation={navigation} />
 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Avatar
           resizeMode="contain"
           rounded
           size="xlarge"
-          source={avatar ? avatar : defAvatar}
+          source={avatarUri ? { uri: avatarUri } : defAvatar}
         />
+        {isUploading ? <ActivityIndicator /> : null}
         <Button
           title="Change"
           onPress={() => pickImage()}
@@ -237,7 +241,7 @@ function Account({ navigation }) {
         </View> */}
         </View>
       </KeyboardAvoidingView>
-      {edit ? <View style={{ bottom: 50 }}>
+      {edit ? <View style={{ bottom: 80 }}>
         <Button
           title="Update"
           onPress={() => Alert.alert("Update?", '\n', [
@@ -251,7 +255,12 @@ function Account({ navigation }) {
             { text: "Cancel" }, { text: "OK", onPress: () => discardChange() }
           ])}
         />
-      </View> : null}
+      </View> : <View style={{ bottom: 100 }}>
+        <Button
+          title="Edit"
+          onPress={() => SetEdit(!edit)}
+        />
+      </View>}
     </SafeAreaView>
   );
 }

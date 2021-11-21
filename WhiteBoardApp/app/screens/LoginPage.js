@@ -14,9 +14,11 @@ import {
   SafeAreaView,
   TextInput,
   Platform,
+  KeyboardAvoidingView
 } from "react-native";
 import Dialog from "react-native-dialog";
 import { loginApi, resetPwdApi } from "../requests/api";
+import urls from "../requests/urls";
 
 function Prompt(props) {
   const [email, setEmail] = React.useState("");
@@ -148,6 +150,7 @@ function LoginPage({ navigation }) {
         user.logged_in = true;
         user.token = response.token;
         user.userInfo = response.user;
+        user.userInfo.avatar = urls.base_url.slice(0, -1) + user.userInfo.avatar;
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
@@ -225,13 +228,16 @@ function LoginPage({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {/* <Ionicons name="md-return-up-back" size={32} color="black" style={styles.back_icon} /> */}
-      <View style={styles.sub_container}>
+      {/* <View style={styles.sub_container}> */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.sub_container}
+      >
         <Image
           resizeMode="contain"
           source={require("../assets/logo.png")}
           style={styles.image}
         />
-
         {wrongInfo ? (
           <View style={styles.errorMsg}>
             <Text style={{ color: "#d40824" }}>
@@ -239,7 +245,6 @@ function LoginPage({ navigation }) {
             </Text>
           </View>
         ) : null}
-
         <View
           style={[
             styles.input_box,
@@ -331,7 +336,8 @@ function LoginPage({ navigation }) {
             <Text style={styles.button_text}>Sign Up</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
+      {/* </View> */}
       {visible ? (
         <Prompt visible={visible} setVisible={setVisible}></Prompt>
       ) : null}
@@ -432,7 +438,7 @@ const styles = StyleSheet.create({
 
   sub_container: {
     alignItems: "center",
-    top: 100,
+    top: 80,
   },
 });
 

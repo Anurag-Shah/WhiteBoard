@@ -178,7 +178,12 @@ class TeamScreen extends Component {
 
   componentDidMount() {
     console.log("team mount!");
+    this.reload();
+  }
+
+  reload = () => {
     this.getUserInfo();
+    this.makeRemoteRequest();
     var filtered = this.state.data.filter(function (value) {
       return !value.isDefault;
     });
@@ -203,7 +208,7 @@ class TeamScreen extends Component {
       .then((ret) => {
         // console.log(ret)
         this.setState({
-          user: ret.userInfo || ret.userInfo,
+          user: ret.userInfo,
           loading: false,
         })
       })
@@ -215,41 +220,40 @@ class TeamScreen extends Component {
   makeRemoteRequest = () => {
     this.setState({ loading: true });
     getAllGroupsApi().then((res) => {
+      console.log(res);
       this.setState({
         //data: res.results,
-        data: res,
-        error: res.error || null,
+        data: res.all_groups,
+        default_group: res.default_group,
+        error: res.msg || null,
         loading: false,
       });
     })
   };
 
   deleteGroup = (groupId) => {
-    // deleteGroupApi(groupId).then((res) => {
-    //   if (res && res.code == 0) {
-    //     Alert.alert("", "Team Successfully deleted", [
-    //       { text: "OK", onPress: () => { navigation.push("Team"); } },
-    //     ]);
-    //   } else {
-    //     Alert.alert("", "Something went wrong. Please try again later!");
-    //   }
-    // });
-    Alert.alert("", "Something went wrong. Please try again later!");
+    deleteGroupApi(groupId).then((res) => {
+      if (res && res.code == 0) {
+        Alert.alert("", "Team Successfully deleted", [
+          { text: "OK", onPress: () => { this.reload() } },
+        ]);
+      } else {
+        Alert.alert("", "Something went wrong. Please try again later!");
+      }
+    });
   }
 
   addGroup = (name, description) => {
-    console.log("addGroup Clicked!");
-    console.log(name);
-    console.log(description);
-    // createGroupApi(name, description).then((res) => {
-    //   if (res && res.code == 0) {
-    //     Alert.alert("", "New Team Created!", [
-    //       { text: "OK", onPress: () => { navigation.push("Team"); } },
-    //     ]);
-    //   } else {
-    //     Alert.alert("", "Something went wrong. Please try again later!");
-    //   }
-    // })
+    console.log("Creating Group!");
+    createGroupApi(name, description).then((res) => {
+      if (res && res.code == 0) {
+        Alert.alert("", "New Team Created!", [
+          { text: "OK", onPress: () => { this.reload() } },
+        ]);
+      } else {
+        Alert.alert("", "Something went wrong. Please try again later!");
+      }
+    })
   };
 
   setVisible = () => {
@@ -345,7 +349,7 @@ class TeamScreen extends Component {
             keyExtractor={item => item.GpID.toString()}
             renderItem={({ item }) => (
               <ListItem bottomDivider onPress={() => this.props.navigation.push("TeamMember", { group: item, user: this.state.user })}>
-                {item.isDefault ? <Avatar source={require('../../assets/avatar.png')} /> : <AntDesign name="team" size={24} color="black" />}
+                {item.isDefault ? <Avatar rounded size='medium' source={{ uri: this.state.user.avatar }} /> : <AntDesign name="team" size={24} color="black" />}
                 <ListItem.Content>
                   <ListItem.Title>{item.Gpname} </ListItem.Title>
                   <ListItem.Subtitle>{item.GpDescription}</ListItem.Subtitle>

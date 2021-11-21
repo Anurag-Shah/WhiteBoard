@@ -11,7 +11,7 @@ class User(models.Model):
     name = models.CharField(max_length=25)
     email = models.EmailField()
     uid = models.IntegerField(primary_key=True)
-    avatar = models.ImageField(upload_to='Avatars', default=None)
+    avatar = models.ImageField(upload_to='Avatars', default='Avatars/default_avatar.jpeg')
 
     class meta():
         db_table = 'User'
@@ -19,8 +19,6 @@ class User(models.Model):
 
     def __str__(self):
         return self.name
-
-
 
 # Modify default User Model in Django Authentication System
 # This model is for user authentication
