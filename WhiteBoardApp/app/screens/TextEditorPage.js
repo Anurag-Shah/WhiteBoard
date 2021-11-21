@@ -25,7 +25,6 @@ import Topbar from "./shared/Topbar";
 
 import urls from "../requests/urls";
 
-// const serverURL = "ec2-18-218-227-246.us-east-2.compute.amazonaws.com";
 const serverURL = "http://172.16.50.73:8000/";
 
 export default class TextEditorPage extends React.Component {
@@ -40,6 +39,8 @@ export default class TextEditorPage extends React.Component {
   }
 
   async sendCode() {
+    this.setState({ responseReceived: false });
+
     try {
       const text = {
         compile_text: this.state.typedCode,
@@ -54,27 +55,33 @@ export default class TextEditorPage extends React.Component {
       //   },
       //   body: JSON.stringify({ typenCode: this.state.typenCode }),
       // });
-      const res = await fetch(
-        "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TextUpload/1",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(text),
-        }
-      );
+      // const res = await fetch(
+      //   "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TempTextUpload/",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       Accept: "application/json",
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify(text),
+      //   }
+      // );
+      const res = await fetch(urls.temp_text, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(text),
+      });
       const response = await res.json();
-      //console.log(response);
       Alert.alert("Code Sent", "Your code has been successfully sent!", [
         {
           text: "OK",
           onPress: () => {
             this.setState({ responseReceived: true });
 
-            //console.log(response);
-            const terminalOutput = response.problem_line; // might need to change the name of the key, depending on backend implementation
+            const terminalOutput = response.problem_line;
             console.log(terminalOutput);
             if (terminalOutput[0] != null) {
               this.setState({ returnValue: -1 });
@@ -111,7 +118,7 @@ export default class TextEditorPage extends React.Component {
         return (
           <View style={styles.consolelog}>
             <ScrollView style={styles.scroll}>
-              <Text>{this.state.returnMessage}</Text>
+              <Text style={styles.termOutput}>{this.state.returnMessage}</Text>
             </ScrollView>
           </View>
         );
@@ -178,7 +185,6 @@ export default class TextEditorPage extends React.Component {
             <Topbar title="Text Editor" navigation={this.props.navigation} />
           </View>
         </TouchableWithoutFeedback>
-        {/* <SafeAreaProvider> */}
 
         <TextInput
           style={styles.input}
@@ -210,8 +216,6 @@ export default class TextEditorPage extends React.Component {
         <View>{this.displayConsoleLog()}</View>
 
         <View>{this.saveOrDiscard()}</View>
-
-        {/* </SafeAreaProvider> */}
       </SafeAreaView>
     );
   }
@@ -257,9 +261,13 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
 
+  termOutput: {
+    fontFamily: "Courier",
+  },
+
   errorMessage: {
     color: "red",
-    fontFamily: "Courier", //TODO
+    fontFamily: "Courier",
   },
 
   saveDiscard: {
