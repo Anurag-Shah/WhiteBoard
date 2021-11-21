@@ -424,26 +424,49 @@ class AddImage(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function logs the user out
+# class UserGroups(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     # permission_classes = [IsAuthenticated]
+#     permission_classes = [AllowAny]
+#     parser_classes = [MultiPartParser, FormParser]
+#
+#     def get_default_group(self, request):
+#         user = User.objects.get(pk=request.user.pk)
+#         return user.group_set.get(isDefault=True)
+#
+#     def get(self, request):
+#         user = User.objects.get(pk=request.user.pk)
+#         groups = user.group_set.all()
+#         default_group = self.get_default_group(request)
+#         serializer = GroupSerializer(groups, many=True)
+#         default_group_serializer = GroupSerializer(default_group)
+#         return JsonResponse(
+#             {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+#              "all_groups": serializer.data})
+
+# Class get all groups of a certain user without authentication
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function logs the user out
 class UserGroups(APIView):
     authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_default_group(self, request):
-        user = User.objects.get(pk=request.user.pk)
+    def get_default_group(self, request, uid):
+        user = User.objects.get(pk=uid)
         return user.group_set.get(isDefault=True)
 
-    def get(self, request):
-        user = User.objects.get(pk=request.user.pk)
+    def get(self, request, uid):
+        user = User.objects.get(pk=uid)
         groups = user.group_set.all()
-        default_group = self.get_default_group(request)
+        default_group = self.get_default_group(request, uid)
         serializer = GroupSerializer(groups, many=True)
         default_group_serializer = GroupSerializer(default_group)
         return JsonResponse(
             {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
              "all_groups": serializer.data})
-
 
 # get all team members
 @authentication_classes([TokenAuthentication, BasicAuthentication])
