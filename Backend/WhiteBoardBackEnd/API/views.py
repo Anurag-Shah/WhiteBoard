@@ -7,6 +7,7 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
+import compiler_wrapper
 import os
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -51,9 +52,6 @@ import sys
 
 sys.path.insert(1, os.path.abspath("../../Compiler"))
 
-import compiler_wrapper
-
-
 
 # Class AllUserList
 # Author: Chunao Liu, Jenna Zhang
@@ -67,7 +65,8 @@ import compiler_wrapper
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class AllUserList(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
+
     def get(self, request):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
@@ -95,7 +94,8 @@ class AllUserList(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificUser(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
+
     def get_user_object(self, id):
         try:
             return User.objects.get(pk=id)
@@ -132,7 +132,8 @@ class SpecificUser(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificGroup(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
+
     def get_group_object(self, id):
         try:
             return Group.objects.get(pk=id)
@@ -150,7 +151,7 @@ class SpecificGroup(APIView):
             Serializer.save()
             return Response(Serializer.data)
         return Response(HttpResponse.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def post(self, request, id):
         serializer = GroupSerializer(data=request.data)
         if serializer.is_valid():
@@ -165,8 +166,9 @@ class SpecificGroup(APIView):
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+
 class TextUpload(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def get_group_object(self, id):
         try:
@@ -185,8 +187,9 @@ class TextUpload(APIView):
         return_data['terminal_output'] = compile_result[0]
         return_data['problem_line'] = compile_result[1]
         group = self.get_group_object(id)
-        image = GroupImages.objects.create(GpID = group, Code = text)
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        image = GroupImages.objects.create(GpID=group, Code=text)
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
         return response
 
 
@@ -202,7 +205,7 @@ class TextUpload(APIView):
 class ImageUpload(APIView):
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
@@ -227,8 +230,9 @@ class ImageUpload(APIView):
         image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
         ImageID = image.pk
-        print ("ID is: " + str(ImageID))
-        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path)
+        print("ID is: " + str(ImageID))
+        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + \
+            str(image_path)
         path_after = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/AfterImages/"
         return_data = {}
         return_data['status'] = 'success'
@@ -245,7 +249,8 @@ class ImageUpload(APIView):
         image.save()
         buffer = BytesIO()
         img_pil.save(fp=buffer, format="PNG")
-        pil_file = ContentFile(buffer.getvalue(), name=request.data['name'] + "OCR_Return")
+        pil_file = ContentFile(
+            buffer.getvalue(), name=request.data['name'] + "OCR_Return")
         ImageObject = GroupImages.objects.filter(pk=ImageID)
         print(ImageObject)
         ImageObject.update(Image_after=pil_file)
@@ -253,24 +258,27 @@ class ImageUpload(APIView):
         return_data['ocr_compile_return'] = ocr_return[1]
         image_path = image.Image_after
         return_data['image_after_uri'] = str(image_path)
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
         return response
 
     def get(self, request, GPid):
         Serializer = GroupImagesSerializer(
             self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
-        
+
     def delete(self, request, GPid):
-        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        ImageObject = GroupImagesSerializer(
+            self.get_Group_image(GPid), many=True)
         try:
             ImageObject.delete()
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
 class ImageDeleteWithID(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def delete(self, request, ImageID):
         ImageObject = GroupImagesSerializer()
@@ -285,8 +293,9 @@ class ImageDeleteWithID(APIView):
 # authentication! It won't save the
 # image, eigher.
 
+
 class TempImageUpload(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def sleep_and_kill(self, path):
         time.sleep(150)
@@ -317,15 +326,19 @@ class TempImageUpload(APIView):
         img_pil.save(CVImageOut, format="PNG")
         return_data['ocr_return'] = ocr_return[2]
         return_data['CV_return'] = CVImageOut
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
-        hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
+        hired_gun = threading.Thread(
+            target=self.sleep_and_kill, args=[str(custom_name)])
         hired_gun.start()
-        hired_CV_gun = threading.Thread(target=self.sleep_and_kill, args=[CVImageOut])
+        hired_CV_gun = threading.Thread(
+            target=self.sleep_and_kill, args=[CVImageOut])
         hired_CV_gun.start()
         return response
-    
+
     def delete(self, request, GPid):
-        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        ImageObject = GroupImagesSerializer(
+            self.get_Group_image(GPid), many=True)
         try:
             ImageObject.delete()
             return Response(status=status.HTTP_200_OK)
@@ -336,6 +349,8 @@ class TempImageUpload(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function receives image from the frontend and send it to ocr to process the image
+
+
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
@@ -353,7 +368,7 @@ def process_image(request):
 @api_view(['POST', 'GET'])
 def process_text(request):
     # If texted code is received, then the imageId field is null
-    
+
     return Response
 
 
@@ -366,9 +381,17 @@ def process_text(request):
 @api_view(['POST', 'GET'])
 def process_text(request):
     # If texted code is received, then the imageId field is null
-    return Response
+    response = {"code": -1, "msg": "Compilation error!"}
+    response = {"code": -2, "msg": "Runtime error!"}
+    response = {"code": 0, "msg": "Code successfully run!"}
+    return JsonResponse(response)
 
 
+# Function register
+# Author: Michelle He, Jenna Zhang
+# Return value: JsonResponse
+# This function receives sign up request from the client and create a new user if
+# all fields are valid
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -400,7 +423,8 @@ def register(request):
         response = {"code": -3, "msg": "Email address already in use!"}
     else:
         UserModel = get_user_model()
-        user_auth = UserModel.objects.create_user(username=username, email=emailAdd, password=pw)
+        user_auth = UserModel.objects.create_user(
+            username=username, email=emailAdd, password=pw)
         user_auth.save()
 
         # Each user belong to a default group
@@ -423,6 +447,8 @@ def register(request):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function allows the user to log in by providing their username and password
+
+
 @api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -595,6 +621,8 @@ class UserGroups(APIView):
              "all_groups": serializer.data})
 
 # get all team members
+
+
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
@@ -626,7 +654,8 @@ class GroupOperations(APIView):
     def post(self, request):
         user = self.get_user(request)
         data = JSONParser().parse(request)
-        new_group = Group(Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
+        new_group = Group(
+            Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
         new_group.save()
         new_group.teamMember.add(user)
         new_group.save()
@@ -697,7 +726,7 @@ class GroupMemberOperations(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
             group.teamMember.remove(member)
             return JsonResponse({"code": 0, "msg": "User successfully removed from the team"},
-                                    status=status.HTTP_200_OK)
+                                status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return JsonResponse({"code": -1, "msg": "You cannot delete someone not in the team!"},
                                 status=status.HTTP_404_NOT_FOUND)

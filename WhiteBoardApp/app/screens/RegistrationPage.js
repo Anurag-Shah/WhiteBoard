@@ -22,9 +22,9 @@ import {
 import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
 
+import urls from "../requests/urls";
+
 // const serverURL = "https://ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
-// const serverURL = "http://127.0.0.1:8000/";
-const serverURL = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/";
 
 const BOTHINUSE = -1;
 const USERNAMEINUSE = -2;
@@ -91,8 +91,7 @@ export default class RegistrationPage extends React.Component {
     };
 
     try {
-      console.log("I am here!");
-      const res = await fetch(serverURL + "Register/", {
+      const res = await fetch(urls.register, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -125,41 +124,25 @@ export default class RegistrationPage extends React.Component {
         return Alert.alert(
           "Success",
           "Your account has been successfully created!",
-          [
-            { text: "OK", onPress: () => this.props.navigation.push("Login") }, //TODO: redirect to login page
-          ]
+          [{ text: "OK", onPress: () => this.props.navigation.push("Login") }]
         );
       }
     } catch (error) {
       console.log("Fetch error: " + error);
     }
-
-    // fetch(serverURL + "Register/", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(userinfo),
-    // })
-    //   .then((response) => {
-    //     console.log(response);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
   }
 
   render() {
     return (
       <SafeAreaView style={styles.safearea}>
         <StatusBar style="auto" />
-        <Icon
+        {/* <Icon
           style={styles.icon}
           name="arrow-undo-outline"
           type="ionicon"
           color="#000"
-          onPress={() => this.props.navigation.push("Login")} //TODO: redirect back to login page
-        />
+          onPress={() => this.props.navigation.push("Login")}
+        /> */}
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
