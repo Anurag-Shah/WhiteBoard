@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 
 export default class Startup extends React.Component {
     render() {
-        setTimeout(() => this.props.navigation.replace('FlatListDemo'),2000)
+        setTimeout(() => this.props.navigation.replace('grouplist'),2000)
         return (
         <View style={styles.container}>
             <Image style={styles.image} source={require('../image/logo.png')}></Image>

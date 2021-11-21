@@ -6,6 +6,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Startup from './pages/startup';
 import FlatListDemo from './pages/FlatListDemo';
 import library from './pages/library';
+import grouplist from './pages/grouplist';
+
 
 const Stack = createStackNavigator();
 
@@ -16,6 +18,8 @@ export default function App() {
         <Stack.Navigator initialRouteName="Startup" >
           <Stack.Screen name="Startup" component={Startup} options={{headerShown: false}}/>
           <Stack.Screen name="FlatListDemo" component={FlatListDemo} options={{headerShown: false}}/>
+          <Stack.Screen name="grouplist" component={grouplist} options={{headerShown: false}}/>
+          <Stack.Screen name="library" component={library} options={{headerShown: false}}/>
          </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="auto" />
