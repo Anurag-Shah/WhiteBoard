@@ -1,6 +1,8 @@
+from django.utils import timezone
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.contrib.auth.models import AbstractUser
+from django.views.decorators.http import last_modified
 
 
 # Create your models here.
@@ -54,6 +56,7 @@ class GroupImages(models.Model):
     Image_after = models.ImageField(upload_to='images/OCR/', null=True)
     Code = models.TextField()
     GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
+    save_time = models.DateTimeField(default=timezone.now)
 
     class meta():
         db_table = 'ImageID'

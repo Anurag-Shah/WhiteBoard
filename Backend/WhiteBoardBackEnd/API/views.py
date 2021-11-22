@@ -8,6 +8,7 @@
 #############################################################################
 
 import os
+from typing import Text
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail, BadHeaderError
@@ -177,7 +178,7 @@ class TextUpload(APIView):
     def post(self, request, id):
         text = request.data["compile_text"]
         compile_result = compiler_wrapper.compiler_wrapper(text, "C")
-        while (compile_result[0] == None):
+        while (compile_result[0] == ""):
             compile_result = compiler_wrapper.compiler_wrapper(text, "C")
         print(compile_result)
         return_data = {}
@@ -186,6 +187,23 @@ class TextUpload(APIView):
         return_data['problem_line'] = compile_result[1]
         group = self.get_group_object(id)
         image = GroupImages.objects.create(GpID = group, Code = text)
+        image.save()
+        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        return response
+
+class TempTextUpload(APIView):
+    permission_classes = [AllowAny,]
+
+    def post(self, request):
+        text = request.data["compile_text"]
+        compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+        while (compile_result[0] == ""):
+            compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+        print(compile_result)
+        return_data = {}
+        return_data['compile_result'] = compile_result[0]
+        return_data['terminal_output'] = compile_result[0]
+        return_data['problem_line'] = compile_result[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -249,10 +267,11 @@ class ImageUpload(APIView):
         ImageObject = GroupImages.objects.filter(pk=ImageID)
         print(ImageObject)
         ImageObject.update(Image_after=pil_file)
-        ImageObject.update(name="Should-Work")
-        return_data['ocr_compile_return'] = ocr_return[1]
+        ImageObject.update(Code=ocr_return[1])
+        return_data['ocr_return'] = ocr_return[2]
         image_path = image.Image_after
         return_data['image_after_uri'] = str(image_path)
+        return_data['ocr_text_detected'] = ocr_return[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -317,6 +336,7 @@ class TempImageUpload(APIView):
         img_pil.save(CVImageOut, format="PNG")
         return_data['ocr_return'] = ocr_return[2]
         return_data['CV_return'] = CVImageOut
+        return_data['ocr_text_detected'] = ocr_return[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
         hired_gun.start()
