@@ -7,6 +7,7 @@
 # by the backend. It support get, put and delete objects from the database
 #############################################################################
 
+import compiler_wrapper
 import os
 from typing import Text
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -52,9 +53,6 @@ import sys
 
 sys.path.insert(1, os.path.abspath("../../Compiler"))
 
-import compiler_wrapper
-
-
 
 # Class AllUserList
 # Author: Chunao Liu, Jenna Zhang
@@ -68,7 +66,8 @@ import compiler_wrapper
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class AllUserList(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
+
     def get(self, request):
         users = User.objects.all()
         Serializer = UserSerializer(users, many=True)
@@ -96,7 +95,8 @@ class AllUserList(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificUser(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
+
     def get_user_object(self, id):
         try:
             return User.objects.get(pk=id)
@@ -133,7 +133,8 @@ class SpecificUser(APIView):
 # @permission_classes([IsAuthenticated])
 # @authentication_classes([TokenAuthentication])
 class SpecificGroup(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
+
     def get_group_object(self, id):
         try:
             return Group.objects.get(pk=id)
@@ -151,7 +152,7 @@ class SpecificGroup(APIView):
             Serializer.save()
             return Response(Serializer.data)
         return Response(HttpResponse.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def post(self, request, id):
         serializer = GroupSerializer(data=request.data)
         if serializer.is_valid():
@@ -166,8 +167,9 @@ class SpecificGroup(APIView):
         GroupObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
+
 class TextUpload(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def get_group_object(self, id):
         try:
@@ -205,6 +207,9 @@ class TempTextUpload(APIView):
         return_data['terminal_output'] = compile_result[0]
         return_data['problem_line'] = compile_result[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        image = GroupImages.objects.create(GpID=group, Code=text)
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
         return response
 
 
@@ -220,7 +225,7 @@ class TempTextUpload(APIView):
 class ImageUpload(APIView):
     # or comment these tow lines:
     # authentication_classes = [TokenAuthentication]
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def get_Group_image(self, GPid):
         aaa = GroupImages.objects.filter(GpID__GpID=GPid)
@@ -245,8 +250,9 @@ class ImageUpload(APIView):
         image = GroupImages.objects.create(Image=img, GpID=group, name=name)
         image_path = image.Image
         ImageID = image.pk
-        print ("ID is: " + str(ImageID))
-        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + str(image_path)
+        print("ID is: " + str(ImageID))
+        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + \
+            str(image_path)
         path_after = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/AfterImages/"
         return_data = {}
         return_data['status'] = 'success'
@@ -263,7 +269,8 @@ class ImageUpload(APIView):
         image.save()
         buffer = BytesIO()
         img_pil.save(fp=buffer, format="PNG")
-        pil_file = ContentFile(buffer.getvalue(), name=request.data['name'] + "OCR_Return")
+        pil_file = ContentFile(
+            buffer.getvalue(), name=request.data['name'] + "OCR_Return")
         ImageObject = GroupImages.objects.filter(pk=ImageID)
         print(ImageObject)
         ImageObject.update(Image_after=pil_file)
@@ -279,17 +286,19 @@ class ImageUpload(APIView):
         Serializer = GroupImagesSerializer(
             self.get_Group_image(GPid), many=True)
         return Response(Serializer.data)
-        
+
     def delete(self, request, GPid):
-        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        ImageObject = GroupImagesSerializer(
+            self.get_Group_image(GPid), many=True)
         try:
             ImageObject.delete()
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
 class ImageDeleteWithID(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def delete(self, request, ImageID):
         ImageObject = GroupImagesSerializer()
@@ -304,8 +313,9 @@ class ImageDeleteWithID(APIView):
 # authentication! It won't save the
 # image, eigher.
 
+
 class TempImageUpload(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def sleep_and_kill(self, path):
         time.sleep(150)
@@ -340,12 +350,14 @@ class TempImageUpload(APIView):
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
         hired_gun.start()
-        hired_CV_gun = threading.Thread(target=self.sleep_and_kill, args=[CVImageOut])
+        hired_CV_gun = threading.Thread(
+            target=self.sleep_and_kill, args=[CVImageOut])
         hired_CV_gun.start()
         return response
-    
+
     def delete(self, request, GPid):
-        ImageObject = GroupImagesSerializer(self.get_Group_image(GPid), many=True)
+        ImageObject = GroupImagesSerializer(
+            self.get_Group_image(GPid), many=True)
         try:
             ImageObject.delete()
             return Response(status=status.HTTP_200_OK)
@@ -356,6 +368,8 @@ class TempImageUpload(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function receives image from the frontend and send it to ocr to process the image
+
+
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
@@ -373,7 +387,7 @@ def process_image(request):
 @api_view(['POST', 'GET'])
 def process_text(request):
     # If texted code is received, then the imageId field is null
-    
+
     return Response
 
 
@@ -386,9 +400,17 @@ def process_text(request):
 @api_view(['POST', 'GET'])
 def process_text(request):
     # If texted code is received, then the imageId field is null
-    return Response
+    response = {"code": -1, "msg": "Compilation error!"}
+    response = {"code": -2, "msg": "Runtime error!"}
+    response = {"code": 0, "msg": "Code successfully run!"}
+    return JsonResponse(response)
 
 
+# Function register
+# Author: Michelle He, Jenna Zhang
+# Return value: JsonResponse
+# This function receives sign up request from the client and create a new user if
+# all fields are valid
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -420,7 +442,8 @@ def register(request):
         response = {"code": -3, "msg": "Email address already in use!"}
     else:
         UserModel = get_user_model()
-        user_auth = UserModel.objects.create_user(username=username, email=emailAdd, password=pw)
+        user_auth = UserModel.objects.create_user(
+            username=username, email=emailAdd, password=pw)
         user_auth.save()
 
         # Each user belong to a default group
@@ -443,6 +466,8 @@ def register(request):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function allows the user to log in by providing their username and password
+
+
 @api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -491,53 +516,73 @@ def logout_view(request):
 @transaction.atomic()
 def update_user(request):
     data = JSONParser().parse(request)
-    uid = data.get('uid')
-    user = User.objects.get(pk=uid)
+    user = User.objects.get(pk=request.user.pk)
     name = data.get('username')
     email = data.get('email')
+    nameDup = 0
+    emailDup = 0
 
     # check if the username is duplicated
     try:
         name_match = User.objects.get(name=name)
-        if name_match.pk == uid:
+        if name_match.pk == user.pk:
             pass
         else:
-            return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+            nameDup = 1
     except User.DoesNotExist:
+        nameDup = 0
         user.name = name
         request.user.username = name
 
     # check if the email is duplicated
     try:
         email_match = User.objects.get(email=email)
-        if email_match.pk == uid:
+        if email_match.pk == user.pk:
             pass
         else:
-            return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+            emailDup = 1
     except User.DoesNotExist:
+        emailDup = 0
         user.email = email
         request.user.email = email
 
+    if nameDup == 1 and emailDup == 0:
+        return JsonResponse({"code": -1, "msg": "Duplicate Username"})
+
+    if nameDup == 0 and emailDup == 1:
+        return JsonResponse({"code": -2, "msg": "This email address has been linked to another account"})
+
+    if nameDup == 1 and emailDup == 1:
+        return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
+
     user.save()
     request.user.save()
-    return JsonResponse({"code": 0, "msg": "Account info successfully updated!"})
+    serializer = UserSerializer(user)
+    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
 
 
 class Avatar(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
 
     def post(self, request):
-        print(request.data)
         user = self.get_user(request)
         file = request.data['Image']
-        user.avatar = file
-        user.save()
-        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!"})
+        custom_name = user.name + str(user.pk) + "Avatar" + ".jpg"
+        try:
+            img = ContentFile(base64.b64decode(file), name=custom_name)
+        except:
+            img = file
+
+        user.avatar.delete(save=True)
+        user.avatar.save(custom_name, img, save=True)
+        serializer = UserSerializer(user)
+        return JsonResponse({"code": 0, "msg": "Avatar Uploaded!", "user": serializer.data})
 
     def get(self, request):
         user = self.get_user(request)
@@ -550,25 +595,63 @@ class Avatar(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function logs the user out
+# class UserGroups(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     # permission_classes = [IsAuthenticated]
+#     permission_classes = [AllowAny]
+#     parser_classes = [MultiPartParser, FormParser]
+#
+#     def get_default_group(self, request):
+#         user = User.objects.get(pk=request.user.pk)
+#         return user.group_set.get(isDefault=True)
+#
+#     def get(self, request):
+#         user = User.objects.get(pk=request.user.pk)
+#         groups = user.group_set.all()
+#         default_group = self.get_default_group(request)
+#         serializer = GroupSerializer(groups, many=True)
+#         default_group_serializer = GroupSerializer(default_group)
+#         return JsonResponse(
+#             {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+#              "all_groups": serializer.data})
+
+# Class get all groups of a certain user without authentication
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function logs the user out
 class UserGroups(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_default_group(self, request):
-        user = User.objects.get(pk=request.user.pk)
+    def get_default_group(self, request, uid):
+        user = User.objects.get(pk=uid)
         return user.group_set.get(isDefault=True)
 
-    def get(self, request):
-        user = User.objects.get(pk=request.user.pk)
-        print(user)
+    def get(self, request, uid):
+        user = User.objects.get(pk=uid)
         groups = user.group_set.all()
-        default_group = self.get_default_group(request)
+        default_group = self.get_default_group(request, uid)
         serializer = GroupSerializer(groups, many=True)
         default_group_serializer = GroupSerializer(default_group)
         return JsonResponse(
-            {"code": 0, "msg": "The teams the user is in are fetched!", "default_group": default_group_serializer.data,
-             "all groups": serializer.data})
+            {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+             "all_groups": serializer.data})
+
+# get all team members
+
+
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def allMembers(request):
+    data = JSONParser().parse(request)
+    groupId = data.get("groupId")
+    group = Group.objects.get(GpID=groupId)
+    query = group.teamMember
+    serializer = UserSerializer(query, many=True)
+    return JsonResponse({"code": 0, "msg": "Team member fetched", "members": serializer.data})
 
 
 # Class
@@ -577,7 +660,8 @@ class UserGroups(APIView):
 # This function logs the user out
 class GroupOperations(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_user(self, request):
         return User.objects.get(pk=request.user.pk)
@@ -589,19 +673,21 @@ class GroupOperations(APIView):
     def post(self, request):
         user = self.get_user(request)
         data = JSONParser().parse(request)
-        new_group = Group(Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
+        new_group = Group(
+            Gpname=data['name'], GpDescription=data['description'], isDefault=False, leader_uid=user.pk)
         new_group.save()
         new_group.teamMember.add(user)
         new_group.save()
         return JsonResponse({"code": 0, "msg": "group created!"}, status=status.HTTP_201_CREATED)
 
+    @transaction.atomic()
     def delete(self, request):
         data = JSONParser().parse(request)
         GpID = data['groupId']
         group = self.get_group(GpID)
         # check if the user is the group leader
         if not group.leader_uid == request.user.pk:
-            return JsonResponse({"code": 0, "msg": "only group leader can delete this group"},
+            return JsonResponse({"code": -2, "msg": "only group leader can delete this group"},
                                 status=status.HTTP_400_BAD_REQUEST)
         if group.isDefault:
             return JsonResponse({"code": -1, "msg": "Cannot delete a default group"},
@@ -633,7 +719,7 @@ class GroupMemberOperations(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 group.teamMember.add(user)
-                return JsonResponse({"cide": 0, "msg": "User successfully addded to the team"},
+                return JsonResponse({"code": 0, "msg": "User successfully addded to the team"},
                                     status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return JsonResponse({"code": -1, "msg": "User does not exist!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -648,24 +734,21 @@ class GroupMemberOperations(APIView):
         try:
             User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({"code": -1, "msg": "email does not exist!"})
+            return JsonResponse({"code": -1, "msg": "user does not exist!"})
 
         # Check if the user is in the group
         try:
             member = group.teamMember.get(email=email)
-            if member is None:
-                return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
-                                    status=status.HTTP_404_NOT_FOUND)
             # Check if the user to delete is the team leader
             if member.pk == self.get_user(request).pk:
                 return JsonResponse({"code": -2, "msg": "You cannot delete a team leader!"},
                                     status=status.HTTP_400_BAD_REQUEST)
+            group.teamMember.remove(member)
+            return JsonResponse({"code": 0, "msg": "User successfully removed from the team"},
+                                status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return JsonResponse({"code": -1, "msg": "You cannot delete a someone not in the team!"},
+            return JsonResponse({"code": -1, "msg": "You cannot delete someone not in the team!"},
                                 status=status.HTTP_404_NOT_FOUND)
-
-        group.teamMember.get(email=email).delete()
-        return JsonResponse({"code": 0, "msg": "User successfully removed from the team"}, status=status.HTTP_200_OK)
 
 
 # Function pwd_reset

@@ -27,20 +27,24 @@ class Migration(migrations.Migration):
             fields=[
                 ('name', models.CharField(max_length=25)),
                 ('email', models.EmailField(max_length=254)),
-                ('uid', models.IntegerField(default=0, primary_key=True, serialize=False)),
+                ('uid', models.IntegerField(default=0,
+                 primary_key=True, serialize=False)),
                 ('avatar', models.ImageField(default=None, upload_to='Avatars')),
             ],
         ),
         migrations.CreateModel(
             name='GroupImages',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('ImageID', models.CharField(max_length=100)),
                 ('name', models.CharField(max_length=50)),
                 ('Image', models.ImageField(null=True, upload_to='images/')),
-                ('Image_after', models.ImageField(null=True, upload_to='images/OCR/')),
+                ('Image_after', models.ImageField(
+                    null=True, upload_to='images/OCR/')),
                 ('Code', models.TextField()),
-                ('GpID', models.ForeignKey(default=8888, on_delete=django.db.models.deletion.CASCADE, to='API.group')),
+                ('GpID', models.ForeignKey(default=8888,
+                 on_delete=django.db.models.deletion.CASCADE, to='API.group')),
             ],
         ),
         migrations.AddField(
