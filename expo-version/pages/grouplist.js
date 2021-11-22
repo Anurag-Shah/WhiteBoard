@@ -131,7 +131,7 @@ class grouplist extends Component {
           data={this.state.data}
           //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
-            <ListItem bottomDivider onPress={() => this.props.navigation.push("library")}>
+            <ListItem bottomDivider onPress={() => this.props.navigation.push("library", {url: "testing url"})}>
               <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>

@@ -6,7 +6,7 @@ import { Icon } from "react-native-elements";
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
 LogBox.ignoreAllLogs();//Ignore all log notifications
-const image_url = "";
+//const url = ;
 
 class library extends Component {
   constructor(props) {
@@ -46,6 +46,7 @@ class library extends Component {
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
     /*local test*/
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
+    console.log(this.props.route.params.url);
     const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Images/1';
 
     this.setState({ loading: true });
