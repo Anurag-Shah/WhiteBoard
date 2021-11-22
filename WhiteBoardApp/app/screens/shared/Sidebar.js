@@ -1,33 +1,39 @@
 import React from 'react';
 
-import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView } from 'react-native';
+import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../../config/storage';
+import { logoutApi } from '../../requests/api';
 
 export default class Sidebar extends React.Component {
 
-  constructor (props) {
-    super (props);
+  constructor(props) {
+    super(props);
     this.state = {
-      routes:[{
-        name: "Save",
-        screen: "Save"
-      }, {
-        name: "TextEditor",
-        screen: "TextEditorPage"
-      },{
-        name: "Library",
-        screen: "Library"
-      }, {
-        name: "Team",
-        screen: "Team"
-      }, {
-        name: "Account",
-        screen: "Account"
-      }],
-      name: '',
+      route_anonymous: [
+        {
+          // name: "Log In",
+          // screen: "Login"
+          name: '',
+        }
+      ],
+      routes_logged_in: [
+        //   {
+        //   name: "Save",
+        //   screen: "Save"
+        // },
+        {
+          name: "Library",
+          screen: "Library"
+        }, {
+          name: "Team",
+          screen: "Team"
+        }, {
+          name: "Account",
+          screen: "Account"
+        }],
+      user: null,
     }
     this.retrieveData = this.retrieveData.bind(this);
   }
@@ -35,63 +41,97 @@ export default class Sidebar extends React.Component {
   componentDidMount() {
     this.retrieveData();
   }
+  logout = () => {
+    if (this.state.user.logged_in) {
+      logoutApi().then((response) => {
+        if (response.code == 0) {
+          // Logout successfully
+          this.state.user.logged_in = false;
+          storage.save({
+            key: "login-session",
+            data: this.state.user,
+          });
+          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => this.props.navigation.navigate('Camera') }]);
+        } else if (response.code == -1) {
+          Alert.alert("Already Logged out!");
+        } else {
+          console.log(response.status);
+        }
 
+      });
+    } else {
+      Alert.alert("Already Logged out!");
+    }
+  }
   retrieveData = async () => {
     try {
-      AsyncStorage.getItem('full_name').then(res => {
-        if (res != null) {
-          this.setState({name: res});
-        } else {
-          this.setState({name: ''});
-        }
+      let data = await storage.load({
+        key: 'login-session',
+        // autoSync (default: true) means if data is not found or has expired,
+        // then invoke the corresponding sync method
+        autoSync: true,
+        syncInBackground: true,
       });
+      let user = data;
+      if (user && user.logged_in) {
+        this.setState({
+          user: user,
+        });
+      }
     } catch (error) {
-      alert(error);
+      console.log(error);
+      // let user = {logged_in: true, name: 'Yierpan', token:'Token: 123'};
+      // this.setState({
+      //   user: user,
+      // });
+      return null;
     }
   };
 
+  login = () => {
+    this.props.navigation.navigate('Login');
+  }
+
   render() {
-    const userId  = "Yierpan42";
+    const userId = "Yierpan42";
     const loggedIn = 'true';
-    
+
     function Item({ item, navigation }) {
       return (
-        <TouchableOpacity style={styles.listItem} onPress={()=> (loggedIn == 'true') ? navigation.navigate(item.screen, { userId: userId }) : {}}>
-          
-          <Text style={[styles.title , {color:'white', fontWeight:"bold", fontSize:18}]}>{item.name}</Text>
+        <TouchableOpacity style={styles.listItem} onPress={() => (loggedIn == 'true') ? navigation.navigate(item.screen, { userId: userId }) : {}}>
+
+          <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
         </TouchableOpacity>
       );
     }
 
     return (
-      <SafeAreaView style={[ styles.container, styles.statusBarMargin]}>
-        
-        {(this.state.name != null && this.state.name != '') &&
-        <Text style={{fontWeight:"bold", fontSize:16, marginTop:10, color:'white'}}>Welcome back, { this.state.name }</Text>
+      <SafeAreaView style={[styles.container, styles.statusBarMargin]}>
+
+        {(this.state.user != null && this.state.user.logged_in) &&
+          <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white' }}> {this.state.user.username}</Text>
         }
-        <FlatList 
-            data={this.state.routes}
-            renderItem={({ item }) => <Item item={item} navigation={this.props.navigation}/>}
-            keyExtractor={item => item.name}
-            style = {{ width:'100%',alignSelf:'flex-start' }}
-            />
-        
+        <FlatList
+          data={this.state.user != null && this.state.user.logged_in ? this.state.routes_logged_in : this.state.route_anonymous}
+          renderItem={({ item }) => <Item item={item} navigation={this.props.navigation} />}
+          keyExtractor={item => item.name}
+          style={{ width: '100%', alignSelf: 'flex-start' }}
+        />
+
         {
-          (loggedIn == 'true') && 
-          <TouchableOpacity style={styles.button} >
+          (this.state.user != null && this.state.user.logged_in) &&
+          <TouchableOpacity style={styles.button} onPress={() => this.logout()} >
             <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
-            <Text style={styles.buttonTitle}>Login</Text>
+            <Text style={styles.buttonTitle}>Logout</Text>
           </TouchableOpacity>
         }
         {
-          (loggedIn == 'false') && 
-        
-            
-            <TouchableOpacity style={styles.button} >
-              <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }}/>
-              <Text style={styles.buttonTitle}>Logout</Text>
-            </TouchableOpacity>
-          
+          (this.state.user == null || !this.state.user.logged_in) &&
+          <TouchableOpacity style={styles.button} onPress={() => this.login()}>
+            <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
+            <Text style={styles.buttonTitle}>Login</Text>
+          </TouchableOpacity>
+
         }
       </SafeAreaView>
     );
@@ -104,33 +144,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: '#a5b498',
-    color:'white'
-    
+    color: 'white'
+
   },
   statusBarMargin: {
-    marginTop: (Platform.OS === 'ios') ? 0 : 0,
+    marginTop: (Platform.OS === 'ios') ? 0 : 24,
   },
-  profileImg:{
-    width:80,
-    height:80,
-    borderRadius:40,
-    marginTop:40
+  profileImg: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginTop: 40
   },
   icon: {
     width: 30,
     height: 30
   },
-  listItem:{
-    height:60,
-    alignItems:"center",
-    flexDirection:"row",
+  listItem: {
+    height: 60,
+    alignItems: "center",
+    flexDirection: "row",
   },
-  title:{
-    fontSize:16,
-    marginLeft:20,
+  title: {
+    fontSize: 16,
+    marginLeft: 20,
   },
   button: {
-    flexDirection:"row",
+    flexDirection: "row",
     alignSelf: 'stretch',
     borderRadius: 4,
     backgroundColor: '#e36f2c',
