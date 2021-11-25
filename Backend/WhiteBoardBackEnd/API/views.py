@@ -207,9 +207,6 @@ class TempTextUpload(APIView):
         return_data['terminal_output'] = compile_result[0]
         return_data['problem_line'] = compile_result[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
-        image = GroupImages.objects.create(GpID=group, Code=text)
-        response = HttpResponse(json.dumps(return_data),
-                                content_type='application/json')
         return response
 
 
@@ -263,7 +260,7 @@ class ImageUpload(APIView):
         print(ocr_return)
         print(type(ocr_return[0]))
         img_pil = ocr_return[0]
-        CVImageOut = path_after + str(GPid) + ":" + str(ImageID) + ".png"
+        CVImageOut = path_after + str(GPid) + "_" + str(ImageID) + ".png"
         img_pil.save(CVImageOut, format="PNG")
         image.Image_after = CVImageOut
         image.save()
@@ -277,7 +274,7 @@ class ImageUpload(APIView):
         ImageObject.update(Code=ocr_return[1])
         return_data['ocr_return'] = ocr_return[2]
         image_path = image.Image_after
-        return_data['image_after_uri'] = str(image_path)
+        return_data['image_after_uri'] = str(image_path)[str(image_path).find("AfterImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
@@ -297,11 +294,26 @@ class ImageUpload(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+# Note: This function is under construction. Please do not use for now.
 class ImageDeleteWithID(APIView):
     permission_classes = [AllowAny, ]
 
-    def delete(self, request, ImageID):
-        ImageObject = GroupImagesSerializer()
+    def delete(self, request, id):
+        try:
+            Group_to_delete = Group.objects.get(pk = id)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        ImageObject = GroupImages.objects.filter(GpID=Group_to_delete)
+        for images in ImageObject:
+            print(images.Image.url)
+            if os.path.isfile(images.Image.url):
+                os.remove(images.Image.url)
+            print(images.Image_after.url)
+            if os.path.isfile(images.Image_after):
+                os.remove(images.Image_after)
+        ImageObject.delete()
+        return Response(status.HTTP_204_NO_CONTENT)
 
 # Class TempImageUpload
 # Author: Chunao Liu
@@ -337,7 +349,7 @@ class TempImageUpload(APIView):
         path = custom_name
         return_data = {}
         return_data['status'] = 'success'
-        return_data['image_uri'] = str(custom_name)
+        return_data['image_uri'] = custom_name[custom_name.find("TempImages"):]
         print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(custom_name)
@@ -345,7 +357,8 @@ class TempImageUpload(APIView):
         img_pil = ocr_return[0]
         img_pil.save(CVImageOut, format="PNG")
         return_data['ocr_return'] = ocr_return[2]
-        return_data['CV_return'] = CVImageOut
+        print (CVImageOut[CVImageOut.find("TempImages"):])
+        return_data['CV_return'] = CVImageOut[CVImageOut.find("TempImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])

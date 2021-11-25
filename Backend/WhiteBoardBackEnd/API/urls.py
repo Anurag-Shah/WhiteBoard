@@ -20,7 +20,7 @@ urlpatterns = [
     path('TextUpload/<int:id>', TextUpload.as_view()),
     path('TempTextUpload/', TempTextUpload.as_view()),
     path('TempImages/', TempImageUpload.as_view()),
-    path('ImageDeleteByID/', ImageDeleteWithID.as_view()),
+    path('ImageDeleteByID/<int:id>', ImageDeleteWithID.as_view()),
     path('Images/<int:GPid>', ImageUpload.as_view()),
     path('Images/process', process_image, name='process_image'),
     path('Text/process', process_text, name='process_image'),
