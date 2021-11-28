@@ -7,5 +7,5 @@ import Account from "./app/screens/AccountScreen";
 import CameraScreen from "./app/screens/CameraScreen";
 export default function App() {
   // return <WelcomeScreen />;
-  return <WelcomeScreen />;
+  return <TeamScreen />;
 }

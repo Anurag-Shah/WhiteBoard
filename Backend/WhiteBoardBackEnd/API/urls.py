@@ -10,6 +10,7 @@ urlpatterns = [
     path('User/logout/', logout_view, name='logout'),
     path('User/update/', update_user, name='account_update'),
     path('User/avatar/', Avatar.as_view(), name='get_or_set_avatar'),
+    path('Add/', AddImage.as_view(), name='add_image'),
     path('User/groups/<int:uid>', UserGroups.as_view(), name='get_user_groups'),
     path('User/group/', GroupOperations.as_view(), name='create_or_a_team'),
     path('User/group/members/', allMembers, name='get_members'),

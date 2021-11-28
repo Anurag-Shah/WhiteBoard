@@ -414,7 +414,7 @@ class AddImage(APIView):
             img = file
 
         group = Group.objects.get(pk=GPid)
-        # image = GroupImages.objects.create(Image=img, GpID=group, name=custom_name)
+        image = GroupImages.objects.create(Image=img, GpID=group, name=custom_name)
         groupSerializer = GroupSerializer(group)
 
         return JsonResponse({"code": 0, "msg": "Avatar Uploaded!", "groups": groupSerializer.data})
@@ -447,7 +447,6 @@ class AddImage(APIView):
 # Class get all groups of a certain user without authentication
 # Author: Jenna Zhang
 # Return value: JsonResponse
-# This function logs the user out
 class UserGroups(APIView):
     authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]

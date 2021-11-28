@@ -348,7 +348,7 @@ class TeamScreen extends Component {
             data={this.state.data}
             keyExtractor={item => item.GpID.toString()}
             renderItem={({ item }) => (
-              <ListItem bottomDivider onPress={() => this.props.navigation.push("TeamMember", { group: item, user: this.state.user })}>
+              <ListItem onPress={() => this.props.navigation.push("TeamMember", { group: item, user: this.state.user })}>
                 {item.isDefault ? <Avatar rounded size='medium' source={{ uri: this.state.user.avatar }} /> : <AntDesign name="team" size={24} color="black" />}
                 <ListItem.Content>
                   <ListItem.Title>{item.Gpname} </ListItem.Title>

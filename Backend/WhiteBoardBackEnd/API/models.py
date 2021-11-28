@@ -48,7 +48,9 @@ class Group(models.Model):
 class GroupImages(models.Model):
     ImageID = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
-    Image = models.ImageField(upload_to='images/', default='DefaultImages/default-image-620x600.jpg')
+    Image = models.ImageField(upload_to='images/', null=True)
+    Image_after = models.ImageField(upload_to='images/OCR/', null=True)
+    Code = models.TextField(null=True)
     GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
 
     class meta():
