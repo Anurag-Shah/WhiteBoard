@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { DrawerActions, NavigationActions } from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 
@@ -9,13 +9,10 @@ export default class Topbar extends React.Component {
     super(props);
   }
 
-  handleClick = () => {
-    this.props.navigation.dispatch(DrawerActions.openDrawer());
-  };
   render() {
     return (
       <View style={[styles.container, styles.statusBarMargin]} >
-        <TouchableOpacity onPress={() => this.handleClick()}>
+        <TouchableOpacity onPress={() => this.props.navigation.dispatch(DrawerActions.openDrawer())}>
           <Ionicons name="ios-list" size={32} style={{ color: 'black' }} />
         </TouchableOpacity>
 

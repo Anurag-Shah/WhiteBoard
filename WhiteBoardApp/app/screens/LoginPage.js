@@ -83,7 +83,7 @@ function LoginPage({ navigation }) {
   const toggleRememberMe = () => {
     setRememberMe(!rememberMe);
     console.log("toggleMePressed");
-  };
+  }
 
   useEffect(() => {
     getUserInfo();
