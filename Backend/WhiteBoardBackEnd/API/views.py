@@ -263,19 +263,13 @@ class ImageUpload(APIView):
         CVImageOut = path_after + str(GPid) + "_" + str(ImageID) + ".png"
         img_pil.save(CVImageOut, format="PNG")
         image.Image_after = CVImageOut
+        image.Image_after_url = CVImageOut
         image.save()
-        buffer = BytesIO()
-        img_pil.save(fp=buffer, format="PNG")
-        pil_file = ContentFile(
-            buffer.getvalue(), name=request.data['name'] + "OCR_Return")
-        ImageObject = GroupImages.objects.filter(pk=ImageID)
-        print(ImageObject)
-        ImageObject.update(Image_after=pil_file)
-        ImageObject.update(Code=ocr_return[1])
         return_data['ocr_return'] = ocr_return[2]
         image_path = image.Image_after
         return_data['image_after_uri'] = str(image_path)[str(image_path).find("AfterImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
+        return_data['y-coord'] = ocr_return[5]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -353,13 +347,15 @@ class TempImageUpload(APIView):
         print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(custom_name)
-        print(ocr_return)
+        for line in ocr_return:
+            print(line)
         img_pil = ocr_return[0]
         img_pil.save(CVImageOut, format="PNG")
         return_data['ocr_return'] = ocr_return[2]
         print (CVImageOut[CVImageOut.find("TempImages"):])
         return_data['CV_return'] = CVImageOut[CVImageOut.find("TempImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
+        return_data['y-coord'] = ocr_return[5]
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
         hired_gun.start()
