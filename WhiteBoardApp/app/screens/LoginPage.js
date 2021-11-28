@@ -345,7 +345,7 @@ function LoginPage({ navigation }) {
 
         <View style={styles.buttons}>
           {/* <View style={styles.button_view}><Button title="Login" style={{height: "100%"}}/></View> */}
-          <TouchableOpacity style={styles.button} onPress={login}>
+          <TouchableOpacity style={styles.button} onPress={login()}>
             <Text style={styles.button_text}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => signUp()}>

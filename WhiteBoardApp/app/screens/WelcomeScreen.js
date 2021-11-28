@@ -74,14 +74,12 @@ const HomeStackNavigator = () => {
 function MyDrawer() {
   useEffect(() => {
     console.log("drawer updated!");
-    setChange(!change);
   }, []);
-  const [change, setChange] = useState(false);
   return (
     <Drawer.Navigator
       initialRouteName="Stack"
       headerMode="none"
-      drawerContent={(props) => <Sidebar {...props} chang={change} setChange={setChange} />}
+      drawerContent={(props) => <Sidebar {...props} />}
       drawerPosition="left"
       drawerStyle={{ width: "35%" }}
       edgeWidth={200}
@@ -96,8 +94,6 @@ function MyDrawer() {
 
 
 function WelcomeScreen(props) {
-  useEffect(() => {
-  })
   return (
     <Provider store={store}>
       <NavigationContainer>

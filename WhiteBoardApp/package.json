@@ -6,12 +6,17 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest"
+    "test": "jest -u"
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFiles": [
-      "./jestSetupFile.js"
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/babel.config.js",
+      "!**/jest.setup.js"
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
@@ -48,7 +53,9 @@
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
-    "jest-expo": "^43.0.1",
+    "@testing-library/jest-native": "^4.0.4",
+    "@testing-library/react-native": "^8.0.0",
+    "jest-expo": "39.0.0",
     "react-test-renderer": "16.13"
   },
   "peerDependencies": {

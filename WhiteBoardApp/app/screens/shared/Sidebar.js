@@ -108,7 +108,6 @@ function Sidebar({ navigation }) {
   function Item({ item, navigation }) {
     return (
       <TouchableOpacity style={styles.listItem} onPress={() => { navigation.navigate(item.screen) }}>
-
         <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
       </TouchableOpacity>
     );
@@ -130,7 +129,7 @@ function Sidebar({ navigation }) {
       />
 
       {
-        (user != null && user.logged_in) &&
+        (user == null || (user != null && user.logged_in)) &&
         <TouchableOpacity style={styles.button} onPress={logout} >
           <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
           <Text style={styles.buttonTitle}>Logout</Text>
