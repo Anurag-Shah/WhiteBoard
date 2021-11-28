@@ -46,7 +46,6 @@ export default function CameraScreen({ navigation }) {
   const [userName, setUserName] = useState('Yierpan42');
 
   useEffect(() => {
-    //getUserInfo();  
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');

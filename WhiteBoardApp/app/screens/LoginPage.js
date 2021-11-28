@@ -90,10 +90,10 @@ function LoginPage({ navigation }) {
   }, []);
 
   const getUserInfo = () => {
-    // Fetch user and login info in local storage
+    // Fetch user and account info in local storage
     storage
       .load({
-        key: "login-session",
+        key: "account",
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
         autoSync: false,
@@ -115,7 +115,15 @@ function LoginPage({ navigation }) {
       .catch((err) => {
         // any exception including data not found
         // goes to catch()
-        console.log("User not found!");
+        console.warn(err.message);
+        switch (err.name) {
+          case 'NotFoundError':
+            console.log("User not found!");
+            break;
+          case 'ExpiredError':
+            console.log("Login Session Expired!");
+            break;
+        }
         setUsername("");
         setPwd("");
         setRememberMe(false);
@@ -138,12 +146,15 @@ function LoginPage({ navigation }) {
     // loginApi communicates with the backend
     let user = {
       username: username,
-      password: password,
       token: "",
-      rememberMe: true,
       logged_in: false,
       userInfo: [],
     };
+    let account = {
+      username: username,
+      password: password,
+      rememberMe: true,
+    }
     loginApi(username, password).then((response) => {
       if (response && response.code == 0) {
         // If Login successfully
@@ -154,9 +165,9 @@ function LoginPage({ navigation }) {
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
-          user.rememberMe = true;
+          account.rememberMe = true;
         } else {
-          user.rememberMe = false;
+          account.rememberMe = false;
           setTimeout(() => {
             setUsername("");
             setPwd("");
@@ -165,6 +176,11 @@ function LoginPage({ navigation }) {
         storage.save({
           key: "login-session",
           data: user,
+        });
+        storage.save({
+          key: "account",
+          data: account,
+          expires: null,
         });
         // Redirecting to Camera Page
         Alert.alert("", "Logged in Successfully!", [

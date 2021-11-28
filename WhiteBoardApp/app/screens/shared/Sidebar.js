@@ -51,13 +51,22 @@ function Sidebar({ navigation }) {
       if (user && user.logged_in) {
         setUser(user);
       }
-    } catch (error) {
-      console.log(error);
-      // let user = {logged_in: true, name: 'Yierpan', token:'Token: 123'};
-      // this.setState({
-      //   user: user,
-      // });
-      return null;
+    } catch (err) {
+      console.log(err);
+      console.warn(err.message);
+      switch (err.name) {
+        case 'NotFoundError':
+          console.log("User not found!");
+          break;
+        case 'ExpiredError':
+          console.log("Login Session Expired!");
+          Alert.alert(
+            "Login Session Expired!",
+            'Please login again',
+            [{ text: "Cancel" }, { text: "Login", onPress: () => navigation.navigate('Login') }]
+          );
+          break;
+      }
     }
   };
 
@@ -72,7 +81,7 @@ function Sidebar({ navigation }) {
             key: "login-session",
             data: user,
           });
-          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera', { shouldChange: true }) }]);
+          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
         } else if (response.code == -1) {
           Alert.alert("Already Logged out!");
           user.logged_in = false;
@@ -98,7 +107,7 @@ function Sidebar({ navigation }) {
 
   function Item({ item, navigation }) {
     return (
-      <TouchableOpacity style={styles.listItem} onPress={() => { navigation.navigate(item.screen, { shouldChange: true }) }}>
+      <TouchableOpacity style={styles.listItem} onPress={() => { navigation.navigate(item.screen) }}>
 
         <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
       </TouchableOpacity>
