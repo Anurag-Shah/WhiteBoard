@@ -47,7 +47,7 @@ class library extends Component {
     /*local test*/
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
     console.log(this.props.route.params.url);
-    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Images/1';
+    const url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com/Images/" + this.props.route.params.url;
 
     this.setState({ loading: true });
 
@@ -133,7 +133,7 @@ class library extends Component {
           //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider>
-              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image}}/>
+              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>
               <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
@@ -141,7 +141,7 @@ class library extends Component {
               </ListItem.Content>
               <ListItem.Chevron 
               onPress={() => {
-                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image;
+                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
                 console.log(this.image_url);
                 this.setState({show:true});
                 }} />
