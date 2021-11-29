@@ -1,0 +1,245 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Login /> renders correctly 1`] = `
+<RCTSafeAreaView
+  emulateUnlessSupported={true}
+  style={
+    Object {
+      "backgroundColor": "white",
+      "height": "100%",
+      "paddingTop": 0,
+    }
+  }
+>
+  <View
+    onLayout={[Function]}
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "top": 80,
+        },
+        Object {
+          "paddingBottom": 0,
+        },
+      ]
+    }
+  >
+    <Image
+      resizeMode="contain"
+      source={1}
+      style={
+        Object {
+          "height": 180,
+          "width": 250,
+        }
+      }
+    />
+    <View
+      style={
+        Array [
+          Object {
+            "borderWidth": 1,
+            "height": 50,
+            "margin": 10,
+            "width": "90%",
+          },
+          Object {
+            "borderColor": "black",
+            "borderWidth": 1,
+          },
+        ]
+      }
+    >
+      <Text />
+      <TextInput
+        allowFontScaling={true}
+        importantForAutofill="yes"
+        onChangeText={[Function]}
+        placeholder="Username"
+        rejectResponderTermination={true}
+        style={
+          Object {
+            "height": "100%",
+            "left": 50,
+            "position": "absolute",
+            "width": "80%",
+          }
+        }
+        underlineColorAndroid="transparent"
+        value=""
+      />
+    </View>
+    <View
+      style={
+        Array [
+          Object {
+            "borderWidth": 1,
+            "height": 50,
+            "margin": 10,
+            "width": "90%",
+          },
+          Object {
+            "borderColor": "black",
+            "borderWidth": 1,
+          },
+        ]
+      }
+    >
+      <Text />
+      <TextInput
+        allowFontScaling={true}
+        importantForAutofill="yes"
+        onChangeText={[Function]}
+        placeholder="Password"
+        rejectResponderTermination={true}
+        secureTextEntry={true}
+        style={
+          Object {
+            "height": "100%",
+            "left": 50,
+            "position": "absolute",
+            "width": "80%",
+          }
+        }
+        underlineColorAndroid="transparent"
+        value=""
+      />
+      <Text />
+    </View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "height": 50,
+          "justifyContent": "space-between",
+          "width": "90%",
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+          }
+        }
+      >
+        <RCTSwitch
+          accessibilityRole="switch"
+          onChange={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "height": 31,
+                "width": 51,
+              },
+              Object {
+                "marginRight": 5,
+              },
+            ]
+          }
+          value={false}
+        />
+        <Text
+          style={
+            Object {
+              "marginTop": 5,
+            }
+          }
+        >
+          Remember me
+        </Text>
+      </View>
+      <View>
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "color": "#4a7fd4",
+              "marginTop": 5,
+            }
+          }
+        >
+          Forgot Password
+        </Text>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "height": 55,
+          "justifyContent": "space-between",
+          "paddingTop": 10,
+          "width": "90%",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#3f993f",
+            "justifyContent": "center",
+            "opacity": 1,
+            "width": 160,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "white",
+              "fontFamily": "Al Nile",
+            }
+          }
+        >
+          Login
+        </Text>
+      </View>
+      <View
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#3f993f",
+            "justifyContent": "center",
+            "opacity": 1,
+            "width": 160,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "white",
+              "fontFamily": "Al Nile",
+            }
+          }
+        >
+          Sign Up
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
