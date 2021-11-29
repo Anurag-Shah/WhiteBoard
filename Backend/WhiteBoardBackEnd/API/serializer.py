@@ -11,17 +11,17 @@ class UserSerializer(serializers.ModelSerializer):
 class AvatarSerializer(serializers.Serializer):
         image = serializers.ImageField(use_url='Avatars')
 
-class ImageSerializer(serializers.Serializer):
-    Image = serializers.ImageField(use_url='images')
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['Gpname', 'GpID', 'GpDescription', 'isDefault']
+
+    user = UserSerializer
+
 
 class GroupImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupImages
-        fields = ['name', 'Image', 'Image_after', 'GpID', 'Code']
+        fields = ['name', 'Image', 'GpID']
 
-class GroupSerializer(serializers.ModelSerializer):
-    user = UserSerializer
-    groupimages = GroupImagesSerializer(source="groupimages_set", many=True)
-    class Meta:
-        model = Group
-        fields = ['Gpname', 'GpID', 'GpDescription', 'isDefault', 'leader_uid', 'groupimages']
+    group = GroupSerializer

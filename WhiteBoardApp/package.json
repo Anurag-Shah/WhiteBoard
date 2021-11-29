@@ -5,22 +5,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject",
-    "test": "jest -u"
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "**/*.{js,jsx}",
-      "!**/coverage/**",
-      "!**/node_modules/**",
-      "!**/babel.config.js",
-      "!**/jest.setup.js"
-    ],
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-    ]
+    "eject": "expo eject"
   },
   "dependencies": {
     "@expo/vector-icons": "^12.0.2",
@@ -30,38 +15,31 @@
     "@react-navigation/stack": "^5.12.8",
     "expo": "~42.0.1",
     "expo-camera": "^11.2.2",
-    "expo-image-picker": "~10.2.2",
-    "expo-media-library": "~12.1.2",
-    "expo-permissions": "~12.1.1",
+    "expo-image-picker": "^11.0.3",
+    "expo-media-library": "^13.0.3",
+    "expo-permissions": "~10.0.0",
     "expo-status-bar": "~1.0.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
-    "react-native-reanimated": "~2.2.0",
-    "react-native-screens": "~3.4.0",
     "react-native-dialog": "^9.2.0",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-image-picker": "^4.1.2",
     "react-native-modal": "^13.0.0",
+    "react-native-reanimated": "^1.13.2",
+    "react-native-screens": "^2.16.1",
     "react-native-storage": "^1.0.1",
     "react-native-web": "^0.13.12",
     "react-navigation": "^4.4.3",
     "react-navigation-drawer": "^2.6.0",
     "react-navigation-stack": "^2.10.2",
     "react-redux": "^7.2.2",
-    "redux": "^4.0.5"
+    "redux": "^4.0.5",
+    "sharingan-rn-modal-dropdown": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0",
-    "@testing-library/jest-native": "^4.0.4",
-    "@testing-library/react-native": "^8.0.0",
-    "jest-expo": "39.0.0",
-    "react-test-renderer": "16.13"
-  },
-  "peerDependencies": {
-    "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "@babel/core": "~7.9.0"
   },
   "private": true
 }

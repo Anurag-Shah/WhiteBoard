@@ -12,11 +12,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
-from decouple import config
-
-import sys
-
-print (sys.path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,14 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = 'django-insecure-qk!d=*&ds!@-jw8%8fu7qpx1xcsy5-0qnkt394+$k+^ua2mlil'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = [
-#     'ec2-3-144-80-126.us-east-2.compute.amazonaws.com', '127.0.0.1', '172.16.50.73']
-
+<<<<<<< HEAD
 # ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
 #                  "127.0.0.1",
 #                  "66.253.158.235",
@@ -44,22 +37,23 @@ ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
                  'ec2-3-15-170-72.us-east-2.compute.amazonaws.com',
                  'ec2-3-144-142-207.us-east-2.compute.amazonaws.com',
                  '66.253.158.235',
-                 'ec2-3-138-112-15.us-east-2.compute.amazonaws.com',
-                 'ip-172-31-32-112.us-east-2.compute.internal',
-                 'ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
-                 '127.0.0.1',
-                 '172.16.50.73',
-                 '3.138.112.15',
                  ]
 
 # AWS SES settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_HOST = "janneyzay540@gmail.com"
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY")  # hidden
-AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")  # hidden
+AWS_ACCESS_KEY_ID = ''  # hidden
+AWS_SECRET_ACCESS_KEY = ''  # hidden
 AWS_SES_REGION_NAME = 'us-west-2'  # (ex: us-east-2)
-# (ex: email.us-east-2.amazonaws.com)
-AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'  # (ex: email.us-east-2.amazonaws.com)
+=======
+ALLOWED_HOSTS = ['ec2-3-144-80-126.us-east-2.compute.amazonaws.com',
+'ec2-18-218-227-246.us-east-2.compute.amazonaws.com',
+'18.218.227.246',
+'ec2-3-15-170-72.us-east-2.compute.amazonaws.com',
+'ec2-3-144-142-207.us-east-2.compute.amazonaws.com',]
+
+>>>>>>> main
 
 # Application definition
 
@@ -79,23 +73,16 @@ INSTALLED_APPS = [
     'corsheaders',
     'API',
     'crispy_forms',
-    'django_extensions',
-    'WhiteBoardBackEnd',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # new
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8000",
 ]
 
 ROOT_URLCONF = 'WhiteBoardBackEnd.urls'
@@ -138,7 +125,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_data_base',
-        'USER': 'chunao',
+        'USER': 'root',
         'PASSWORD': '990603qwerty',
         'HOST': 'localhost',
         'PORT': '3306',
@@ -183,8 +170,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/var/www/static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -212,4 +197,3 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_EXPOSE_HEADERS = ['Content-Type']
-DATA_UPLOAD_MAX_MEMORY_SIZE = 99999999999999

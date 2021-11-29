@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 
-function Save(_props) {
+function Team(_props) {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} />
@@ -19,4 +19,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-export default Save;
+export default Team;
