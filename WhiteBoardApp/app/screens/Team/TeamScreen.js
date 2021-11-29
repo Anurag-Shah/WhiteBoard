@@ -223,6 +223,7 @@ class TeamScreen extends Component {
 
     makeRemoteRequest = () => {
         this.setState({ loading: true });
+        console.log(this.state.user);
         getAllGroupsApi(this.state.user.uid).then((res) => {
             // console.log(res);
             this.setState({
