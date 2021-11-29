@@ -1,52 +1,44 @@
-import React from 'react';
-
-import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useIsDrawerOpen } from '@react-navigation/drawer';
+import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import storage from '../../config/storage';
 import { logoutApi } from '../../requests/api';
 
-export default class Sidebar extends React.Component {
+function Sidebar({ navigation }) {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      route_anonymous: [
-        {
-          // name: "Log In",
-          // screen: "Login"
-          name: '',
-        }
-      ],
-      routes_logged_in: [
-      //   {
-      //   name: "Save",
-      //   screen: "Save"
-      // },
-      {
-        name: "Library",
-        screen: "Library"
-      }, {
-        name: "Team",
-        screen: "Team"
-      }, {
-        name: "Account",
-        screen: "Account"
-      }],
-      user: null,
+  const route_anonymous = [
+    {
+      // name: "Log In",
+      // screen: "Login"
+      name: '',
     }
-    this.retrieveData = this.retrieveData.bind(this);
-  }
+  ];
 
-  componentDidMount() {
-    this.retrieveData();
-  }
-  logout = () => {
-    logoutApi();
-    this.props.navigation.navigate('Camera');
-  }
-  retrieveData = async () => {
+  const routes_logged_in = [
+    //   {
+    //   name: "Save",
+    //   screen: "Save"
+    // },
+    {
+      name: "Library",
+      screen: "Library"
+    }, {
+      name: "Team",
+      screen: "Team"
+    }, {
+      name: "Account",
+      screen: "Account"
+    }];
+
+  const drawerOpen = useIsDrawerOpen()
+  useEffect(() => {
+    retrieveData();
+  }, [drawerOpen]);
+
+  const retrieveData = async () => {
+    // console.log("Side bar retrieving data");
     try {
       let data = await storage.load({
         key: 'login-session',
@@ -57,64 +49,102 @@ export default class Sidebar extends React.Component {
       });
       let user = data;
       if (user && user.logged_in) {
-        this.setState({
-          user: user,
-        });
+        setUser(user);
       }
-    } catch (error) {
-      console.log(error);
-      // let user = {logged_in: true, name: 'Yierpan', token:'Token: 123'};
-      // this.setState({
-      //   user: user,
-      // });
-      return null;
+    } catch (err) {
+      console.log(err);
+      console.warn(err.message);
+      switch (err.name) {
+        case 'NotFoundError':
+          console.log("User not found!");
+          break;
+        case 'ExpiredError':
+          console.log("Login Session Expired!");
+          Alert.alert(
+            "Login Session Expired!",
+            'Please login again',
+            [{ text: "Cancel" }, { text: "Login", onPress: () => navigation.navigate('Login') }]
+          );
+          break;
+      }
     }
   };
 
-  render() {
-    const userId = "Yierpan42";
-    const loggedIn = 'true';
 
-    function Item({ item, navigation }) {
-      return (
-        <TouchableOpacity style={styles.listItem} onPress={() => (loggedIn == 'true') ? navigation.navigate(item.screen, { userId: userId }) : {}}>
+  const logout = () => {
+    if (user.logged_in) {
+      logoutApi().then((response) => {
+        if (response.code == 0) {
+          // Logout successfully
+          user.logged_in = false;
+          storage.save({
+            key: "login-session",
+            data: user,
+          });
+          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+        } else if (response.code == -1) {
+          Alert.alert("Already Logged out!");
+          user.logged_in = false;
+          storage.save({
+            key: "login-session",
+            data: user,
+          });
+          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+        } else {
+          console.log(response.status);
+        }
 
-          <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
-        </TouchableOpacity>
-      );
+      });
+    } else {
+      Alert.alert("Already Logged out!");
     }
-
-    return (
-      <SafeAreaView style={[styles.container, styles.statusBarMargin]}>
-
-        {(this.state.user != null && this.state.user.logged_in) &&
-          <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white' }}>Welcome back, {this.state.name}</Text>
-        }
-        <FlatList
-          data={this.state.user != null && this.state.user.logged_in ? this.state.routes_logged_in : this.state.route_anonymous}
-          renderItem={({ item }) => <Item item={item} navigation={this.props.navigation} />}
-          keyExtractor={item => item.name}
-          style={{ width: '100%', alignSelf: 'flex-start' }}
-        />
-
-        {
-          (this.state.user != null && this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} onPress={()=>this.logout()} >
-            <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
-            <Text style={styles.buttonTitle}>Logout</Text>
-          </TouchableOpacity>
-        }
-        {
-          (this.state.user == null || !this.state.user.logged_in) &&
-          <TouchableOpacity style={styles.button} onPress={()=>this.props.navigation.navigate('Login')}>
-            <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
-            <Text style={styles.buttonTitle}>Login</Text>
-          </TouchableOpacity>
-
-        }
-      </SafeAreaView>
-    );
   }
+
+
+  const login = () => {
+    navigation.navigate('Login');
+  }
+
+  function Item({ item, navigation }) {
+    return (
+      <TouchableOpacity style={styles.listItem} onPress={() => { navigation.navigate(item.screen) }}>
+        <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const [user, setUser] = React.useState(null);
+
+  return (
+    <SafeAreaView style={[styles.container, styles.statusBarMargin]}>
+
+      {(user != null && user.logged_in) &&
+        <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white', marginRight: 22 }}>Hello, {user.username}</Text>
+      }
+      <FlatList
+        data={user != null && user.logged_in ? routes_logged_in : route_anonymous}
+        renderItem={({ item }) => <Item item={item} navigation={navigation} />}
+        keyExtractor={item => item.name}
+        style={{ width: '100%', alignSelf: 'flex-start' }}
+      />
+
+      {
+        (user == null || (user != null && user.logged_in)) &&
+        <TouchableOpacity style={styles.button} onPress={logout} >
+          <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
+          <Text style={styles.buttonTitle}>Logout</Text>
+        </TouchableOpacity>
+      }
+      {
+        (user == null || !user.logged_in) &&
+        <TouchableOpacity style={styles.button} onPress={login}>
+          <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
+          <Text style={styles.buttonTitle}>Login</Text>
+        </TouchableOpacity>
+
+      }
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -163,3 +193,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
   }
 });
+
+export default Sidebar;
