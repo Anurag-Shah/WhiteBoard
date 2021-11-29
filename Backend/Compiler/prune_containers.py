@@ -7,5 +7,8 @@ def prune(time):
 		client.containers.prune()
 		t.sleep(time)
 
-if __name__ == "__main__":
+def main():
 	prune(600)
+
+if __name__ == "__main__":
+	main()

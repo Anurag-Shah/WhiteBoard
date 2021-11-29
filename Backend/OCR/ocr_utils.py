@@ -7,6 +7,10 @@
 # Utilities for OCR
 #############################################################################
 
+from guesslang import Guess
+
+GLOBAL_GUESSER = Guess()
+
 # OCRError
 # Error type for error in OCR
 class OCRError(Exception):

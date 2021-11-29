@@ -61,7 +61,7 @@ def ocr(image_file_name, input_text=None):
 	imtype = "Typeform"
 	return outimage, ocr_out, compiler_out, imtype, imlang, left_coords, line_numbers
 
-if __name__ == "__main__":
+def main():
 	sys.path.insert(1, os.path.abspath("../../Compiler"))
 	sys.path.insert(1, os.path.abspath("../../OCR"))
 	# Testing function for pipeline
@@ -72,3 +72,6 @@ if __name__ == "__main__":
 	print(out)
 	out[0].save("result.png")
 	print(ocr(None, '#include<stdio.h>\nint main() {printf("Hello World");}'))
+
+if __name__ == "__main__":
+	main()

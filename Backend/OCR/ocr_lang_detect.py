@@ -16,5 +16,17 @@ import ocr_utils
 #	1. code - code text
 # This function is a wrapper for the entire OCR Process
 
-def detect(code):	
-	return "C"
+import ocr_utils
+
+def detect(code):
+	language = ocr_utils.GLOBAL_GUESSER.language_name(code)
+	return language
+
+def main():
+	print(detect('#include<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}'))
+	print(detect("#include <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}"))
+	print(detect("namespace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WrieteLine(\"Hello World\");\n}\n}\n}"))
+	print(detect("class HelloWorld {\npublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}"))
+
+if __name__ == "__main__":
+	main()

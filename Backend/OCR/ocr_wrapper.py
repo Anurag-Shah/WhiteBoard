@@ -68,10 +68,12 @@ def ocr_wrapper(image):
 	language = ocr_lang_detect.detect(code)
 	return (code, language, out_image, texttype)
 
-
-if __name__ == "__main__":
+def main():
 	# Testing function for pipeline
 	test_im_path = "images/tesseract_tests/"
 	test_im = "min_area_rect_test"
 	imsuffix = ".png"
 	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix).convert('RGB')))
+
+if __name__ == "__main__":
+	main()
