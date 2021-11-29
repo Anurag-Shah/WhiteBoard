@@ -6,7 +6,6 @@ import {
   TextInput,
   KeyboardAvoidingView,
   View,
-  Image,
   Button,
   Text,
   Alert,
