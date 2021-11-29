@@ -12,4 +12,5 @@ export default {
     group_operations: base_url + "User/group/",
     getAllMembers: base_url + "User/group/members/",
     memeber_operations: base_url + "User/group/member/",
+    delete_image
 }

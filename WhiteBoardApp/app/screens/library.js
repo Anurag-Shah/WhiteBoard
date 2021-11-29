@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { Icon } from "react-native-elements";
-import { getAllGroupsApi, createGroupApi, deleteGroupApi } from "../requests/api";
 
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
 LogBox.ignoreAllLogs();//Ignore all log notifications
-const image_url = "";
+//const url = ;
 
-class LibraryScreen extends Component {
+class library extends Component {
   constructor(props) {
     super(props);
 
@@ -17,20 +16,17 @@ class LibraryScreen extends Component {
       loading: false,
       show: false,
       //data: [],
-      user: {
-        "uid": 3,
-    },
       data: [ {
-        name: 'group 1',
+        name: 'testing1',
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
-        GpID: '1',
+        GpID: '8/11/2021',
       },
       {
-        name: 'group 2',
+        name: 'testing2',
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
-        GpID: '2',
+        GpID: '8/29/2021',
       }],
       error: null,
     };
@@ -44,22 +40,37 @@ class LibraryScreen extends Component {
     this.makeRemoteRequest();
   }
 
-  
-
   makeRemoteRequest = () => {
+    //const url = `https://randomuser.me/api/?&results=20`;
+    /*server test*/
+    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
+    /*local test*/
+    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
+    console.log(this.props.route.params.url);
+    const url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com/Images/" + this.props.route.params.url;
+
     this.setState({ loading: true });
-    console.log(this.state.user);
-    getAllGroupsApi(this.state.user.uid).then((res) => {
+
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
         console.log(res);
+        //console.log("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080" + res[1].Image);
+
         this.setState({
-            //data: res.results,
-            data: res.all_groups,
-            default_group: res.default_group,
-            error: res.msg || null,
-            loading: false,
+          //data: res.results,
+          data: res,
+          error: res.error || null,
+          loading: false,
         });
-    })
-};
+        //this.arrayholder = res.results;
+        this.arrayholder = res;
+      })
+      .catch(error => {
+        this.setState({ error, loading: false });
+        this.arrayholder = this.state.data;
+      });
+  };
 
   renderSeparator = () => {
     return (
@@ -121,11 +132,11 @@ class LibraryScreen extends Component {
           data={this.state.data}
           //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
-            <ListItem bottomDivider onPress={() => this.props.navigation.push("library", {url: item.GpID})}>
+            <ListItem bottomDivider>
               <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image}}/>
               <ListItem.Content>
-              <ListItem.Title>{item.Gpname}</ListItem.Title>
-              <ListItem.Subtitle>{"Group ID: " + item.GpID}</ListItem.Subtitle>
+              <ListItem.Title>{item.name}</ListItem.Title>
+              <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
               
               </ListItem.Content>
               <ListItem.Chevron 
@@ -164,7 +175,7 @@ class LibraryScreen extends Component {
           //keyExtractor={item => item.email}
 
           ItemSeparatorComponent={this.renderSeparator}
-          //ListHeaderComponent={this.renderHeader}
+          ListHeaderComponent={this.renderHeader}
         />
       </SafeAreaView>
     );
@@ -190,4 +201,4 @@ const styles = StyleSheet.create({
    
   });
 
-export default LibraryScreen;
+export default library;
