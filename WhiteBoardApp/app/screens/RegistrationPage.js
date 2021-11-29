@@ -10,8 +10,8 @@ import {
   View,
   Button,
 } from "react-native";
-import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
+// import { Icon } from "react-native-elements";
 
 export default class RegistrationPage extends React.Component {
   constructor(props) {

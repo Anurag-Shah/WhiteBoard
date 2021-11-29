@@ -1,19 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useIsDrawerOpen } from '@react-navigation/drawer';
-import { Text, View, Image, StyleSheet, FlatList, TouchableOpacity, Platform, SafeAreaView, Alert } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import React, { useState, useEffect } from "react";
+import { useIsDrawerOpen } from "@react-navigation/drawer";
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Platform,
+  SafeAreaView,
+  Alert,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
-import storage from '../../config/storage';
-import { logoutApi } from '../../requests/api';
+import storage from "../../config/storage";
+import { logoutApi } from "../../requests/api";
 
 function Sidebar({ navigation }) {
-
   const route_anonymous = [
     {
       // name: "Log In",
       // screen: "Login"
-      name: '',
-    }
+      name: "",
+    },
   ];
 
   const routes_logged_in = [
@@ -23,16 +32,19 @@ function Sidebar({ navigation }) {
     // },
     {
       name: "Library",
-      screen: "Library"
-    }, {
+      screen: "Library",
+    },
+    {
       name: "Team",
-      screen: "Team"
-    }, {
+      screen: "Team",
+    },
+    {
       name: "Account",
-      screen: "Account"
-    }];
+      screen: "Account",
+    },
+  ];
 
-  const drawerOpen = useIsDrawerOpen()
+  const drawerOpen = useIsDrawerOpen();
   useEffect(() => {
     retrieveData();
   }, [drawerOpen]);
@@ -41,7 +53,7 @@ function Sidebar({ navigation }) {
     // console.log("Side bar retrieving data");
     try {
       let data = await storage.load({
-        key: 'login-session',
+        key: "login-session",
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
         autoSync: true,
@@ -55,21 +67,19 @@ function Sidebar({ navigation }) {
       console.log(err);
       console.warn(err.message);
       switch (err.name) {
-        case 'NotFoundError':
+        case "NotFoundError":
           console.log("User not found!");
           break;
-        case 'ExpiredError':
+        case "ExpiredError":
           console.log("Login Session Expired!");
-          Alert.alert(
-            "Login Session Expired!",
-            'Please login again',
-            [{ text: "Cancel" }, { text: "Login", onPress: () => navigation.navigate('Login') }]
-          );
+          Alert.alert("Login Session Expired!", "Please login again", [
+            { text: "Cancel" },
+            { text: "Login", onPress: () => navigation.navigate("Login") },
+          ]);
           break;
       }
     }
   };
-
 
   const logout = () => {
     if (user.logged_in) {
@@ -81,15 +91,22 @@ function Sidebar({ navigation }) {
             key: "login-session",
             data: user,
           });
-          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-        } else if (response && response.code == -1) {
+          Alert.alert("Logged out!", "See you soon!", [
+            {
+              text: "OK",
+              onPress: () => this.props.navigation.navigate("Camera"),
+            },
+          ]);
+        } else if (response.code == -1) {
           Alert.alert("Already Logged out!");
           user.logged_in = false;
           storage.save({
             key: "login-session",
             data: user,
           });
-          Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
+          Alert.alert("Logged out!", "See you soon!", [
+            { text: "OK", onPress: () => navigation.navigate("Camera") },
+          ]);
         } else {
           user.logged_in = false;
           storage.save({
@@ -97,56 +114,82 @@ function Sidebar({ navigation }) {
             data: user,
           });
         }
-
       });
     } else {
       Alert.alert("Already Logged out!");
     }
-  }
-
+  };
 
   const login = () => {
-    navigation.navigate('Login');
-  }
+    navigation.navigate("Login");
+  };
 
   function Item({ item, navigation }) {
     return (
-      <TouchableOpacity style={styles.listItem} onPress={() => { navigation.navigate(item.screen) }}>
-        <Text style={[styles.title, { color: 'white', fontWeight: "bold", fontSize: 18 }]}>{item.name}</Text>
+      <TouchableOpacity
+        style={styles.listItem}
+        onPress={() => {
+          navigation.navigate(item.screen);
+        }}
+      >
+        <Text
+          style={[
+            styles.title,
+            { color: "white", fontWeight: "bold", fontSize: 18 },
+          ]}
+        >
+          {item.name}
+        </Text>
       </TouchableOpacity>
     );
-  };
+  }
 
   const [user, setUser] = React.useState(null);
 
   return (
     <SafeAreaView style={[styles.container, styles.statusBarMargin]}>
-
-      {(user != null && user.logged_in) &&
-        <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10, color: 'white', marginRight: 22 }}>Hello, {user.username}</Text>
-      }
+      {user != null && user.logged_in && (
+        <Text
+          style={{
+            fontWeight: "bold",
+            fontSize: 16,
+            marginTop: 10,
+            color: "white",
+            marginRight: 22,
+          }}
+        >
+          Hello, {user.username}
+        </Text>
+      )}
       <FlatList
-        data={user != null && user.logged_in ? routes_logged_in : route_anonymous}
+        data={
+          user != null && user.logged_in ? routes_logged_in : route_anonymous
+        }
         renderItem={({ item }) => <Item item={item} navigation={navigation} />}
-        keyExtractor={item => item.name}
-        style={{ width: '100%', alignSelf: 'flex-start' }}
+        keyExtractor={(item) => item.name}
+        style={{ width: "100%", alignSelf: "flex-start" }}
       />
 
-      {
-        (user != null && user.logged_in) &&
-        <TouchableOpacity style={styles.button} onPress={logout} >
-          <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
+      {user != null && user.logged_in && (
+        <TouchableOpacity style={styles.button} onPress={logout}>
+          <AntDesign
+            name="login"
+            size={24}
+            style={{ color: "white", marginRight: 10 }}
+          />
           <Text style={styles.buttonTitle}>Logout</Text>
         </TouchableOpacity>
-      }
-      {
-        (user == null || !user.logged_in) &&
+      )}
+      {(user == null || !user.logged_in) && (
         <TouchableOpacity style={styles.button} onPress={login}>
-          <AntDesign name='logout' size={24} style={{ color: 'white', marginRight: 10 }} />
+          <AntDesign
+            name="logout"
+            size={24}
+            style={{ color: "white", marginRight: 10 }}
+          />
           <Text style={styles.buttonTitle}>Login</Text>
         </TouchableOpacity>
-
-      }
+      )}
     </SafeAreaView>
   );
 }
@@ -154,24 +197,23 @@ function Sidebar({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    backgroundColor: '#a5b498',
-    color: 'white'
-
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#a5b498",
+    color: "white",
   },
   statusBarMargin: {
-    marginTop: (Platform.OS === 'ios') ? 0 : 24,
+    marginTop: Platform.OS === "ios" ? 0 : 24,
   },
   profileImg: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginTop: 40
+    marginTop: 40,
   },
   icon: {
     width: 30,
-    height: 30
+    height: 30,
   },
   listItem: {
     height: 60,
@@ -184,18 +226,18 @@ const styles = StyleSheet.create({
   },
   button: {
     flexDirection: "row",
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     borderRadius: 4,
-    backgroundColor: '#e36f2c',
+    backgroundColor: "#e36f2c",
     padding: 10,
     margin: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonTitle: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-  }
+  },
 });
 
 export default Sidebar;
