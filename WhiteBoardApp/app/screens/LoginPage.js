@@ -161,7 +161,9 @@ function LoginPage({ navigation }) {
         user.logged_in = true;
         user.token = response.token;
         user.userInfo = response.user;
-        user.userInfo.avatar = urls.base_url.slice(0, -1) + user.userInfo.avatar;
+        if (user.userInfo.avatar != null) {
+          user.userInfo.avatar = urls.base_url.slice(0, -1) + user.userInfo.avatar;
+        }
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
@@ -345,7 +347,7 @@ function LoginPage({ navigation }) {
 
         <View style={styles.buttons}>
           {/* <View style={styles.button_view}><Button title="Login" style={{height: "100%"}}/></View> */}
-          <TouchableOpacity style={styles.button} onPress={login()}>
+          <TouchableOpacity style={styles.button} onPress={() => login()}>
             <Text style={styles.button_text}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => signUp()}>

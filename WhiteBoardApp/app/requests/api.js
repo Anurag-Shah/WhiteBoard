@@ -116,10 +116,10 @@ export const updateAccountApi = async (username, email) => {
     }
 };
 
-export const getAllGroupsApi = async () => {
+export const getAllGroupsApi = async (uid) => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.getAllGroups, {
+        const response = await fetch(urls.getAllGroups + uid, {
             method: 'GET',
             headers: {
                 token: '',

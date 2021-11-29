@@ -93,7 +93,7 @@ function MyDrawer() {
 }
 
 
-function WelcomeScreen(props) {
+function WelcomeScreen() {
   return (
     <Provider store={store}>
       <NavigationContainer>

@@ -6,6 +6,8 @@ import { getAllGroupsApi, createGroupApi, deleteGroupApi } from "../../requests/
 import Topbar from '../shared/Topbar';
 import Dialog from "react-native-dialog";
 import storage from "../../config/storage";
+import defAvatar from '../../assets/avatar.png';
+
 
 
 function Prompt(props) {
@@ -43,7 +45,7 @@ class TeamScreen extends Component {
             loading: false,
             visible: false,
             user: {
-                "uid": 0,
+                "uid": 3,
             },
             value: "",
             default_group: {
@@ -210,17 +212,19 @@ class TeamScreen extends Component {
                 this.setState({
                     user: ret.userInfo,
                     loading: false,
-                })
+                });
+                return true;
             })
             .catch((err) => {
                 console.log(err);
+                return false;
             });
     };
 
     makeRemoteRequest = () => {
         this.setState({ loading: true });
-        getAllGroupsApi().then((res) => {
-            console.log(res);
+        getAllGroupsApi(this.state.user.uid).then((res) => {
+            // console.log(res);
             this.setState({
                 //data: res.results,
                 data: res.all_groups,
@@ -349,7 +353,7 @@ class TeamScreen extends Component {
                         keyExtractor={item => item.GpID.toString()}
                         renderItem={({ item }) => (
                             <ListItem onPress={() => this.props.navigation.push("TeamMember", { group: item, user: this.state.user })}>
-                                {item.isDefault ? <Avatar rounded size='medium' source={{ uri: this.state.user.avatar }} /> : <AntDesign name="team" size={24} color="black" />}
+                                {item.isDefault ? <Avatar rounded size='medium' source={this.state.user.avatar !== null ? { uri: this.state.user.avatar } : defAvatar} /> : <AntDesign name="team" size={24} color="black" />}
                                 <ListItem.Content>
                                     <ListItem.Title>{item.Gpname} </ListItem.Title>
                                     <ListItem.Subtitle>{item.GpDescription}</ListItem.Subtitle>
@@ -361,7 +365,7 @@ class TeamScreen extends Component {
                             </ListItem>
                         )}
                         ItemSeparatorComponent={this.renderSeparator}
-                        ListHeaderComponent={this.renderHeader}
+                    //ListHeaderComponent={this.renderHeader}
                     />
                 </View>
                 <View style={styles.bottom_bar}>

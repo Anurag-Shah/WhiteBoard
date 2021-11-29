@@ -74,7 +74,7 @@ function Sidebar({ navigation }) {
   const logout = () => {
     if (user.logged_in) {
       logoutApi().then((response) => {
-        if (response.code == 0) {
+        if (response && response.code == 0) {
           // Logout successfully
           user.logged_in = false;
           storage.save({
@@ -82,7 +82,7 @@ function Sidebar({ navigation }) {
             data: user,
           });
           Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
-        } else if (response.code == -1) {
+        } else if (response && response.code == -1) {
           Alert.alert("Already Logged out!");
           user.logged_in = false;
           storage.save({
@@ -91,7 +91,11 @@ function Sidebar({ navigation }) {
           });
           Alert.alert("Logged out!", "See you soon!", [{ text: 'OK', onPress: () => navigation.navigate('Camera') }]);
         } else {
-          console.log(response.status);
+          user.logged_in = false;
+          storage.save({
+            key: "login-session",
+            data: user,
+          });
         }
 
       });
@@ -129,7 +133,7 @@ function Sidebar({ navigation }) {
       />
 
       {
-        (user == null || (user != null && user.logged_in)) &&
+        (user != null && user.logged_in) &&
         <TouchableOpacity style={styles.button} onPress={logout} >
           <AntDesign name='login' size={24} style={{ color: 'white', marginRight: 10 }} />
           <Text style={styles.buttonTitle}>Logout</Text>
