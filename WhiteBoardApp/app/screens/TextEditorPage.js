@@ -47,25 +47,6 @@ export default class TextEditorPage extends React.Component {
         language: "C",
       };
 
-      // const res = await fetch(serverURL + "Text/process", {
-      //   method: "POST",
-      //   headers: {
-      //     Accept: "application/json",
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ typenCode: this.state.typenCode }),
-      // });
-      // const res = await fetch(
-      //   "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TempTextUpload/",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       Accept: "application/json",
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(text),
-      //   }
-      // );
       const res = await fetch(urls.temp_text, {
         method: "POST",
         headers: {
