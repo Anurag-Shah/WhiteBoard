@@ -1,3 +1,11 @@
+/**
+ * TextEditorPage.js
+ *
+ * Authors: Michelle He
+ *
+ * This is the text editor page that allows users to type code and run it
+ */
+
 import React from "react";
 import {
   SafeAreaView,
@@ -8,6 +16,9 @@ import {
   TextInput,
   Platform,
   View,
+  ScrollView,
+  Text,
+  Button,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import {
@@ -281,7 +292,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    flex: 1,
+    flex: 11,
     fontSize: 16,
     padding: 10,
   },
@@ -295,6 +306,34 @@ const styles = StyleSheet.create({
     marginRight: 15,
     alignItems: "flex-end",
   },
-});
 
-export default TextEditorPage;
+  consolelog: {
+    height: 200,
+  },
+
+  scroll: {
+    marginLeft: 20,
+    marginRight: 20,
+  },
+
+  termOutput: {
+    fontFamily: "Courier",
+  },
+
+  errorMessage: {
+    color: "red",
+    fontFamily: "Courier",
+  },
+
+  saveDiscard: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    marginTop: 15,
+  },
+
+  button: {
+    marginLeft: 45,
+    marginRight: 30,
+  },
+});
