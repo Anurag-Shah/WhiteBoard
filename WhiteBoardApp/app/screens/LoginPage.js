@@ -14,9 +14,11 @@ import {
   SafeAreaView,
   TextInput,
   Platform,
+  KeyboardAvoidingView
 } from "react-native";
 import Dialog from "react-native-dialog";
-import { loginApi, resetPwdApi, helloApi } from "../requests/api";
+import { loginApi, resetPwdApi } from "../requests/api";
+import urls from "../requests/urls";
 
 function Prompt(props) {
   const [email, setEmail] = React.useState("");
@@ -81,18 +83,17 @@ function LoginPage({ navigation }) {
   const toggleRememberMe = () => {
     setRememberMe(!rememberMe);
     console.log("toggleMePressed");
-  };
+  }
 
   useEffect(() => {
-    console.log("I am useEffect!");
     getUserInfo();
   }, []);
 
   const getUserInfo = () => {
-    // Fetch user and login info in local storage
+    // Fetch user and account info in local storage
     storage
       .load({
-        key: "login-session",
+        key: "account",
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
         autoSync: false,
@@ -114,7 +115,15 @@ function LoginPage({ navigation }) {
       .catch((err) => {
         // any exception including data not found
         // goes to catch()
-        console.log("User not found!");
+        console.warn(err.message);
+        switch (err.name) {
+          case 'NotFoundError':
+            console.log("User not found!");
+            break;
+          case 'ExpiredError':
+            console.log("Login Session Expired!");
+            break;
+        }
         setUsername("");
         setPwd("");
         setRememberMe(false);
@@ -132,27 +141,33 @@ function LoginPage({ navigation }) {
 
   const login = () => {
     console.log("Login Clicked");
-    // login Api communicates with the backend
+    //navigation.reset("SideBar");
+    //navigation.navigate("Drawer");
+    // loginApi communicates with the backend
     let user = {
       username: username,
-      password: password,
       token: "",
-      rememberMe: true,
       logged_in: false,
+      userInfo: [],
     };
+    let account = {
+      username: username,
+      password: password,
+      rememberMe: true,
+    }
     loginApi(username, password).then((response) => {
       if (response && response.code == 0) {
         // If Login successfully
         user.logged_in = true;
         user.token = response.token;
-        user.uid = response.user.uid;
-        user.groupId = response.user.uid;
+        user.userInfo = response.user;
+        user.userInfo.avatar = urls.base_url.slice(0, -1) + user.userInfo.avatar;
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
-          user.rememberMe = true;
+          account.rememberMe = true;
         } else {
-          user.rememberMe = false;
+          account.rememberMe = false;
           setTimeout(() => {
             setUsername("");
             setPwd("");
@@ -162,9 +177,14 @@ function LoginPage({ navigation }) {
           key: "login-session",
           data: user,
         });
+        storage.save({
+          key: "account",
+          data: account,
+          expires: null,
+        });
         // Redirecting to Camera Page
         Alert.alert("", "Logged in Successfully!", [
-          { text: "OK", onPress: () => { navigation.push("Camera"); navigation.push("Drawer"); } },
+          { text: "OK", onPress: () => { navigation.push("Camera"); } },
         ]);
       } else {
         setWrongInfo(true);
@@ -224,13 +244,16 @@ function LoginPage({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {/* <Ionicons name="md-return-up-back" size={32} color="black" style={styles.back_icon} /> */}
-      <View style={styles.sub_container}>
+      {/* <View style={styles.sub_container}> */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.sub_container}
+      >
         <Image
           resizeMode="contain"
           source={require("../assets/logo.png")}
           style={styles.image}
         />
-
         {wrongInfo ? (
           <View style={styles.errorMsg}>
             <Text style={{ color: "#d40824" }}>
@@ -238,7 +261,6 @@ function LoginPage({ navigation }) {
             </Text>
           </View>
         ) : null}
-
         <View
           style={[
             styles.input_box,
@@ -323,14 +345,15 @@ function LoginPage({ navigation }) {
 
         <View style={styles.buttons}>
           {/* <View style={styles.button_view}><Button title="Login" style={{height: "100%"}}/></View> */}
-          <TouchableOpacity style={styles.button} onPress={login}>
+          <TouchableOpacity style={styles.button} onPress={login()}>
             <Text style={styles.button_text}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => signUp()}>
             <Text style={styles.button_text}>Sign Up</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
+      {/* </View> */}
       {visible ? (
         <Prompt visible={visible} setVisible={setVisible}></Prompt>
       ) : null}
@@ -418,10 +441,7 @@ const styles = StyleSheet.create({
     height: "100%",
     position: "absolute",
     left: 50,
-    //top: 5,
     width: "80%",
-    //margin: 12,
-    //paddingLeft: 30,
   },
 
   input_box: {
@@ -429,14 +449,12 @@ const styles = StyleSheet.create({
     margin: 10,
     height: 50,
     width: "90%",
-    //flex:1,
-    //justifyContent: "center",
+
   },
 
   sub_container: {
     alignItems: "center",
-    //justifyContent: "flex-end",
-    //justifyContent: "center",
+    top: 80,
   },
 });
 
