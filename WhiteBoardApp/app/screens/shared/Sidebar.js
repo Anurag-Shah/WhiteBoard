@@ -94,7 +94,7 @@ function Sidebar({ navigation }) {
           Alert.alert("Logged out!", "See you soon!", [
             {
               text: "OK",
-              onPress: () => this.props.navigation.navigate("Camera"),
+              onPress: () => navigation.navigate("Camera"),
             },
           ]);
         } else if (response.code == -1) {

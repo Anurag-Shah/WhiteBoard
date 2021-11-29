@@ -45,7 +45,7 @@ class TeamScreen extends Component {
             loading: false,
             visible: false,
             user: {
-                "uid": 3,
+                "uid": 4,
             },
             value: "",
             default_group: {

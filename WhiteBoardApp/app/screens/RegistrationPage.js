@@ -30,14 +30,6 @@ const BOTHINUSE = -1;
 const USERNAMEINUSE = -2;
 const EMAILINUSE = -3;
 
-// const serverURL = "https://ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
-// const serverURL = "http://127.0.0.1:8000/";
-const serverURL = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/";
-
-const BOTHINUSE = -1;
-const USERNAMEINUSE = -2;
-const EMAILINUSE = -3;
-
 export default class RegistrationPage extends React.Component {
   constructor(props) {
     super(props);
