@@ -24,7 +24,7 @@ export default class Topbar extends React.Component {
         <Text style={styles.title}>{this.props.title}</Text>
         {this.props.title === "Camera" ? (
           <TouchableOpacity
-            onPress={() => this.props.navigation.push("TextEditorPage")}
+            onPress={() => this.props.navigation.navigate("TextEditorPage")}
           >
             <Ionicons
               name="clipboard-outline"
@@ -34,7 +34,7 @@ export default class Topbar extends React.Component {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            onPress={() => this.props.navigation.push("Camera")}
+            onPress={() => this.props.navigation.navigate("Camera")}
           >
             <Ionicons
               name="camera-outline"

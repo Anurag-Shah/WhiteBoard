@@ -1,11 +1,3 @@
-/**
- * RegistrationPage.js
- *
- * Authors: Michelle He
- *
- * This is the registration page that allows users to create an account
- */
-
 import React from "react";
 import {
   SafeAreaView,
@@ -17,18 +9,9 @@ import {
   Text,
   View,
   Button,
-  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 // import { Icon } from "react-native-elements";
-
-import urls from "../requests/urls";
-
-// const serverURL = "https://ec2-18-218-227-246.us-east-2.compute.amazonaws.com:8000/";
-
-const BOTHINUSE = -1;
-const USERNAMEINUSE = -2;
-const EMAILINUSE = -3;
 
 export default class RegistrationPage extends React.Component {
   constructor(props) {
@@ -40,7 +23,6 @@ export default class RegistrationPage extends React.Component {
       confirm: "",
       validEmail: true,
       samePassword: true,
-      noEmpty: false,
     };
   }
 
@@ -66,83 +48,17 @@ export default class RegistrationPage extends React.Component {
     }
   }
 
-  noEmptyField() {
-    if (
-      this.state.username != "" &&
-      this.state.email != "" &&
-      this.state.password != "" &&
-      this.state.confirm != ""
-    ) {
-      this.state.noEmpty = true;
-    } else {
-      return Alert.alert(
-        "Empty field still exists!",
-        "Please make sure that all fields are filled.",
-        [{ text: "OK" }]
-      );
-    }
-  }
-
-  async sendUserInfo() {
-    const userinfo = {
-      username: this.state.username,
-      email: this.state.email,
-      password: this.state.password,
-    };
-
-    try {
-      const res = await fetch(urls.register, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userinfo),
-      });
-      const response = await res.json();
-
-      code = Object.values(response)[0];
-      if (code == BOTHINUSE) {
-        return Alert.alert(
-          "Username and email address already in use",
-          "Please login or choose another username and email address.",
-          [{ text: "OK" }]
-        );
-      } else if (code == USERNAMEINUSE) {
-        return Alert.alert(
-          "Username already in use",
-          "Please choose another username.",
-          [{ text: "OK" }]
-        );
-      } else if (code == EMAILINUSE) {
-        return Alert.alert(
-          "Email address already in use",
-          "Please try to login or choose another email address.",
-          [{ text: "OK" }]
-        );
-      } else {
-        return Alert.alert(
-          "Success",
-          "Your account has been successfully created!",
-          [{ text: "OK", onPress: () => this.props.navigation.push("Login") }]
-        );
-      }
-    } catch (error) {
-      console.log("Fetch error: " + error);
-    }
-  }
-
   render() {
     return (
       <SafeAreaView style={styles.safearea}>
         <StatusBar style="auto" />
-        {/* <Icon
+        <Icon
           style={styles.icon}
           name="arrow-undo-outline"
           type="ionicon"
           color="#000"
-          onPress={() => this.props.navigation.push("Login")}
-        /> */}
+          onPress={() => console.log("Back to login in page")} //TODO: redirect back to login page
+        />
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
@@ -219,20 +135,7 @@ export default class RegistrationPage extends React.Component {
               <Button
                 title="Sign up"
                 color="#fff"
-                onPress={() => {
-                  this.noEmptyField();
-                  if (this.state.noEmpty) {
-                    if (this.state.validEmail && this.state.samePassword) {
-                      this.sendUserInfo();
-                    } else {
-                      Alert.alert(
-                        "Input error",
-                        "Please correctly input your information.",
-                        [{ text: "OK" }]
-                      );
-                    }
-                  }
-                }}
+                onPress={() => console.log("Sign up success!")} //TODO: send new user info to backend and redirect to login in page
               />
             </View>
           </View>
@@ -244,7 +147,6 @@ export default class RegistrationPage extends React.Component {
 
 const styles = StyleSheet.create({
   safearea: {
-    flex: 1,
     backgroundColor: "#fff",
   },
 
