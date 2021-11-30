@@ -48,6 +48,19 @@ def compiler_wrapper(compiler_input, language):
 			if int(temp_m[0]) not in line_numbers:
 				line_numbers += [int(temp_m[0])]
 		return out_text, line_numbers
+	# elif language == "java":
+	# 	dockerCommand = ["/bin/sh", "-c", ("printf '" + compiler_input + "' > compile.java && javac compile.java && java compile")]
+	# 	client = docker.from_env()
+	# 	error_r = False
+	# 	out_text = ""
+	# 	try:
+	# 		container = client.containers.run("frolvlad/alpine-gcc", command=dockerCommand)
+	# 	except docker.errors.ContainerError as e:
+	# 		error_r = True
+	# 		out_text = str(e.stderr.decode())
+	# 	if not error_r:
+	# 		out_text = str(container.decode())
+	# 	print ("\n" + out_text + "\n")
 	else:
 		"Language Not Supported"
 	return None, None

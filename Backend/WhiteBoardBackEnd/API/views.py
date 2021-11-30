@@ -9,6 +9,7 @@
 
 import compiler_wrapper
 import os
+import re
 from typing import Text
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -238,6 +239,7 @@ class ImageUpload(APIView):
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
+        language_in = request.data['language']
         custom_name = name + ":" + str(GPid) + ".jpg"
         try:
             img = ContentFile(base64.b64decode(file), name=custom_name)
@@ -255,10 +257,25 @@ class ImageUpload(APIView):
         return_data['status'] = 'success'
         return_data['image_uri'] = str(image_path)
         print(Path(path).as_uri())
+
         # ocr_return should have the stack trace so far
-        ocr_return = ocr.ocr(path)
+        ocr_return = ocr.ocr(path, language=language_in)
+
         print(ocr_return)
-        print(type(ocr_return[0]))
+    
+        ocr_error_output = []
+        error_msg_whole = ocr_return[2]
+        for i in ocr_return[6]:
+            current_error = []
+            print("compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)")
+            matches = re.finditer("compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)", error_msg_whole, re.MULTILINE)
+            for match in matches:
+                print(match.group())
+                error_msg_whole.replace(match.group(), "")
+                current_error.append(match.group())
+            ocr_error_output.append(current_error)
+
+
         img_pil = ocr_return[0]
         CVImageOut = path_after + str(GPid) + "_" + str(ImageID) + ".png"
         img_pil.save(CVImageOut, format="PNG")
@@ -270,6 +287,8 @@ class ImageUpload(APIView):
         return_data['image_after_uri'] = str(image_path)[str(image_path).find("AfterImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
         return_data['y-coord'] = ocr_return[5]
+        return_data['line-num'] = ocr_return[6]
+        return_data['y-coord-match'] = ocr_error_output
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         return response
 
@@ -304,8 +323,8 @@ class ImageDeleteWithID(APIView):
             if os.path.isfile(images.Image.url):
                 os.remove(images.Image.url)
             print(images.Image_after.url)
-            if os.path.isfile(images.Image_after):
-                os.remove(images.Image_after)
+            if os.path.isfile(images.Image_after_url):
+                os.remove(str(images.Image_afte_url))
         ImageObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
@@ -344,11 +363,33 @@ class TempImageUpload(APIView):
         return_data = {}
         return_data['status'] = 'success'
         return_data['image_uri'] = custom_name[custom_name.find("TempImages"):]
-        print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(custom_name)
+
         for line in ocr_return:
             print(line)
+
+        print("goodies!\n")
+
+        ocr_error_output = []
+        error_msg_whole = ocr_return[2]
+        for i in ocr_return[6]:
+            current_error = []
+            print("compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)")
+            matches = re.finditer("compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)", error_msg_whole, re.MULTILINE)
+            for match in matches:
+                print(match.group())
+                error_msg_whole.replace(match.group(), "")
+                current_error.append(match.group())
+            ocr_error_output.append(current_error)
+
+        print("all errors are as follows:\n")
+        for error in ocr_error_output:
+            print(error)
+            print("size of error: " + str(len(error)))
+            print("------------------\n")
+        print("\nend of error\n")
+
         img_pil = ocr_return[0]
         img_pil.save(CVImageOut, format="PNG")
         return_data['ocr_return'] = ocr_return[2]
@@ -356,6 +397,8 @@ class TempImageUpload(APIView):
         return_data['CV_return'] = CVImageOut[CVImageOut.find("TempImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
         return_data['y-coord'] = ocr_return[5]
+        return_data['line-num'] = ocr_return[6]
+        return_data['y-coord-match'] = ocr_error_output
         response = HttpResponse(json.dumps(return_data), content_type='application/json')
         hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
         hired_gun.start()

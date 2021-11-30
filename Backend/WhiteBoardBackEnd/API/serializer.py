@@ -17,7 +17,7 @@ class ImageSerializer(serializers.Serializer):
 class GroupImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupImages
-        fields = ['name', 'Image', 'Image_after', 'GpID', 'Code']
+        fields = ['ImageID','name', 'Image', 'Image_after', 'GpID', 'Code']
 
 class GroupSerializer(serializers.ModelSerializer):
     user = UserSerializer
