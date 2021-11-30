@@ -21,6 +21,13 @@ import {
   Button,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import {
+  MenuProvider,
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from "react-native-popup-menu";
 import Topbar from "./shared/Topbar";
 
 import urls from "../requests/urls";
@@ -47,25 +54,6 @@ export default class TextEditorPage extends React.Component {
         language: "C",
       };
 
-      // const res = await fetch(serverURL + "Text/process", {
-      //   method: "POST",
-      //   headers: {
-      //     Accept: "application/json",
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ typenCode: this.state.typenCode }),
-      // });
-      // const res = await fetch(
-      //   "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/TempTextUpload/",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       Accept: "application/json",
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(text),
-      //   }
-      // );
       const res = await fetch(urls.temp_text, {
         method: "POST",
         headers: {
@@ -176,47 +164,114 @@ export default class TextEditorPage extends React.Component {
   }
 
   render() {
+    // return (
+    //   <SafeAreaView
+    //     style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
+    //   >
+    //     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    //       <View>
+    //         <Topbar title="Text Editor" navigation={this.props.navigation} />
+    //       </View>
+    //     </TouchableWithoutFeedback>
+
+    //     <TextInput
+    //       style={styles.input}
+    //       placeholder="Start typying your code here..."
+    //       multiline={true}
+    //       onChangeText={(typedCode) => this.setState({ typedCode })}
+    //     />
+
+    //     <View style={styles.view}>
+    //       <Icon
+    //         name="play"
+    //         type="ionicon"
+    //         color="#000"
+    //         size={40}
+    //         style={styles.play}
+    //         onPress={() =>
+    //           Alert.alert("Attention", "Are you sure of running the code?", [
+    //             { text: "Cancel", style: "cancel" },
+    //             {
+    //               text: "Submit",
+    //               style: "destructive",
+    //               onPress: () => this.sendCode(),
+    //             },
+    //           ])
+    //         }
+    //       />
+    //     </View>
+
+    //     <View>{this.displayConsoleLog()}</View>
+
+    //     <View>{this.saveOrDiscard()}</View>
+    //   </SafeAreaView>
+    // );
+
     return (
-      <SafeAreaView
-        style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <MenuProvider>
+        <SafeAreaView
+          style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
+        >
           <View>
-            <Topbar title="Text Editor" navigation={this.props.navigation} />
+            <Menu>
+              <MenuTrigger />
+              <MenuOptions>
+                <MenuOption onSelect={() => alert(`Save`)} text="Save" />
+                <MenuOption onSelect={() => alert(`Delete`)}>
+                  <Text style={{ color: "red" }}>Delete</Text>
+                </MenuOption>
+                <MenuOption
+                  onSelect={() => alert(`Not called`)}
+                  disabled={true}
+                  text="Disabled"
+                />
+              </MenuOptions>
+            </Menu>
+            <TouchableWithoutFeedback
+              onPress={Keyboard.dismiss}
+              accessible={false}
+            >
+              <View>
+                <Topbar
+                  title="Text Editor"
+                  navigation={this.props.navigation}
+                />
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </TouchableWithoutFeedback>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Start typying your code here..."
-          multiline={true}
-          onChangeText={(typedCode) => this.setState({ typedCode })}
-        />
-
-        <View style={styles.view}>
-          <Icon
-            name="play"
-            type="ionicon"
-            color="#000"
-            size={40}
-            style={styles.play}
-            onPress={() =>
-              Alert.alert("Attention", "Are you sure of running the code?", [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Submit",
-                  style: "destructive",
-                  onPress: () => this.sendCode(),
-                },
-              ])
-            }
+          <TextInput
+            style={styles.input}
+            placeholder="Start typying your code here..."
+            multiline={true}
+            onChangeText={(typedCode) => this.setState({ typedCode })}
           />
-        </View>
 
-        <View>{this.displayConsoleLog()}</View>
+          <View style={styles.view}>
+            <Icon
+              name="play"
+              type="ionicon"
+              color="#000"
+              size={40}
+              style={styles.play}
+              onPress={() =>
+                Alert.alert("Attention", "Are you sure of running the code?", [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Submit",
+                    style: "destructive",
+                    onPress: () => this.sendCode(),
+                  },
+                ])
+              }
+            />
+          </View>
 
-        <View>{this.saveOrDiscard()}</View>
-      </SafeAreaView>
+          <View>{this.displayConsoleLog()}</View>
+
+          <View>{this.saveOrDiscard()}</View>
+        </SafeAreaView>
+      </MenuProvider>
     );
   }
 }

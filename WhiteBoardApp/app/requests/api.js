@@ -1,5 +1,15 @@
 import urls from "./urls";
 import storage from "../config/storage";
+import { Alert } from 'react-native'
+
+// TODO
+// If the token authentication fails, set the state to logout, and prompt the user to login again
+
+export const promptLogin = () => {
+    // Alert.alert("", "You need to login first!", [
+    //     { text: "OK", onPress: () => { navigation.push("Login"); } },
+    // ]);
+};
 
 
 export const getToken = async () => {
@@ -82,7 +92,7 @@ export const resetPwdApi = async (email) => {
     }
 };
 
-export const updateAccountApi = async (user, email) => {
+export const updateAccountApi = async (username, email) => {
     let token = await getToken();
     try {
         const response = await fetch(urls.updateAccount, {
@@ -94,7 +104,6 @@ export const updateAccountApi = async (user, email) => {
                 'Authorization': token,
             },
             body: JSON.stringify({
-                uid: user.uid,
                 username: username,
                 email: email,
             })
@@ -106,6 +115,50 @@ export const updateAccountApi = async (user, email) => {
         console.error(error);
     }
 };
+
+export const getAllGroupsApi = async (uid) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.getAllGroups + uid, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getAllTeamMemebersApi = async (id) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.getAllMembers, {
+            method: 'POST',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                "groupId": id,
+            })
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 
 export const getAvatarApi = async (user, email) => {
     let token = await getToken();
@@ -161,7 +214,7 @@ export const createGroupApi = async (Gpname, description) => {
                 'Authorization': token,
             },
             body: JSON.stringify({
-                "Gpname": Gpname,
+                "name": Gpname,
                 "description": description
             })
         });
@@ -197,7 +250,7 @@ export const deleteGroupApi = async (groupId) => {
     }
 };
 
-export const addMemeberApi = async (groupId, email) => {
+export const addMemberApi = async (groupId, email) => {
     let token = await getToken();
     try {
         const response = await fetch(urls.memeber_operations, {

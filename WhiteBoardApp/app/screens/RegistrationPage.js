@@ -19,8 +19,8 @@ import {
   Button,
   Alert,
 } from "react-native";
-import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
+// import { Icon } from "react-native-elements";
 
 import urls from "../requests/urls";
 

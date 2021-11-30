@@ -50,7 +50,7 @@ class Group(models.Model):
 
 
 class GroupImages(models.Model):
-    ImageID = models.CharField(max_length=100)
+    ImageID = models.AutoField(max_length=100)
     name = models.CharField(max_length=50)
     Image = models.ImageField(upload_to='images/', null=True)
     # Note: due to some minor issues, Image_after is no longer used. Please use Image_after_url

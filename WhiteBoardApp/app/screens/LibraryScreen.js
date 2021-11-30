@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Modal, Image } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { Icon } from "react-native-elements";
+import { getAllGroupsApi, createGroupApi, deleteGroupApi } from "../requests/api";
 
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
+LogBox.ignoreAllLogs();//Ignore all log notifications
+const image_url = "";
 
 class LibraryScreen extends Component {
   constructor(props) {
@@ -14,17 +17,20 @@ class LibraryScreen extends Component {
       loading: false,
       show: false,
       //data: [],
-      data: [{
-        name: 'testing1',
+      user: {
+        "uid": 3,
+    },
+      data: [ {
+        name: 'group 1',
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
-        GpID: '8/11/2021',
+        GpID: '1',
       },
       {
-        name: 'testing2',
+        name: 'group 2',
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
-        GpID: '8/29/2021',
+        GpID: '2',
       }],
       error: null,
     };
@@ -38,36 +44,22 @@ class LibraryScreen extends Component {
     this.makeRemoteRequest();
   }
 
+  
+
   makeRemoteRequest = () => {
-    //const url = `https://randomuser.me/api/?&results=20`;
-    /*server test*/
-    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
-    /*local test*/
-    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
-    const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/Group/1';
-
     this.setState({ loading: true });
-
-    fetch(url)
-      .then(res => res.json())
-      .then(res => {
+    console.log(this.state.user);
+    getAllGroupsApi(this.state.user.uid).then((res) => {
         console.log(res);
-        //console.log("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080" + res[1].Image);
-
         this.setState({
-          //data: res.results,
-          data: res,
-          error: res.error || null,
-          loading: false,
+            //data: res.results,
+            data: res.all_groups,
+            default_group: res.default_group,
+            error: res.msg || null,
+            loading: false,
         });
-        //this.arrayholder = res.results;
-        this.arrayholder = res;
-      })
-      .catch(error => {
-        this.setState({ error, loading: false });
-        this.arrayholder = this.state.data;
-      });
-  };
+    })
+};
 
   renderSeparator = () => {
     return (
@@ -109,7 +101,7 @@ class LibraryScreen extends Component {
         autoCorrect={false}
         value={this.state.value}
       />
-
+      
     );
   };
 
@@ -124,46 +116,47 @@ class LibraryScreen extends Component {
     //console.log(this.state.data);
     //<Avatar source={item.avatar_url} />
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{flex: 1}}>
         <FlatList
           data={this.state.data}
-          keyExtractor={item => item.name.toString()}
+          //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
-            <ListItem bottomDivider>
-              <Avatar source={{ uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image }} />
+            <ListItem bottomDivider onPress={() => this.props.navigation.push("library", {url: item.GpID})}>
+              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image}}/>
               <ListItem.Content>
-                <ListItem.Title>{item.name}</ListItem.Title>
-                <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
-                <Modal
-                  transparent={true}
-                  visible={this.state.show}
-                >
-                  <SafeAreaView style={{ backgroundColor: "#CED0CE", flex: 1 }}>
+              <ListItem.Title>{item.Gpname}</ListItem.Title>
+              <ListItem.Subtitle>{"Group ID: " + item.GpID}</ListItem.Subtitle>
+              
+              </ListItem.Content>
+              <ListItem.Chevron 
+              onPress={() => {
+                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
+                console.log(this.image_url);
+                this.setState({show:true});
+                }} />
+              <Modal
+               transparent={true}
+               visible={this.state.show}
+               >
+                 <SafeAreaView style={{backgroundColor:"#CED0CE", flex:1}}>
                     <Text>{item.name}</Text>
                     <Image
-                      style={{
-                        width: 500,
-                        height: 500
-                      }}
-                      source={{ uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000" + item.Image }} />
+                    style={{width: 500,
+                        height: 500}}
+                    source={{uri: this.image_url}}/>
                     <Button
-                      title="close"
-                      onPress={() => this.setState({ show: false })}
+                        title="close"
+                        onPress={() => this.setState({show:false})}
                     />
-                  </SafeAreaView>
-
-                </Modal>
-              </ListItem.Content>
-              <ListItem.Chevron
-                onPress={() => this.setState({ show: true })} />
-
+                 </SafeAreaView>
+              </Modal>
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
-            //<ListItem //style={{ height: 50 }}
-            //leftAvatar={{ source: { uri: item.picture.thumbnail } }}
-            //title={`${item.name.first} ${item.name.last}`}
-            //subtitle={item.email}
-            ///>
+              //<ListItem //style={{ height: 50 }}
+              //leftAvatar={{ source: { uri: item.picture.thumbnail } }}
+              //title={`${item.name.first} ${item.name.last}`}
+              //subtitle={item.email}
+              ///>
             //<Text style={{fontSize: 30}}>{item.name.first}</Text>
           )}
           //data={ this.state.FlatListItems }
@@ -171,7 +164,7 @@ class LibraryScreen extends Component {
           //keyExtractor={item => item.email}
 
           ItemSeparatorComponent={this.renderSeparator}
-          ListHeaderComponent={this.renderHeader}
+          //ListHeaderComponent={this.renderHeader}
         />
       </SafeAreaView>
     );
@@ -179,22 +172,22 @@ class LibraryScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-
-  MainContainer: {
-
-    // Setting up View inside content in Vertically center.
-    justifyContent: 'center',
-    flex: 1,
-    margin: 10
-
+ 
+  MainContainer :{
+   
+  // Setting up View inside content in Vertically center.
+  justifyContent: 'center',
+  flex:1,
+  margin: 10
+   
   },
-
+   
   item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-  },
-
-});
+      padding: 10,
+      fontSize: 18,
+      height: 44,
+    },
+   
+  });
 
 export default LibraryScreen;
