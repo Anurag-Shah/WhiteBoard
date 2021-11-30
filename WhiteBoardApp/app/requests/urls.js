@@ -9,6 +9,7 @@ export default {
     updateAccount: base_url + "User/update/",
     avatar: base_url + "User/avatar/",
     getAllGroups: base_url + "User/groups/",
+    getAllGroupsW: base_url + "User/groups/w/",
     group_operations: base_url + "User/group/",
     getAllMembers: base_url + "User/group/members/",
     memeber_operations: base_url + "User/group/member/",

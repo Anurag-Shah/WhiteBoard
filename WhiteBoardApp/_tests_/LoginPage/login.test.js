@@ -2,7 +2,8 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
-import { cleanup } from '@testing-library/react-native/pure';
+import { cleanup, waitFor } from '@testing-library/react-native/pure';
+import { act } from 'react-test-renderer';
 
 import LoginPage from '../../app/screens/LoginPage';
 
@@ -18,10 +19,12 @@ describe('<Login />', () => {
         afterEach(cleanup);
 
         it('username', () => {
-            const { getByPlaceholderText, getByText, get } = render(<LoginPage />);
-            let element = getByPlaceholderText("Username");
+            const rendered = render(<LoginPage />);
+            let element = rendered.getByPlaceholderText("Username");
             expect(element).toBeTruthy();
-            fireEvent.changeText(element, 'jane');
+            act(() => {
+                fireEvent.changeText(element, 'jane');
+            });
             expect(element.props.value).toBe('jane');
         });
 
@@ -32,6 +35,19 @@ describe('<Login />', () => {
             fireEvent.changeText(element, '111');
             expect(element.props.value).toBe('111');
         });
+
+        it('username and password', () => {
+            const rendered = render(<LoginPage />);
+            let pwd = rendered.getByPlaceholderText("Password");
+            let username = rendered.getByPlaceholderText("Username");
+            expect(pwd).toBeTruthy();
+            expect(username).toBeTruthy();
+            fireEvent.changeText(pwd, '111');
+            fireEvent.changeText(username, 'jack');
+            expect(username.props.value).toBe('jack');
+            expect(pwd.props.value).toBe('111');
+        });
+
     });
 
     test.todo('add should be associative');

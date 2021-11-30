@@ -24,6 +24,7 @@ import Topbar from './shared/Topbar';
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { getToken } from '../requests/api';
 import Constants from 'expo-constants';
 
 import * as FileSystem from 'expo-file-system';
@@ -73,62 +74,62 @@ export default function CameraScreen({ navigation }) {
   const [imageName, setImageName] = useState(null);
 
   useEffect(() => {
-    getUserInfo(); 
-    
+    getUserInfo();
+
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
       const galleryStatus =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setHasGalleryPermission(galleryStatus.status === 'granted');    
+      setHasGalleryPermission(galleryStatus.status === 'granted');
 
     })();
   }, []);
 
   /****** group list & rename modal related ***** */
 
-  const modalHeader=(
+  const modalHeader = (
     <View style={styles.modalHeader}>
       <Text style={styles.title}>Select a Group</Text>
       <View style={styles.divider}></View>
     </View>
   )
 
-  const modalBody=(
+  const modalBody = (
     <View style={styles.modalBody}>
-        <Dropdown
-            label="Group"
-            data={groupList}
-            enableSearch
-            value={selGroupId}
-            onChange={(v)=>{setSelGroupId(v)}}
-          />
-        <View style={styles.divider}></View>
-        <View style={{flexDirection:"row-reverse",margin:10}}>
-          <TouchableOpacity style={{...styles.actions,backgroundColor:"#21ba45"}}
-            onPress={() => {
-              if(selGroupId) {
-                // Alert.alert(selGroupId);
-                setShowRenameDlg(true);
-              }
-              else {
-                Alert.alert('Please select a group.');
-              }
-            }}>
-            <Text style={styles.actionText}>Select</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{...styles.actions,backgroundColor:"#db2828"}} 
-            onPress={() => {
-              // Alert.alert('Modal has been closed.');
-              setSelGroupId(null);
-              setShowGroups(!showGroups);
-            }}>
-            <Text style={styles.actionText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+      <Dropdown
+        label="Group"
+        data={groupList}
+        enableSearch
+        value={selGroupId}
+        onChange={(v) => { setSelGroupId(v) }}
+      />
+      <View style={styles.divider}></View>
+      <View style={{ flexDirection: "row-reverse", margin: 10 }}>
+        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
+          onPress={() => {
+            if (selGroupId) {
+              // Alert.alert(selGroupId);
+              setShowRenameDlg(true);
+            }
+            else {
+              Alert.alert('Please select a group.');
+            }
+          }}>
+          <Text style={styles.actionText}>Select</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#db2828" }}
+          onPress={() => {
+            // Alert.alert('Modal has been closed.');
+            setSelGroupId(null);
+            setShowGroups(!showGroups);
+          }}>
+          <Text style={styles.actionText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
-  const modalContainer=(
+  const modalContainer = (
     <View style={styles.modalContainer}>
       {modalHeader}
       {modalBody}
@@ -166,17 +167,17 @@ export default function CameraScreen({ navigation }) {
               <View style={styles.divider}></View>
             </View>
             <View style={styles.modalBody}>
-            <TextInput
-              style={{height: 40}}
-              placeholder="Type the image name"
-              onChangeText={v => setImageName(v)}
-              defaultValue={'GroupImage'}
-            />
+              <TextInput
+                style={{ height: 40 }}
+                placeholder="Type the image name"
+                onChangeText={v => setImageName(v)}
+                defaultValue={'GroupImage'}
+              />
               <View style={styles.divider}></View>
-              <View style={{flexDirection:"row-reverse",margin:10}}>
-                <TouchableOpacity style={{...styles.actions,backgroundColor:"#21ba45"}}
+              <View style={{ flexDirection: "row-reverse", margin: 10 }}>
+                <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
                   onPress={() => {
-                    if(imageName) {
+                    if (imageName) {
                       // Alert.alert(imageName);
                       // after renaming, we can send the picture for logged in user.
                       sendPicture(photo);
@@ -187,7 +188,7 @@ export default function CameraScreen({ navigation }) {
                   }}>
                   <Text style={styles.actionText}>Ok</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{...styles.actions,backgroundColor:"#db2828"}} 
+                <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#db2828" }}
                   onPress={() => {
                     // Alert.alert('Modal has been closed.');
                     setImageName(null);
@@ -239,8 +240,8 @@ export default function CameraScreen({ navigation }) {
           Alert.alert('Error', 'Connection Error!');
         }
         */
-        
-        
+
+
       })
       .catch(err => {
         setUser(false);
@@ -264,13 +265,14 @@ export default function CameraScreen({ navigation }) {
         method: 'GET',
         headers: {
           'Content-Type': 'multipart/form-data',
+          // 'Authorization': "Token " + user.token,
         },
-        redirect:'follow'
+        redirect: 'follow'
       });
       const result = await response.json();
       // setShowGroups(true);
       // setGroupList(result.all_groups); 
-      setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
+      setGroupList(result.all_groups.map(x => { return { 'label': x.Gpname, 'value': x.GpID } }));
     } catch (error) {
       console.log(error);
       console.log('Connection Error!');
@@ -354,14 +356,14 @@ export default function CameraScreen({ navigation }) {
     // check whether user logged in or not
     // if logged in: fetch groups & show groups list
     // else call temp_image
-    if(!user) {
+    if (!user) {
       sendPicture(picture);
     }
-    else if(user && !showGroups) {
-      fetchGroups().then(()=>{
+    else if (user && !showGroups) {
+      fetchGroups().then(() => {
         setShowGroups(true);
         setShowRenameDlg(false);
-      });     
+      });
     }
     else if (user && showGroups && !showRenameDlg) {
       setShowRenameDlg(true);
@@ -369,7 +371,7 @@ export default function CameraScreen({ navigation }) {
   }
 
   const sendPicture = async (picture) => {
-    
+
     // dispatch(removeClipItem());
     // let localUri = picture;
     let filename = picture.uri.split('/').pop();
@@ -391,47 +393,47 @@ export default function CameraScreen({ navigation }) {
       const data = new FormData();
       //console.log(photo.uri);
       data.append('Image', photo.base64
-      // isCamera ? photo.uri : photo.base64
+        // isCamera ? photo.uri : photo.base64
 
-      // {
-      //   name: filename,
-      //   type: type,
-      //   uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
-      //   data: photo.base64
-      // }
+        // {
+        //   name: filename,
+        //   type: type,
+        //   uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+        //   data: photo.base64
+        // }
       );
-    
+
       Object.keys(body).forEach((key) => {
         data.append(key, body[key]);
       });
       //console.log(data);
       return data;
     };
-    
+
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
     const targetUrl = user ? uploadImageUrl : tempUploadImgUrl;
-    const targetBody = user ? 
-      createFormData(picture, { name: imageName, description: 'picture' }):
+    const targetBody = user ?
+      createFormData(picture, { name: imageName, description: 'picture' }) :
       createFormData(picture, { name: 'TempImage', description: 'picture' });
 
     try {
       // console.log(targetUrl, tempUploadImgUrl)
-      const response = await fetch( targetUrl , {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         body: targetBody,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        redirect:'follow'
+        redirect: 'follow'
       });
       console.log(tempUploadImgUrl, response);
       const result = await response.json();
       console.log(result)
-      if(result.status === 'success') {
+      if (result.status === 'success') {
         Alert.alert('Success', 'The photo was successfully sent!');
-        setReturnImg(serverUrl+'media/'+result.image_uri);//CV_return for tempimage;image_after_uri for Images API
-        console.log(serverUrl+'media/'+result.image_uri);
+        setReturnImg(serverUrl + 'media/' + result.image_uri);//CV_return for tempimage;image_after_uri for Images API
+        console.log(serverUrl + 'media/' + result.image_uri);
       }
       else {
         Alert.alert('Error', 'Could not save image!');
@@ -443,16 +445,16 @@ export default function CameraScreen({ navigation }) {
       console.error(error);
       console.log('Connection Error in sending picture!');
       setReturnImg(null);
-      
+
       setShowGroups(false);
       setShowRenameDlg(false);
       Alert.alert('Error', 'Something went wrong!');
     }
-    
+
 
 
   };
-  
+
   return (
     <SafeAreaView style={{ flex: 1, marginTop: 20 }}>
       {!showGroups && !showRenameDlg && <Topbar title="Camera" navigation={navigation} />}
@@ -460,7 +462,7 @@ export default function CameraScreen({ navigation }) {
         <View style={{ flex: 1 }}>
           <Camera
             style={{ flex: 1 }}
-            type={type}            
+            type={type}
             ref={(ref) => {
               setCameraRef(ref);
             }}
@@ -472,7 +474,7 @@ export default function CameraScreen({ navigation }) {
               paddingHorizontal: 15,
               padding: 15,
             }}>
-            <Text style={{ alignSelf: 'flex-end', width:30 }}>{''}</Text>
+            <Text style={{ alignSelf: 'flex-end', width: 30 }}>{''}</Text>
             <TouchableOpacity
               style={{
                 alignSelf: 'flex-end',
@@ -480,9 +482,9 @@ export default function CameraScreen({ navigation }) {
               }}
               onPress={async () => {
                 if (cameraRef) {
-                  let result = await cameraRef.takePictureAsync({base64: true});
+                  let result = await cameraRef.takePictureAsync({ base64: true });
                   setIsCamera(true);
-                  setPhoto(result);                  
+                  setPhoto(result);
                   // Alert.alert("","TakePicture");
                 }
               }}>
@@ -513,7 +515,7 @@ export default function CameraScreen({ navigation }) {
                 name="image-outline"
                 size={40}
                 onPress={() => pickImage()}
-                style={{ 
+                style={{
                   alignSelf: 'flex-end',
                   alignItems: 'center',
                   color: 'black'
@@ -524,12 +526,12 @@ export default function CameraScreen({ navigation }) {
         </View>
       )}
       {!returnImg && photo && (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent:  'center'}}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Image
             source={{ uri: photo.uri }}
             style={{
               width: width,
-              height: height - ((Platform.OS === 'ios') ? 45+80 :  60 + 80 + 20), //Topbar & footer, status height due to OS
+              height: height - ((Platform.OS === 'ios') ? 45 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
               resizeMode: isCamera ? 'cover' : 'contain',
             }}
           />
@@ -538,17 +540,18 @@ export default function CameraScreen({ navigation }) {
               {/* onPress={sendPicture} */}
               <View style={styles.modalButton}>
                 <Text
-                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems: 'center' }}>
                   Accept
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
-              setPhoto(null);setShowGroups(false);
-              setShowRenameDlg(false);}}>
+              setPhoto(null); setShowGroups(false);
+              setShowRenameDlg(false);
+            }}>
               <View style={styles.modalButton}>
                 <Text
-                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems: 'center' }}>
                   Retake
                 </Text>
               </View>
@@ -559,37 +562,39 @@ export default function CameraScreen({ navigation }) {
       {returnImg && (
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          
-            <Image
-              // source={{ uri: returnImg }}
-              source={{ uri: `${returnImg}` }}
-              style={{ width: width, height: height - ((Platform.OS === 'ios') ? 45+80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
-               resizeMode: 'contain' }}
-            />
-            <View style={[styles.modalBottomContainer]}>
-              <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
-                    Save
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              {/* <Text style={{ width: 30 }}></Text> */}
-              <TouchableOpacity
-                onPress={() => {
-                  setPhoto(null);
-                  setReturnImg(null);
-                  // Alert.alert('Close')
-                }}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
-                    Close
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+
+          <Image
+            // source={{ uri: returnImg }}
+            source={{ uri: `${returnImg}` }}
+            style={{
+              width: width, height: height - ((Platform.OS === 'ios') ? 45 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
+              resizeMode: 'contain'
+            }}
+          />
+          <View style={[styles.modalBottomContainer]}>
+            <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems: 'center' }}>
+                  Save
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {/* <Text style={{ width: 30 }}></Text> */}
+            <TouchableOpacity
+              onPress={() => {
+                setPhoto(null);
+                setReturnImg(null);
+                // Alert.alert('Close')
+              }}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems: 'center' }}>
+                  Close
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
       {
@@ -598,7 +603,7 @@ export default function CameraScreen({ navigation }) {
       {
         user && showGroups && showRenameDlg && renameModal
       }
-    
+
     </SafeAreaView>
   );
 }
@@ -630,46 +635,46 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 16,
   },
-  
-  modal:{
-    backgroundColor:"#00000099",
-    flex:1,
+
+  modal: {
+    backgroundColor: "#00000099",
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modalContainer:{
-    backgroundColor:"#f9fafb",
-    width:"90%",
-    borderRadius:5
+  modalContainer: {
+    backgroundColor: "#f9fafb",
+    width: "90%",
+    borderRadius: 5
   },
-  modalHeader:{
-    
+  modalHeader: {
+
   },
-  title:{
-    fontWeight:"bold",
-    fontSize:20,
-    padding:15,
-    color:"#000"
+  title: {
+    fontWeight: "bold",
+    fontSize: 20,
+    padding: 15,
+    color: "#000"
   },
-  divider:{
-    width:"100%",
-    height:1,
-    backgroundColor:"lightgray"
+  divider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "lightgray"
   },
-  modalBody:{
-    backgroundColor:"#fff",
-    paddingVertical:20,
-    paddingHorizontal:10
+  modalBody: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 10
   },
-  modalFooter:{
+  modalFooter: {
   },
-  actions:{
-    borderRadius:5,
-    marginHorizontal:10,
-    paddingVertical:10,
-    paddingHorizontal:20
+  actions: {
+    borderRadius: 5,
+    marginHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20
   },
-  actionText:{
-    color:"#fff"
+  actionText: {
+    color: "#fff"
   }
 });

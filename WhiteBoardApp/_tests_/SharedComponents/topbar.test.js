@@ -21,6 +21,12 @@ describe('<Topbar />', () => {
             expect(title).toBeTruthy();
         });
 
+        it('Empty Title', () => {
+            const { getByText } = render(<Topbar />);
+            const title = getByText('WhiteBoard');
+            expect(title).toBeTruthy();
+        });
+
         it('Camera', () => {
             let topbar = renderer.create(<Topbar title='Camera' />).getInstance();
             expect(topbar.props.title).toEqual('Camera');
