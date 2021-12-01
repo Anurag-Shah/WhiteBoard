@@ -40,7 +40,7 @@ import urls from '../requests/urls';
 const { height, width } = Dimensions.get('window');
 
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = urls.base;//'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
+const serverUrl = urls.base_url;//'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
 //TempImages
 
 const DATA = [
@@ -79,7 +79,6 @@ export default function CameraScreen({ navigation }) {
 
   useEffect(() => {
     getUserInfo();
-
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -219,10 +218,9 @@ export default function CameraScreen({ navigation }) {
       })
       .then(ret => {
         // found data go to then()
-        console.log(ret)
         // selGroupId(ret.groupId)
         // console.log(ret)
-        setUser(ret);
+        setUser(ret.userInfo);
         // for test, in real, Do Comment below line Kk
         //setGroupList(DATA.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
         // Do active try-clause in real
@@ -274,11 +272,13 @@ export default function CameraScreen({ navigation }) {
   const fetchGroups = async () => {
     try {
       // console.log(user);
-      console.log('fetching groups...')
+      console.log('fetching groups...');
+      console.log(user.uid);
+      console.log(serverUrl + 'User/groups/' + user.uid);
       const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
         method: 'GET',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           // 'Authorization': "Token " + user.token,
         },
         redirect: 'follow'
@@ -290,7 +290,7 @@ export default function CameraScreen({ navigation }) {
       console.log('Done fetching groups...')
       
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       console.log('Connection Error!');
       setGroupList(null);
       Alert.alert('Error', 'Connection Error in fetch groups!');
