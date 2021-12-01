@@ -685,7 +685,7 @@ class UserGroups(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_default_group(self, request, uid):
+    def get_default_group(self, uid):
         user = User.objects.get(pk=uid)
         return user.group_set.get(isDefault=True)
 
