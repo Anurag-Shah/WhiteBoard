@@ -184,6 +184,7 @@ class library extends Component {
                     <Image
                     style={{width: 500,
                         height: 500}}
+                    resizeMode="contain"
                     source={{uri: this.image_url}}/>
                     <Text>{this.image_code}</Text>
                     <Button
