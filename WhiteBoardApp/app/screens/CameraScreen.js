@@ -397,8 +397,7 @@ export default function CameraScreen({ navigation }) {
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
 
-    if (filename) setImageName(filename.split('.')[0])
-    else setImageName('image')
+    if (!filename) setImageName('image')
 
     // Upload the image using the fetch and FormData APIs
     //let formData = new FormData();
