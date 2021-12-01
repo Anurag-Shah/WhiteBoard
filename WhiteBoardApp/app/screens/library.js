@@ -21,12 +21,16 @@ class library extends Component {
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
         GpID: '8/11/2021',
+        pk: '0',
+        Code: 'hello world 1'
       },
       {
         name: 'testing2',
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
         GpID: '8/29/2021',
+        pk: '1',
+        Code: 'hello world 2'
       }],
       error: null,
     };
@@ -132,7 +136,13 @@ class library extends Component {
           data={this.state.data}
           //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
-            <ListItem bottomDivider>
+            <ListItem bottomDivider onPress={() => {
+              this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
+              this.image_title = item.name;
+              this.image_code = item.Code;
+              console.log(this.image_url);
+              this.setState({show:true});
+              }}>
               <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.name}</ListItem.Title>
@@ -141,20 +151,41 @@ class library extends Component {
               </ListItem.Content>
               <ListItem.Chevron 
               onPress={() => {
-                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
-                console.log(this.image_url);
-                this.setState({show:true});
+                Alert.alert(
+                  //title
+                  'File Delete',
+                  //body
+                  'Do you want to delete this file?',
+                  [
+                    {
+                      text: 'Yes',
+                      onPress: () => {
+                        console.log(item.pk)
+                        console.log('Yes Pressed')
+                        fetch("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, {method: 'DELETE'});
+                        this.props.navigation.replace("library", {url: this.props.route.params.url})
+                        //this.render();
+                      }
+                    },
+                    {
+                      text: 'No',
+                      onPress: () => console.log('No Pressed')
+                    },
+                  ],
+                  {cancelable: true},
+                );
                 }} />
               <Modal
                transparent={true}
                visible={this.state.show}
                >
                  <SafeAreaView style={{backgroundColor:"#CED0CE", flex:1}}>
-                    <Text>{item.name}</Text>
+                    <Text>{this.image_title}</Text>
                     <Image
                     style={{width: 500,
                         height: 500}}
                     source={{uri: this.image_url}}/>
+                    <Text>{this.image_code}</Text>
                     <Button
                         title="close"
                         onPress={() => this.setState({show:false})}

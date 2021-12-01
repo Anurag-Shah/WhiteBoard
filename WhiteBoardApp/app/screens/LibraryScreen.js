@@ -66,9 +66,9 @@ class LibraryScreen extends Component {
       <View
         style={{
           height: 1,
-          width: '86%',
+          //width: '86%',
           backgroundColor: '#CED0CE',
-          marginLeft: '14%',
+          //marginLeft: '14%',
         }}
       />
     );
@@ -122,34 +122,11 @@ class LibraryScreen extends Component {
           //keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider onPress={() => this.props.navigation.push("library", {url: item.GpID})}>
-              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image}}/>
               <ListItem.Content>
               <ListItem.Title>{item.Gpname}</ListItem.Title>
               <ListItem.Subtitle>{"Group ID: " + item.GpID}</ListItem.Subtitle>
               
               </ListItem.Content>
-              <ListItem.Chevron 
-              onPress={() => {
-                this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
-                console.log(this.image_url);
-                this.setState({show:true});
-                }} />
-              <Modal
-               transparent={true}
-               visible={this.state.show}
-               >
-                 <SafeAreaView style={{backgroundColor:"#CED0CE", flex:1}}>
-                    <Text>{item.name}</Text>
-                    <Image
-                    style={{width: 500,
-                        height: 500}}
-                    source={{uri: this.image_url}}/>
-                    <Button
-                        title="close"
-                        onPress={() => this.setState({show:false})}
-                    />
-                 </SafeAreaView>
-              </Modal>
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
               //<ListItem //style={{ height: 50 }}

@@ -56,7 +56,7 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="SideBar" component={Sidebar} options={{ headerShown: false }}></Stack.Screen>
       <Stack.Screen name="Save" component={Save}></Stack.Screen>
       <Stack.Screen name="Library" component={Library}></Stack.Screen>
-      <Stack.Screen name="library" component={library}></Stack.Screen>
+      <Stack.Screen name="library" component={library} ></Stack.Screen>
       <Stack.Screen name="Team" component={Team}></Stack.Screen>
       <Stack.Screen name="TeamMember" component={TeamMember}></Stack.Screen>
       <Stack.Screen name="Account" component={Account}></Stack.Screen>
