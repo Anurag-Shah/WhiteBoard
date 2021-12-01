@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import storage from '../config/storage';
-import { FontAwesome, Entypo } from '@expo/vector-icons'
+import React, { useEffect, useRef } from "react";
+import storage from "../config/storage";
+import { FontAwesome, Entypo } from "@expo/vector-icons";
 import {
   StyleSheet,
   Switch,
@@ -14,31 +14,22 @@ import {
   SafeAreaView,
   TextInput,
   Platform,
-} from 'react-native';
+  KeyboardAvoidingView
+} from "react-native";
 import Dialog from "react-native-dialog";
-import { loginApi, resetPwdApi, helloApi } from '../requests/api';
-
+import { loginApi, resetPwdApi } from "../requests/api";
+import urls from "../requests/urls";
 
 function Prompt(props) {
-  const [email, setEmail] = React.useState('');
-  const [feedback, setFeedback] = React.useState('');
+  const [email, setEmail] = React.useState("");
+  const [feedback, setFeedback] = React.useState("");
   const [success, setSuccess] = React.useState(true);
   const handleConfirm = () => {
     // Validate Input first
-    if (email.indexOf('@') < 0) {
+    if (email.indexOf("@") < 0) {
       setSuccess(false);
       setFeedback("Please enter a valid email...");
     } else {
-      // // Recieve success msg
-      // if (email == "admin@gmail.com") {
-      //   setSuccess(true);
-      //   setFeedback("");
-      //   Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-      //     { text: 'OK', onPress: () => props.setVisible(false) }]);
-      // } else {
-      //   setSuccess(false);
-      //   setFeedback("No account found!");
-      // }
 
       // Send Email to backend
       resetPwdApi(email).then((response) => {
@@ -47,9 +38,11 @@ function Prompt(props) {
           // Send successfully
           setSuccess(true);
           setFeedback("");
-          Alert.alert('Reset password link sent!', 'A reset password link has been sent to \"' + email + '\"', [
-            { text: 'OK' }]);
-          props.setVisible(false);
+          Alert.alert(
+            "Reset password link sent!",
+            'A reset password link has been sent to "' + email + '"',
+            [{ text: "OK", onPress: () => { props.setVisible(false); } }]
+          );
         } else if (response.code == -1) {
           // Email has not been registered
           setSuccess(false);
@@ -63,60 +56,76 @@ function Prompt(props) {
 
   return (
     <Dialog.Container visible={props.visible}>
-      {Platform.OS !== "android" ? <Dialog.Title>Please enter your email to reset password:</Dialog.Title> :
+      {Platform.OS !== "android" ? (
+        <Dialog.Title>Please enter your email to reset password:</Dialog.Title>
+      ) : (
         <Dialog.Description>
           Please enter your email to reset password:
-        </Dialog.Description>}
+        </Dialog.Description>
+      )}
       <Dialog.Input value={email} onChangeText={setEmail} />
-      <Text style={{ color: success ? "black" : "red", paddingLeft: 20, paddingBottom: 15 }}>{feedback}</Text>
+      <Text
+        style={{
+          color: success ? "black" : "red",
+          paddingLeft: 20,
+          paddingBottom: 15,
+        }}
+      >
+        {feedback}
+      </Text>
       <Dialog.Button label="Cancel" onPress={() => props.setVisible(false)} />
       <Dialog.Button label="Confirm" onPress={() => handleConfirm()} />
     </Dialog.Container>
-  )
+  );
 }
 
-
 function LoginPage({ navigation }) {
-
   const toggleRememberMe = () => {
     setRememberMe(!rememberMe);
     console.log("toggleMePressed");
-  };
+  }
 
   useEffect(() => {
-    console.log("I am useEffect!");
     getUserInfo();
   }, []);
 
   const getUserInfo = () => {
-    // Store user account info in local storage
+    // Fetch user and account info in local storage
     storage
       .load({
-        key: 'login-session',
+        key: "account",
         // autoSync (default: true) means if data is not found or has expired,
         // then invoke the corresponding sync method
         autoSync: false,
         syncInBackground: true,
       })
-      .then(ret => {
+      .then((ret) => {
         // found data go to then()
-        console.log("Login Page found data!")
+        console.log("Login Page found data!");
         if (ret.rememberMe) {
           setUsername(ret.username);
           setPwd(ret.password);
           setRememberMe(true);
         } else {
-          setUsername('');
-          setPwd('');
+          setUsername("");
+          setPwd("");
           setRememberMe(false);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         // any exception including data not found
         // goes to catch()
-        console.log("User not found!")
-        setUsername('');
-        setPwd('');
+        console.warn(err.message);
+        switch (err.name) {
+          case 'NotFoundError':
+            console.log("User not found!");
+            break;
+          case 'ExpiredError':
+            console.log("Login Session Expired!");
+            break;
+        }
+        setUsername("");
+        setPwd("");
         setRememberMe(false);
       });
   };
@@ -130,38 +139,60 @@ function LoginPage({ navigation }) {
     // }
   };
 
-
   const login = () => {
     console.log("Login Clicked");
-    // login Api communicates with the backend
-    let user = { username: username, password: password, token: '', rememberMe: true, logged_in: false };
+    //navigation.reset("SideBar");
+    //navigation.navigate("Drawer");
+    // loginApi communicates with the backend
+    let user = {
+      username: username,
+      token: "",
+      logged_in: false,
+      userInfo: [],
+    };
+    let account = {
+      username: username,
+      password: password,
+      rememberMe: true,
+    }
     loginApi(username, password).then((response) => {
-      if (response.code == 0) {
+      if (response && response.code == 0) {
         // If Login successfully
         user.logged_in = true;
         user.token = response.token;
-        user.uid = response.user.uid;
-        user.groupId = response.user.uid;
+        user.userInfo = response.user;
+        if (user.userInfo.avatar != null) {
+          user.userInfo.avatar = urls.base_url.slice(0, -1) + user.userInfo.avatar;
+        }
         setWrongInfo(false);
         if (rememberMe) {
           console.log("Remember me true");
-          user.rememberMe = false;
-          console.log(user);
+          account.rememberMe = true;
         } else {
-          user.rememberMe = false;
+          account.rememberMe = false;
+          setTimeout(() => {
+            setUsername("");
+            setPwd("");
+          }, 3000);
         }
         storage.save({
           key: "login-session",
           data: user,
         });
+        storage.save({
+          key: "account",
+          data: account,
+          expires: null,
+        });
         // Redirecting to Camera Page
-        Alert.alert('', 'Logged in Successfully!', [{ text: 'OK', onPress: () => navigation.push('Camera') }]);
+        Alert.alert("", "Logged in Successfully!", [
+          { text: "OK", onPress: () => { navigation.push("Camera"); } },
+        ]);
       } else {
         setWrongInfo(true);
         console.log(response.msg);
       }
     });
-
 
     // For frontend testing
     // const test_username = "admin";
@@ -201,7 +232,7 @@ function LoginPage({ navigation }) {
 
   const signUp = () => {
     console.log("Sign Up clicked");
-    // Redirect to Signup page
+    navigation.push("Register");
   };
 
   const [username, setUsername] = React.useState("");
@@ -215,17 +246,38 @@ function LoginPage({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {/* <Ionicons name="md-return-up-back" size={32} color="black" style={styles.back_icon} /> */}
-      <View style={styles.sub_container}>
+      {/* <View style={styles.sub_container}> */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.sub_container}
+      >
         <Image
           resizeMode="contain"
-          source={require('../assets/logo.png')} style={styles.image} />
-
-        {wrongInfo ? <View style={styles.errorMsg}>
-          <Text style={{ color: "#d40824" }}>Incorrect username or password.</Text>
-        </View> : null}
-
-        <View style={[styles.input_box, { borderColor: wrongInfo ? "red" : "black", borderWidth: wrongInfo ? 2 : 1 }]}>
-          <FontAwesome style={styles.icon} name="user" size={25} color="#929c92" />
+          source={require("../assets/logo.png")}
+          style={styles.image}
+        />
+        {wrongInfo ? (
+          <View style={styles.errorMsg}>
+            <Text style={{ color: "#d40824" }}>
+              Incorrect username or password.
+            </Text>
+          </View>
+        ) : null}
+        <View
+          style={[
+            styles.input_box,
+            {
+              borderColor: wrongInfo ? "red" : "black",
+              borderWidth: wrongInfo ? 2 : 1,
+            },
+          ]}
+        >
+          <FontAwesome
+            style={styles.icon}
+            name="user"
+            size={25}
+            color="#929c92"
+          />
           <TextInput
             style={styles.input}
             onChangeText={setUsername}
@@ -235,8 +287,21 @@ function LoginPage({ navigation }) {
           />
         </View>
 
-        <View style={[styles.input_box, { borderColor: wrongInfo ? "red" : "black", borderWidth: wrongInfo ? 2 : 1 }]}>
-          <FontAwesome style={styles.icon} name="key" size={25} color="#929c92" />
+        <View
+          style={[
+            styles.input_box,
+            {
+              borderColor: wrongInfo ? "red" : "black",
+              borderWidth: wrongInfo ? 2 : 1,
+            },
+          ]}
+        >
+          <FontAwesome
+            style={styles.icon}
+            name="key"
+            size={25}
+            color="#929c92"
+          />
           <TextInput
             secureTextEntry={!showPwd}
             style={styles.input}
@@ -245,33 +310,55 @@ function LoginPage({ navigation }) {
             placeholder="Password"
             importantForAutofill="yes"
           />
-          <Entypo style={styles.eye_icon} name={showPwd ? "eye" : "eye-with-line"} size={24} color="black" onPress={() => setSecurity(!showPwd)} />
+          <Entypo
+            style={styles.eye_icon}
+            name={showPwd ? "eye" : "eye-with-line"}
+            size={24}
+            color="black"
+            onPress={() => setSecurity(!showPwd)}
+          />
         </View>
 
         <View style={styles.extra}>
           <View style={styles.checkbox}>
-            {Platform.OS === "android" ?
-              <CheckBox value={rememberMe} onValueChange={() => toggleRememberMe()} /> :
-              <Switch value={rememberMe} onValueChange={() => toggleRememberMe()} style={{ marginRight: 5 }} />}
+            {Platform.OS === "android" ? (
+              <CheckBox
+                value={rememberMe}
+                onValueChange={() => toggleRememberMe()}
+              />
+            ) : (
+              <Switch
+                value={rememberMe}
+                onValueChange={() => toggleRememberMe()}
+                style={{ marginRight: 5 }}
+              />
+            )}
             <Text style={{ marginTop: 5 }}>Remember me</Text>
           </View>
           <View>
-            <Text onPress={() => forgotPwd()} style={{ marginTop: 5, color: clicked ? "#834299" : "#4a7fd4" }}>Forgot Password</Text>
+            <Text
+              onPress={() => forgotPwd()}
+              style={{ marginTop: 5, color: clicked ? "#834299" : "#4a7fd4" }}
+            >
+              Forgot Password
+            </Text>
           </View>
         </View>
 
         <View style={styles.buttons}>
           {/* <View style={styles.button_view}><Button title="Login" style={{height: "100%"}}/></View> */}
-          <TouchableOpacity style={styles.button} onPress={login}>
+          <TouchableOpacity style={styles.button} onPress={() => login()}>
             <Text style={styles.button_text}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => signUp()}>
             <Text style={styles.button_text}>Sign Up</Text>
           </TouchableOpacity>
         </View>
-
-      </View>
-      {visible ? <Prompt visible={visible} setVisible={setVisible}></Prompt> : null}
+      </KeyboardAvoidingView>
+      {/* </View> */}
+      {visible ? (
+        <Prompt visible={visible} setVisible={setVisible}></Prompt>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -310,7 +397,7 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     backgroundColor: "white",
-    height: "100%"
+    height: "100%",
     //flex:1,
   },
 
@@ -322,7 +409,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 5,
-    backgroundColor: "#edc2c8"
+    backgroundColor: "#edc2c8",
   },
 
   extra: {
@@ -335,7 +422,7 @@ const styles = StyleSheet.create({
   eye_icon: {
     position: "absolute",
     right: 10,
-    top: 11
+    top: 11,
   },
 
   icon: {
@@ -356,29 +443,21 @@ const styles = StyleSheet.create({
     height: "100%",
     position: "absolute",
     left: 50,
-    //top: 5,
     width: "80%",
-    //margin: 12,
-    //paddingLeft: 30,
   },
 
   input_box: {
     borderWidth: 1,
     margin: 10,
     height: 50,
-    width: "90%"
-    //flex:1,
-    //justifyContent: "center",
+    width: "90%",
+
   },
 
   sub_container: {
     alignItems: "center",
-    //justifyContent: "flex-end",
-    //justifyContent: "center",
+    top: 80,
   },
-
 });
-
-
 
 export default LoginPage;

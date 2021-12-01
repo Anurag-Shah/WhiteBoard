@@ -11,7 +11,7 @@ const storage = new Storage({
 
     // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
     // can be null, which means never expire.
-    defaultExpires: 1000 * 3600 * 24 * 30,
+    defaultExpires: 1000 * 3600 * 24 * 7,
 
     // cache data in the memory. default is true.
     enableCache: true,
