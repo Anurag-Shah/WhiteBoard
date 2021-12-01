@@ -1,8 +1,8 @@
 const base_url =
-  "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8000/";
+  "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/";
 
 export default {
-  base_url: base_url,
+  base: base_url,
   login: base_url + "User/login/",
   logout: base_url + "User/logout/",
   register: base_url + "Register/",
