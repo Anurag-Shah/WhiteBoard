@@ -218,7 +218,7 @@ class TeamMemeber extends Component {
                 <ListItem.Title>{item.name} </ListItem.Title>
                 <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
             </ListItem.Content>
-            {item.uid != this.state.user.uid && (<AntDesign name="minuscircleo" size={24}
+            {item.uid != this.state.group.leader_uid && (<AntDesign name="minuscircleo" size={24}
                 color={this.state.isLeader ? "red" : "grey"}
                 onPress={() => { this.state.isLeader ? this.removeMember(item) : Alert.alert("Only the group leader can remove members from the team!") }} />)}
         </ListItem>

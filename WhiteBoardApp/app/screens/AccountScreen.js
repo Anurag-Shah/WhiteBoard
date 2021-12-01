@@ -6,18 +6,15 @@ import {
   TextInput,
   KeyboardAvoidingView,
   View,
-  Image,
   Button,
   Text,
   Alert,
-  StatusBar,
   ActivityIndicator,
 } from 'react-native';
 import { setAvatarApi, updateAccountApi } from '../requests/api';
 import * as ImagePicker from 'expo-image-picker';
 import storage from "../config/storage";
 import defAvatar from '../assets/avatar.png';
-import { set } from 'react-native-reanimated';
 import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
 import urls from '../requests/urls';
 import Topbar from './shared/Topbar';
