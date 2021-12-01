@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Modal, Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
+import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
+import Topbar from './shared/Topbar';
 import { Icon } from "react-native-elements";
 
 //import {SafeAreaView} from 'react-navigation';
@@ -132,6 +134,7 @@ class library extends Component {
     //<Avatar source={item.avatar_url} />
     return (
       <SafeAreaView style={{ flex: 1 }}>
+        <Topbar title="Team Images" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
           //keyExtractor={item => item.name.toString()}
