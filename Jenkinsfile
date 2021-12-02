@@ -1,4 +1,4 @@
-node('main') {
+node('built-in') {
     checkout scm
     stage('Build') {
         steps {
