@@ -136,13 +136,13 @@ export default class RegistrationPage extends React.Component {
     return (
       <SafeAreaView style={styles.safearea}>
         <StatusBar style="auto" />
-        {/* <Icon
+        <Icon
           style={styles.icon}
           name="arrow-undo-outline"
           type="ionicon"
           color="#000"
           onPress={() => this.props.navigation.push("Login")}
-        /> */}
+        />
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
