@@ -143,7 +143,7 @@ class SpecificGroup(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, id):
-        Serializer = GroupSerializer(self.get_group_object(id))
+        Serializer = GroupSerializerWithoutImage(self.get_group_object(id))
         return Response(Serializer.data)
 
     def put(self, request, id):
@@ -356,6 +356,7 @@ class TempImageUpload(APIView):
 
     def post(self, request):
         file = request.data['Image']
+        print(file)
         name = request.data['name']
         custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + name + ".png"
         CVImageOut = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + name + ".png"
@@ -681,7 +682,7 @@ class UserGroups(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_default_group(self, uid):
+    def get_default_group(self, request, uid):
         user = User.objects.get(pk=uid)
         return user.group_set.get(isDefault=True)
 
