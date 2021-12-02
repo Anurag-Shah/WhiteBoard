@@ -579,6 +579,7 @@ def logout_view(request):
 def update_user(request):
     data = JSONParser().parse(request)
     user = User.objects.get(pk=request.user.pk)
+    defaultGroup = user.group_set.get(isDefault=True)
     name = data.get('username')
     email = data.get('email')
     nameDup = 0
@@ -594,6 +595,8 @@ def update_user(request):
     except User.DoesNotExist:
         nameDup = 0
         user.name = name
+        defaultGroup.Gpname = name
+        defaultGroup.description = name + "'s default group"
         request.user.username = name
 
     # check if the email is duplicated
@@ -618,6 +621,7 @@ def update_user(request):
         return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
 
     user.save()
+    defaultGroup.save()
     request.user.save()
     serializer = UserSerializer(user)
     return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})

@@ -14,21 +14,6 @@ function Prompt(props) {
             setSuccess(false);
             setFeedback("Please enter a valid email...");
         } else {
-            // if (code == 0) {
-            //     //props.setVisible();
-            //     Alert.alert(
-            //         "User successfully added to the team!", "",
-            //         [{ text: "OK", onPress: () => { props.setVisible(); props.reload() } }]
-            //     );
-            // } else if (code == -1) {
-            //     Alert.alert(
-            //         "User does not exist!", ""
-            //     );
-            // } else if (code == -2) {
-            //     Alert.alert(
-            //         "User Already in the Team", "",
-            //     );
-            // }
 
             addMemberApi(props.groupId, email).then((ret) => {
                 console.log(ret);

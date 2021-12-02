@@ -125,6 +125,8 @@ function Account({ navigation }) {
         if (res.code == 0) {
           setNameDup(false);
           setEmailDup(false);
+          let new_avatar = urls.base_url.slice(0, -1) + res.user.avatar;
+          res.user.avatar = new_avatar;
           update_user(res);
           Alert.alert("UserInfo successfully updated!");
           SetEdit(false);
