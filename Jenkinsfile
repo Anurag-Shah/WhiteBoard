@@ -4,7 +4,9 @@ node('built-in') {
         def user = env.BUILD_USER_ID
     }
     stage('Build') {
-        sh "chmod +x -R ${env.WORKSPACE}"
-        sh './Backend/Build_Script.sh'
+        dir('Backend') {
+            sh "chmod +x -R ${env.WORKSPACE}"
+            sh './Backend/Build_Script.sh'   
+        }
     }
 }
