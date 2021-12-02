@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_extensions',
     'WhiteBoardBackEnd',
+    'django_jenkins',
 ]
 
 MIDDLEWARE = [
