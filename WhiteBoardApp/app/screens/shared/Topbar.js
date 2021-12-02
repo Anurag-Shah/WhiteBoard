@@ -21,7 +21,7 @@ export default class Topbar extends React.Component {
           <Ionicons name="ios-list" size={32} style={{ color: "black" }} />
         </TouchableOpacity>
 
-        <Text style={styles.title}>{this.props.title}</Text>
+        <Text style={styles.title}>{this.props.title ? this.props.title : "WhiteBoard"}</Text>
         {this.props.title === "Camera" ? (
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate("TextEditorPage")}

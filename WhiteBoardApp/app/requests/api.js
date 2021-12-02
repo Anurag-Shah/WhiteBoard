@@ -1,16 +1,5 @@
 import urls from "./urls";
 import storage from "../config/storage";
-import { Alert } from 'react-native'
-
-// TODO
-// If the token authentication fails, set the state to logout, and prompt the user to login again
-
-export const promptLogin = () => {
-    // Alert.alert("", "You need to login first!", [
-    //     { text: "OK", onPress: () => { navigation.push("Login"); } },
-    // ]);
-};
-
 
 export const getToken = async () => {
     try {
@@ -117,9 +106,27 @@ export const updateAccountApi = async (username, email) => {
 };
 
 export const getAllGroupsApi = async (uid) => {
-    let token = await getToken();
     try {
         const response = await fetch(urls.getAllGroups + uid, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getAllGroupsWApi = async (uid) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.getAllGroupsW, {
             method: 'GET',
             headers: {
                 token: '',
@@ -135,6 +142,7 @@ export const getAllGroupsApi = async (uid) => {
         console.error(error);
     }
 };
+
 
 export const getAllTeamMemebersApi = async (id) => {
     let token = await getToken();

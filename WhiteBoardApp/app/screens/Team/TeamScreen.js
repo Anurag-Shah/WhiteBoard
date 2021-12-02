@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Dimensions } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
-import { getAllGroupsApi, createGroupApi, deleteGroupApi } from "../../requests/api";
+import { getAllGroupsWApi, createGroupApi, deleteGroupApi } from "../../requests/api";
 import Topbar from '../shared/Topbar';
 import Dialog from "react-native-dialog";
 import storage from "../../config/storage";
@@ -42,7 +42,7 @@ class TeamScreen extends Component {
         super(props);
 
         this.state = {
-            loading: false,
+            loading: true,
             visible: false,
             user: {
                 "uid": 4,
@@ -223,9 +223,8 @@ class TeamScreen extends Component {
 
     makeRemoteRequest = () => {
         this.setState({ loading: true });
-        console.log(this.state.user);
-        getAllGroupsApi(this.state.user.uid).then((res) => {
-            // console.log(res);
+        getAllGroupsWApi().then((res) => {
+            console.log(res);
             this.setState({
                 //data: res.results,
                 data: res.all_groups,
