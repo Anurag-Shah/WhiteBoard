@@ -75,10 +75,11 @@ export default function CameraScreen({ navigation }) {
   const [selLang, setSelLang] = useState('Auto');
   const [ocrReturnData, setOcrReturnData] = useState(null);
   const langs = ['Auto', 'C', 'C#', 'Java'];
-  const langList = langs.map(x => { return { 'label': x, 'value': x } });
+  const langList = langs.map(x=>{return {'label':x, 'value':x}});
 
   useEffect(() => {
     getUserInfo();
+
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -100,35 +101,35 @@ export default function CameraScreen({ navigation }) {
 
   const modalBody = (
     <View style={styles.modalBody}>
-      <Dropdown
-        // label="Group"
-        data={groupList}
-        value={selGroupId}
-        onChange={(v) => { setSelGroupId(v) }}
-      />
-      <View style={styles.divider}></View>
-      <View style={{ flexDirection: "row-reverse", margin: 10 }}>
-        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
-          onPress={() => {
-            if (selGroupId) {
-              // Alert.alert(selGroupId);
-              setShowRenameDlg(true);
-            }
-            else {
-              Alert.alert('Please select a group.');
-            }
-          }}>
-          <Text style={styles.actionText}>Select</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#db2828" }}
-          onPress={() => {
-            // Alert.alert('Modal has been closed.');
-            // setSelGroupId(null);
-            setShowGroups(!showGroups);
-          }}>
-          <Text style={styles.actionText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
+        <Dropdown
+            // label="Group"
+            data={groupList}
+            value={selGroupId}
+            onChange={(v)=>{setSelGroupId(v)}}
+          />
+        <View style={styles.divider}></View>
+        <View style={{flexDirection:"row-reverse",margin:10}}>
+          <TouchableOpacity style={{...styles.actions,backgroundColor:"#21ba45"}}
+            onPress={() => {
+              if(selGroupId) {
+                // Alert.alert(selGroupId);
+                setShowRenameDlg(true);
+              }
+              else {
+                Alert.alert('Please select a group.');
+              }
+            }}>
+            <Text style={styles.actionText}>Select</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{...styles.actions,backgroundColor:"#db2828"}} 
+            onPress={() => {
+              // Alert.alert('Modal has been closed.');
+              // setSelGroupId(null);
+              setShowGroups(!showGroups);
+            }}>
+            <Text style={styles.actionText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
     </View>
   )
   const modalContainer = (
@@ -169,13 +170,13 @@ export default function CameraScreen({ navigation }) {
               <View style={styles.divider}></View>
             </View>
             <View style={styles.modalBody}>
-              <TextInput
-                style={{ height: 40 }}
-                // placeholder="Type the image name"
-                onChangeText={v => setImageName(v)}
-                defaultValue={'image'}
-                value={imageName}
-              />
+            <TextInput
+              style={{height: 40}}
+              // placeholder="Type the image name"
+              onChangeText={v => setImageName(v)}
+              defaultValue={'image'}
+              value={imageName}
+            />
               <View style={styles.divider}></View>
               <View style={{ flexDirection: "row-reverse", margin: 10 }}>
                 <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
@@ -185,7 +186,20 @@ export default function CameraScreen({ navigation }) {
                       // after renaming, we can send the picture for logged in user.
                       setImageName('image')  
                     }
-                    sendPicture(photo);
+                    sendPicture(photo, false).then(()=>{                      
+                         
+                    }); // for backend save
+                    //saveToPhone(returnImg)// for local save
+
+                    // setPhoto(null);
+                    // setReturnImg(null);
+                    // Alert.alert(
+                    //   'Info', 
+                    //   'Would you like to save on local?', 
+                    //   [{ text: 'OK', onPress: () => saveToPhone(returnImg) }],
+                    //   { cancelable: false },
+                    //   )// for local save
+                    
                   }}>
                   <Text style={styles.actionText}>Ok</Text>
                 </TouchableOpacity>
@@ -219,7 +233,8 @@ export default function CameraScreen({ navigation }) {
         console.log(ret)
         setSelGroupId(ret.groupId)
         // console.log(ret)
-        setUser(ret.userInfo);
+        setUser(ret);
+        
         // for test, in real, Do Comment below line Kk
         //setGroupList(DATA.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
         // Do active try-clause in real
@@ -258,7 +273,7 @@ export default function CameraScreen({ navigation }) {
 
   const showError = (evt) => {
     //ocrReturnData
-    const ocr_return = ocrReturnData.ocr_return;
+    const ocr_return = ocrReturnData?ocrReturnData.ocr_return:[];
     if(ocr_return.length){
       Alert.alert('Compile Error', ocr_return, [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
       { cancelable: false },);
@@ -283,7 +298,7 @@ export default function CameraScreen({ navigation }) {
       const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           // 'Authorization': "Token " + user.token,
         },
         redirect: 'follow'
@@ -291,11 +306,11 @@ export default function CameraScreen({ navigation }) {
       const result = await response.json();
       // setShowGroups(true);
       // setGroupList(result.all_groups); 
-      setGroupList(result.all_groups.map(x => { return { 'label': x.Gpname, 'value': x.GpID } }));
+      setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
       console.log('Done fetching groups...')
-
+      
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       console.log('Connection Error!');
       setGroupList(null);
       Alert.alert('Error', 'Connection Error in fetch groups!');
@@ -344,6 +359,13 @@ export default function CameraScreen({ navigation }) {
   };
 
   const saveToPhone = async (url) => {
+    if ( user ) {
+      if (! showGroups && !showRenameDlg) {setShowGroups(true); return;}
+      // else if(showGroups && !showRenameDlg) {setShowGroups(true); return;} 
+      // show groupList
+      // show renameDlg
+    }
+
     if (Platform.OS === 'android') {
       const granted = await getPermissionAndroid();
       if (!granted) {
@@ -367,7 +389,9 @@ export default function CameraScreen({ navigation }) {
     try {
       const { uri } = await downloadResumable.downloadAsync();
       MediaLibrary.saveToLibraryAsync(uri)
-      Alert.alert('', 'Saved to photos successfully')
+      Alert.alert('', 'Saved to photos successfully');
+      // setShowGroups(false);
+      // setShowRenameDlg(false);
     } catch (e) {
       Alert.alert('Error', 'Could not save the image')
     }
@@ -377,27 +401,29 @@ export default function CameraScreen({ navigation }) {
     // check whether user logged in or not
     // if logged in: fetch groups & show groups list
     // else call temp_image
-    if (!user) {
-      sendPicture(picture);
-    }
-    else if (user && !showGroups) {
-      fetchGroups().then(() => {
-        setShowGroups(true);
-        setShowRenameDlg(false);
-      });
-    }
-    else if (user && showGroups && !showRenameDlg) {
-      setShowRenameDlg(true);
-    }
+    fetchGroups();
+    sendPicture(picture, true) // isTempIamge
+    // if (!user) {
+    //   sendPicture(picture);
+    // }
+    // else if (user && !showGroups) {
+    //   fetchGroups().then(() => {
+    //     setShowGroups(true);
+    //     setShowRenameDlg(false);
+    //   });
+    // }
+    // else if (user && showGroups && !showRenameDlg) {
+    //   setShowRenameDlg(true);
+    // }
   }
 
-  const sendPicture = async (picture) => {
+  const sendPicture = async (picture, isTempIamge) => {
 
     // dispatch(removeClipItem());
     // let localUri = picture;
     // console.log(picture);
     let filename = picture.uri.split('/').pop();
-
+    
     // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
@@ -416,35 +442,25 @@ export default function CameraScreen({ navigation }) {
 
     const createFormData = (photo, body = {}) => {
       const data = new FormData();
-      //console.log(photo.uri);
       data.append('Image', photo.base64
-        // isCamera ? photo.uri : photo.base64
-
-        // {
-        //   name: filename,
-        //   type: type,
-        //   uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
-        //   data: photo.base64
-        // }
       );
 
       Object.keys(body).forEach((key) => {
         data.append(key, body[key]);
       });
-      //console.log(data);
       return data;
     };
+    
+    if(!selLang) setSelLang('Auto');
 
-    // const selectedLang = 'Auto'
-    if (!selLang) setSelLang('Auto');
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
-    const targetUrl = user ? uploadImageUrl : tempUploadImgUrl;
-    const targetBody = user ?
-      createFormData(picture, { name: imageName, description: 'picture', language: selLang }) :
-      createFormData(picture, { name: 'TempImage', description: 'picture', language: selLang });
-    try {
-      const response = await fetch(targetUrl, {
+    const targetUrl = isTempIamge ? uploadImageUrl : tempUploadImgUrl;
+    const targetBody = !isTempIamge ? 
+      createFormData(picture, { name: imageName, description: 'picture', language:selLang }):
+      createFormData(picture, { name: 'TempImage', description: 'picture', language:selLang });
+    try {      
+      const response = await fetch( targetUrl , {
         method: 'POST',
         body: targetBody,
         headers: {
@@ -456,24 +472,31 @@ export default function CameraScreen({ navigation }) {
       const result = await response.json();
 
       console.log(targetUrl,result)
-      if(result.status === 'success') {
-        //Alert.alert('Success', 'The photo was successfully sent!');
-        setOcrReturnData(result);
-        const ycoord = result['y-coord'];
-        console.log(ycoord);
-        const hasError_ = ycoord.length;
-        if(hasError_) Alert.alert('Compiling Error', 'Detected Language: '+selLang+' \n' + 'Please fix the error(s)', 
-          [{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }],);
-        else Alert.alert('Success', 'Detected Language: ' +  selLang + '\n ' + result.ocr_return,[{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }], )
-        console.log('return_image:'+serverUrl+'media/'+ (user ? result.image_after_uri : result.CV_return));
-        //CV_return for tempimage;image_after_uri for Images API
+      if(result.status === 'success') {    
+        if(isTempIamge) {   
+            const ycoord = result['y-coord'];
+            console.log(ycoord);
+            setOcrReturnData(result);
+            const hasError_ = ycoord.length;
+            if(hasError_) Alert.alert('Compiling Error', 'Detected Language: '+selLang+' \n' + 'Please fix the error(s)', 
+              [{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }],);
+            else 
+              Alert.alert('Success',
+                'Detected Language: ' +  selLang + '\n ' + result.ocr_return,
+                [{ text: 'OK', 
+                  onPress: () => {
+                    setReturnImg(serverUrl+'media/'+(isTempIamge?result.image_after_uri:result.CV_return))                     
+                  }}], )
+        }
+        else{
+          Alert.alert('Success', 'Successfully saved the image on Server!');
+        }
+        console.log('return_image:'+serverUrl+'media/'+ (isTempIamge ? result.image_after_uri : result.CV_return));       
         
       }
-      else {
-        
+      else {        
         setOcrReturnData(null);
-        Alert.alert('Error', 'Could not save image!');
-
+        Alert.alert('Error', 'Something is wrong on Server!');
       }
       
       setShowGroups(false);
@@ -745,8 +768,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20
   },
-  actionText: {
-    color: "#fff"
+  actionText:{
+    color:"#fff"
   },
   dropdownLang: {
     fontSize: 24, 
