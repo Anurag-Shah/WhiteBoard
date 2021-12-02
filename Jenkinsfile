@@ -1,6 +1,8 @@
 node('built-in') {
     checkout scm
     stage('Build') {
-        sh './Build_Script.sh'
+        cd './Backend/WhiteBoardBackEnd/'
+        source './Backend/bin/activate'
+        sudo 'python3 manage.py test'
     }
 }
