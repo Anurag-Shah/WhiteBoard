@@ -6,7 +6,6 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                cd ./Backend/WhiteBoardBackEnd/
                 ./Build_Script.sh
             }
         }
