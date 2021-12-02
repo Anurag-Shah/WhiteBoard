@@ -40,7 +40,7 @@ import urls from '../requests/urls';
 const { height, width } = Dimensions.get('window');
 
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = urls.base;//'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/';
+const serverUrl = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/'; //urls.base; //
 //TempImages
 
 const DATA = [
@@ -73,7 +73,7 @@ export default function CameraScreen({ navigation }) {
   const [selGroupId, setSelGroupId] = useState(null);
   const [imageName, setImageName] = useState('image');
   const [selLang, setSelLang] = useState('Auto');
-
+  const [ocrReturnData, setOcrReturnData] = useState(null);
   const langs = ['Auto', 'C', 'C#', 'Java'];
   const langList = langs.map(x=>{return {'label':x, 'value':x}});
 
@@ -181,14 +181,12 @@ export default function CameraScreen({ navigation }) {
               <View style={{ flexDirection: "row-reverse", margin: 10 }}>
                 <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
                   onPress={() => {
-                    if (imageName) {
+                    if (!imageName) {
                       // Alert.alert(imageName);
                       // after renaming, we can send the picture for logged in user.
-                      sendPicture(photo);
+                      setImageName('image')  
                     }
-                    else {
-                      Alert.alert('Enter a image name.');
-                    }
+                    sendPicture(photo);
                   }}>
                   <Text style={styles.actionText}>Ok</Text>
                 </TouchableOpacity>
@@ -220,7 +218,7 @@ export default function CameraScreen({ navigation }) {
       .then(ret => {
         // found data go to then()
         console.log(ret)
-        // selGroupId(ret.groupId)
+        setSelGroupId(ret.groupId)
         // console.log(ret)
         setUser(ret);
         // for test, in real, Do Comment below line Kk
@@ -251,7 +249,7 @@ export default function CameraScreen({ navigation }) {
 
       })
       .catch(err => {
-        console.log('===============')
+        selGroupId(null);
         setUser(false);
         // any exception including data not found
         // goes to catch()
@@ -260,8 +258,15 @@ export default function CameraScreen({ navigation }) {
   };
 
   const showError = (evt) => {
-    console.log("Coordinates",`x coord = ${evt.nativeEvent.locationX}`);
-    console.log("Coordinates",`y coord = ${evt.nativeEvent.locationY}`);
+    //ocrReturnData
+    const ocr_return = ocrReturnData.ocr_return;
+    if(ocr_return.length){
+      Alert.alert('Compile Error', ocr_return, [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+      { cancelable: false },);
+    }   
+
+    // console.log("Coordinates",`x coord = ${evt.nativeEvent.locationX}`);
+    // console.log("Coordinates",`y coord = ${evt.nativeEvent.locationY}`);
   }
 
   if (hasPermission === null || hasGalleryPermission === false) {
@@ -275,6 +280,7 @@ export default function CameraScreen({ navigation }) {
     try {
       // console.log(user);
       console.log('fetching groups...')
+      console.log(serverUrl + 'User/groups/' + user.uid)
       const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
         method: 'GET',
         headers: {
@@ -396,9 +402,9 @@ export default function CameraScreen({ navigation }) {
     // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-
-    if(filename) setImageName(filename.split('.')[0])
-    else setImageName('image')
+    
+    // if(filename) setImageName(filename.split('.')[0])
+    // else setImageName('image')
     
     // Upload the image using the fetch and FormData APIs
     //let formData = new FormData();
@@ -450,30 +456,41 @@ export default function CameraScreen({ navigation }) {
 
       const result = await response.json();
 
-      // console.log(targetUrl,result)
+      console.log(targetUrl,result)
       if(result.status === 'success') {
         //Alert.alert('Success', 'The photo was successfully sent!');
-        console.log(targetUrl,result)
+        setOcrReturnData(result);
         const ycoord = result['y-coord'];
-        const hasError = ycoord.length;
-        if(hasError) Alert.alert('Compiling Error', 'Detected Language: '+selLang+' \n' + 'Please fix the error(s)');
-        else Alert.alert('Success', 'Detected Language: ' + selLang + '\n ' + result.ocr_return)
-        setReturnImg(serverUrl+'media/'+user?result.image_after_uri:CV_return);//CV_return for tempimage;image_after_uri for Images API
-        console.log(serverUrl+'media/'+user?result.image_after_uri:CV_return);
+        console.log(ycoord);
+        const hasError_ = ycoord.length;
+        if(hasError_) Alert.alert('Compiling Error', 'Detected Language: '+selLang+' \n' + 'Please fix the error(s)', 
+          [{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }],);
+        else Alert.alert('Success', 'Detected Language: ' +  selLang + '\n ' + result.ocr_return,[{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }], )
+        console.log('return_image:'+serverUrl+'media/'+ (user ? result.image_after_uri : result.CV_return));
+        //CV_return for tempimage;image_after_uri for Images API
+        
       }
       else {
+        
+        setOcrReturnData(null);
         Alert.alert('Error', 'Could not save image!');
+
       }
+      
       setShowGroups(false);
       setShowRenameDlg(false);
 
     } catch (error) {
+      
       console.error(error);
       console.log('Connection Error in sending picture!');
+      
       setReturnImg(null);
+      setOcrReturnData(null);
 
       setShowGroups(false);
       setShowRenameDlg(false);
+      
       Alert.alert('Error', 'Something went wrong!');
     }
 
@@ -482,7 +499,7 @@ export default function CameraScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, marginTop: 20 }}>
+    <SafeAreaView style={{ flex: 1, marginTop: (Platform.OS === 'ios'? 50: 30) }}>
       {!showGroups && !showRenameDlg && <Topbar title="Camera" navigation={navigation} />}
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
@@ -557,7 +574,7 @@ export default function CameraScreen({ navigation }) {
             source={{ uri: photo.uri }}
             style={{
               width: width,
-              height: height - ((Platform.OS === 'ios') ? 45 + 80 + 20 :  60 + 80 + 20), //Topbar & footer, status height due to OS
+              height: height - ((Platform.OS === 'ios') ? 45 + 80 + 80 :  60 + 80 + 20), //Topbar & footer, status height due to OS
               resizeMode: isCamera ? 'cover' : 'contain',
             }}
           />
@@ -576,6 +593,12 @@ export default function CameraScreen({ navigation }) {
               // label="Language"
               data={langList}
               value={selLang}
+              itemTextStyle = {{fontSize:20,}}
+              selectedItemTextStyle={{ fontSize:20,fontWeight: 'bold' }}
+              selectedItemViewStyle={{ fontSize:20,fontWeight: 'bold', backgroundColor: '#fff' }}
+              selectedItemTextStyle={{ fontWeight: 'bold' }}
+              disableSelectionTick
+              removeLabel
               onChange={(v)=>{setSelLang(v)}}
             />
             </View>
@@ -597,11 +620,14 @@ export default function CameraScreen({ navigation }) {
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}          
           >
+            <View 
+              style={{ flex:1, width: width, height: height - ((Platform.OS === 'ios') ?  45 + 80 + 80 : 60 + 80 + 20)}}
+            >
             <TouchableOpacity onPress={(evt) => showError(evt)}>
               <Image
                 // source={{ uri: returnImg }}
                 source={{ uri: `${returnImg}` }}
-                style={{ width: width, height: height - ((Platform.OS === 'ios') ? 45 + 80 + 20 : 60 + 80 + 20), //Topbar & footer, status height due to OS
+                style={{ width: width, height: height - ((Platform.OS === 'ios') ?  45 + 80 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
                 resizeMode: 'contain' }}
                 // onLayout={(event) => {
                 //   event.target.measure(
@@ -616,6 +642,7 @@ export default function CameraScreen({ navigation }) {
                 // }}
               />
             </TouchableOpacity>
+            </View>
             <View style={[styles.modalBottomContainer]}>
               <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
                 <View style={styles.modalButton}>
@@ -658,12 +685,12 @@ const styles = StyleSheet.create({
   modalBottomContainer: {
     width: '100%',
     //flex: 1,
-    height: Platform.OS === 'ios' ? 60 : 80,
+    height: Platform.OS === 'ios' ? 80 : 80,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
   },
   // modalView: {
   //   backgroundColor: 'white',
@@ -723,6 +750,8 @@ const styles = StyleSheet.create({
     color:"#fff"
   },
   dropdownLang: {
+    fontSize: 24, 
+    fontWeight: 'bold',
     backgroundColor:"#fff",
     paddingVertical:10,
     paddingHorizontal:5,
