@@ -15,4 +15,5 @@ export default {
   getAllMembers: base_url + "User/group/members/",
   memeber_operations: base_url + "User/group/member/",
   temp_text: base_url + "TempTextUpload/",
+  text_upload: base_url + "TextUpload/",
 };

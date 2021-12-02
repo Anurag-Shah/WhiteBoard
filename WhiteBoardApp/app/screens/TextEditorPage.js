@@ -24,32 +24,29 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { Dropdown } from "sharingan-rn-modal-dropdown";
-// import {
-//   MenuProvider,
-//   Menu,
-//   MenuOptions,
-//   MenuOption,
-//   MenuTrigger,
-// } from "react-native-popup-menu";
+
 import Topbar from "./shared/Topbar";
 import storage from "../config/storage";
-
 import urls from "../requests/urls";
 
 const serverURL = "http://172.16.50.73:8000/";
 
-const DATA = [
+const languages = [
   {
-    GpID: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    Gpname: "First Item",
+    label: "Auto",
+    value: "Auto",
   },
   {
-    GpID: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    Gpname: "Second Item",
+    label: "C",
+    value: "C",
   },
   {
-    GpID: "58694a0f-3da1-471f-bd96-145571e29d72",
-    Gpname: "Third Item",
+    label: "Java",
+    value: "Java",
+  },
+  {
+    label: "C#",
+    value: "C#",
   },
 ];
 
@@ -58,6 +55,7 @@ export default class TextEditorPage extends React.Component {
     super(props);
     this.state = {
       typedCode: "",
+      lang: "",
       responseReceived: false,
       returnValue: 1,
       returnMessage: "",
@@ -68,7 +66,7 @@ export default class TextEditorPage extends React.Component {
       showGroups: false,
       showRenameDlg: false,
       selGroupId: null,
-      imageName: "",
+      codeName: "",
     };
   }
 
@@ -76,57 +74,77 @@ export default class TextEditorPage extends React.Component {
     this.getUserInfo();
   }
 
+  chooseLanguage() {
+    if (!this.state.responseReceived) {
+      return (
+        <Dropdown
+          label="Choose Language"
+          data={languages}
+          onChange={(lang) => {
+            this.setState({ lang }, () => {
+              console.log(this.state.lang);
+            });
+          }}
+        />
+      );
+    }
+  }
+
   async sendCode() {
     this.setState({ responseReceived: false });
 
-    try {
-      const text = {
-        compile_text: this.state.typedCode,
-        language: "C",
-      };
+    if (this.state.lang == "") {
+      Alert.alert("Please choose a language.");
+    } else {
+      try {
+        const text = {
+          compile_text: this.state.typedCode,
+          language: this.state.lang,
+        };
 
-      const res = await fetch(urls.temp_text, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(text),
-      });
-      const response = await res.json();
-      Alert.alert("Code Sent", "Your code has been successfully sent!", [
-        {
-          text: "OK",
-          onPress: () => {
-            this.setState({ responseReceived: true });
-
-            const terminalOutput = response.problem_line;
-            if (terminalOutput[0] != null) {
-              this.setState({ returnValue: -1 });
-              Alert.alert(
-                "Error",
-                "There are some error occurred. The stack trace will be displayed.",
-                [{ text: "OK" }]
-              );
-            } else {
-              this.setState({ returnValue: 0 });
-              Alert.alert(
-                "Success",
-                "Your code runs successfully! The output of your code will be displayed.",
-                [{ text: "OK" }]
-              );
-            }
-
-            const compileResult = response.compile_result;
-            console.log(compileResult);
-            this.setState({
-              returnMessage: compileResult,
-            });
+        const res = await fetch(urls.temp_text, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
           },
-        },
-      ]);
-    } catch (error) {
-      console.log(error);
+          body: JSON.stringify(text),
+        });
+        const response = await res.json();
+        Alert.alert("Code Sent", "Your code has been successfully sent!", [
+          {
+            text: "OK",
+            onPress: () => {
+              this.setState({ responseReceived: true });
+
+              const terminalOutput = response.problem_line;
+              if (terminalOutput[0] != null) {
+                this.setState({ returnValue: -1 });
+                Alert.alert(
+                  "Error",
+                  "There are some error occurred. The stack trace will be displayed.",
+                  [{ text: "OK" }]
+                );
+              } else {
+                this.setState({ returnValue: 0 });
+                Alert.alert(
+                  "Success",
+                  "Your code runs successfully! The output of your code will be displayed.",
+                  [{ text: "OK" }]
+                );
+              }
+
+              const compileResult = response.compile_result;
+              console.log(compileResult);
+              this.setState({
+                returnMessage: compileResult,
+              });
+            },
+          },
+        ]);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -226,16 +244,11 @@ export default class TextEditorPage extends React.Component {
       );
       const response = await res.json();
 
-      this.setState(
-        {
-          groupList: response.all_groups.map((x) => {
-            return { label: x.Gpname, value: x.GpID };
-          }),
-        }
-        // () => {
-        //   console.log(this.state.groupList);
-        // }
-      );
+      this.setState({
+        groupList: response.all_groups.map((x) => {
+          return { label: x.Gpname, value: x.GpID };
+        }),
+      });
     } catch (error) {
       console.log("Fetch group error: " + error);
     }
@@ -339,21 +352,15 @@ export default class TextEditorPage extends React.Component {
                   style={styles.naming}
                   placeholder="Type the name here"
                   placeholderTextColor="#808080"
-                  onChangeText={(imageName) => this.setState({ imageName })}
+                  onChangeText={(codeName) => this.setState({ codeName })}
                 />
                 <View style={styles.divider}></View>
                 <View style={{ flexDirection: "row-reverse", margin: 10 }}>
                   <TouchableOpacity
                     style={{ ...styles.actions, backgroundColor: "#21ba45" }}
                     onPress={() => {
-                      if (this.state.imageName) {
-                        // TODO: send code with group ID and imagename
-                        this.setState({
-                          showRenameDlg: false,
-                          responseReceived: false,
-                        });
-
-                        console.log("Group and Name OK");
+                      if (this.state.codeName) {
+                        this.saveCode();
                       } else {
                         Alert.alert("Enter a image name.");
                       }
@@ -366,7 +373,7 @@ export default class TextEditorPage extends React.Component {
                     onPress={() => {
                       this.setState({
                         selGroupId: null,
-                        imageName: "",
+                        codeName: "",
                         showRenameDlg: false,
                       });
                     }}
@@ -382,19 +389,39 @@ export default class TextEditorPage extends React.Component {
     );
   }
 
-  // selectGroupAndName() {
-  //   if (this.state.loading == null) {
-  //     // if (this.state.groupList == null) {
-  //     // this.setState({ groupList: DATA }, () => {
-  //     //   console.log(this.state.groupList);
-  //     //   this.setState({ showGroups: true });
+  async saveCode() {
+    try {
+      const text = {
+        compile_text: this.state.typedCode,
+        language: "C",
+      };
 
-  //     //   // console.log("Selected group: " + this.state.selGroupId);
-  //     //   //this.renameModal();
-  //     // });
-  //     this.setState({ showGroups: true });
-  //   }
-  // }
+      const res = await fetch(urls.text_upload + this.state.selGroupId, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(text),
+      });
+      const response = await res.json();
+
+      Alert.alert("Code Saved", "Your code has been successfully saved!", [
+        {
+          text: "OK",
+          onPress: () => {
+            this.setState({
+              showRenameDlg: false,
+              responseReceived: false,
+            });
+          },
+        },
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
+    console.log("Group and Name OK");
+  }
 
   render() {
     return (
@@ -413,6 +440,17 @@ export default class TextEditorPage extends React.Component {
           multiline={true}
           onChangeText={(typedCode) => this.setState({ typedCode })}
         />
+
+        <View
+          style={{
+            flex: 1,
+            marginRight: 20,
+            marginLeft: 20,
+            marginBottom: 25,
+          }}
+        >
+          {this.chooseLanguage()}
+        </View>
 
         <View style={styles.view}>
           <Icon
@@ -443,73 +481,6 @@ export default class TextEditorPage extends React.Component {
         {this.renameModal()}
       </SafeAreaView>
     );
-
-    // return (
-    //   <MenuProvider>
-    //     <SafeAreaView
-    //       style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
-    //     >
-    //       <View>
-    //         <Menu>
-    //           <MenuTrigger />
-    //           <MenuOptions>
-    //             <MenuOption onSelect={() => alert(`Save`)} text="Save" />
-    //             <MenuOption onSelect={() => alert(`Delete`)}>
-    //               <Text style={{ color: "red" }}>Delete</Text>
-    //             </MenuOption>
-    //             <MenuOption
-    //               onSelect={() => alert(`Not called`)}
-    //               disabled={true}
-    //               text="Disabled"
-    //             />
-    //           </MenuOptions>
-    //         </Menu>
-    //         <TouchableWithoutFeedback
-    //           onPress={Keyboard.dismiss}
-    //           accessible={false}
-    //         >
-    //           <View>
-    //             <Topbar
-    //               title="Text Editor"
-    //               navigation={this.props.navigation}
-    //             />
-    //           </View>
-    //         </TouchableWithoutFeedback>
-    //       </View>
-
-    //       <TextInput
-    //         style={styles.input}
-    //         placeholder="Start typying your code here..."
-    //         multiline={true}
-    //         onChangeText={(typedCode) => this.setState({ typedCode })}
-    //       />
-
-    //       <View style={styles.view}>
-    //         <Icon
-    //           name="play"
-    //           type="ionicon"
-    //           color="#000"
-    //           size={40}
-    //           style={styles.play}
-    //           onPress={() =>
-    //             Alert.alert("Attention", "Are you sure of running the code?", [
-    //               { text: "Cancel", style: "cancel" },
-    //               {
-    //                 text: "Submit",
-    //                 style: "destructive",
-    //                 onPress: () => this.sendCode(),
-    //               },
-    //             ])
-    //           }
-    //         />
-    //       </View>
-
-    //       <View>{this.displayConsoleLog()}</View>
-
-    //       <View>{this.saveOrDiscard()}</View>
-    //     </SafeAreaView>
-    //   </MenuProvider>
-    // );
   }
 }
 
@@ -539,13 +510,13 @@ const styles = StyleSheet.create({
   },
 
   play: {
-    marginTop: 5,
+    marginTop: 0,
     marginRight: 15,
     alignItems: "flex-end",
   },
 
   consolelog: {
-    height: 200,
+    height: 170,
   },
 
   scroll: {
