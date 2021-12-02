@@ -1,4 +1,3 @@
-Jenkinsfile (Declarative Pipeline)
 checkout scm
 stage('Build') {
     steps {
