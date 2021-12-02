@@ -42,7 +42,7 @@ class TeamScreen extends Component {
         super(props);
 
         this.state = {
-            loading: false,
+            loading: true,
             visible: false,
             user: {
                 "uid": 4,
@@ -224,7 +224,7 @@ class TeamScreen extends Component {
     makeRemoteRequest = () => {
         this.setState({ loading: true });
         getAllGroupsWApi().then((res) => {
-            // console.log(res);
+            console.log(res);
             this.setState({
                 //data: res.results,
                 data: res.all_groups,

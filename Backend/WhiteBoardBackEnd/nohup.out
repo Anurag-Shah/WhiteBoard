@@ -1,0 +1,394 @@
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 20:40:24
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+[30/Nov/2021 20:42:58] "GET /User/groups/w/ HTTP/1.1" 200 2154
+Mandy
+[30/Nov/2021 20:43:03] "GET /User/logout/ HTTP/1.1" 200 49
+[30/Nov/2021 20:43:15] "POST /User/login/ HTTP/1.1" 200 208
+[30/Nov/2021 20:43:19] "GET /User/groups/w/ HTTP/1.1" 200 4556
+[30/Nov/2021 20:43:19] "GET /media/Avatars/jack3Avatar.jpg HTTP/1.1" 304 0
+[30/Nov/2021 20:43:31,746] - Broken pipe from ('128.210.106.57', 57623)
+
+[30/Nov/2021 20:43:31,747] - Broken pipe from ('128.210.106.57', 11944)
+
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/serializer.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 21:34:16
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+[30/Nov/2021 21:35:18] "GET /User/groups/w/ HTTP/1.1" 200 4472
+[30/Nov/2021 21:36:22] "GET /User/groups/w/ HTTP/1.1" 200 4472
+[30/Nov/2021 21:37:05] "GET /User/groups/w/ HTTP/1.1" 200 4472
+[30/Nov/2021 21:37:16] "GET /User/groups/w/ HTTP/1.1" 200 4472
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/serializer.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:07:06
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:11:50
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:12:48
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:14:01
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/serializer.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:15:17
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:15:33
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:16:48
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+November 30, 2021 - 22:17:20
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+Not Found: /
+[30/Nov/2021 23:33:14] "GET / HTTP/1.1" 404 6329
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 00:06:36
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 00:25:04
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+[01/Dec/2021 00:55:30] "GET /User/groups/3 HTTP/1.1" 200 8108
+[01/Dec/2021 01:31:57] "GET /User/groups/3 HTTP/1.1" 200 9196
+[01/Dec/2021 01:38:36] "GET /User/groups/3 HTTP/1.1" 200 9196
+[01/Dec/2021 01:39:03] "GET /User/groups/3 HTTP/1.1" 200 9196
+[01/Dec/2021 01:42:03] "GET /User/groups/3 HTTP/1.1" 200 9196
+[01/Dec/2021 01:42:15,234] - Broken pipe from ('68.44.249.150', 63367)
+
+[01/Dec/2021 01:43:03] "GET /User/groups/3 HTTP/1.1" 200 9196
+[01/Dec/2021 01:43:28,045] - Broken pipe from ('68.44.249.150', 63382)
+
+[01/Dec/2021 01:46:48] "GET /User/groups/3 HTTP/1.1" 200 9196
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 01:48:21
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/WhiteBoardBackEnd/settings.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.8/threading.py", line 870, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/core/management/commands/runserver.py", line 110, in inner_run
+    autoreload.raise_last_exception()
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/utils/autoreload.py", line 87, in raise_last_exception
+    raise _exception[1]
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/core/management/__init__.py", line 375, in execute
+    autoreload.check_errors(django.setup)()
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/apps/config.py", line 224, in create
+    import_module(entry)
+  File "/usr/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 973, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'django-jenkins'
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/WhiteBoardBackEnd/settings.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 01:50:08
+Django version 3.2.9, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/contrib/auth/models.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 01:53:27
+Django version 3.2.8, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/WhiteBoardBackEnd/settings.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.8/threading.py", line 870, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/core/management/commands/runserver.py", line 110, in inner_run
+    autoreload.raise_last_exception()
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/utils/autoreload.py", line 87, in raise_last_exception
+    raise _exception[1]
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/core/management/__init__.py", line 375, in execute
+    autoreload.check_errors(django.setup)()
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+  File "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages/django/apps/config.py", line 224, in create
+    import_module(entry)
+  File "/usr/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 973, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'django-jenkins'
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/WhiteBoardBackEnd/settings.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 01:54:02
+Django version 3.2.8, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/WhiteBoardBackEnd/settings.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 01:56:48
+Django version 3.2.8, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/WhiteBoardBackEnd/settings.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 01:56:51
+Django version 3.2.8, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+[01/Dec/2021 02:01:54] "GET /User/groups/3 HTTP/1.1" 200 8806
+[01/Dec/2021 02:08:08] "GET /User/groups/3 HTTP/1.1" 200 8200
+[01/Dec/2021 02:08:30] code 400, message Bad request version ('À\x14À')
+[01/Dec/2021 02:08:30] You're accessing the development server over HTTPS, but it only supports HTTP.
+
+Invalid HTTP_HOST header: 'fuwu.sogou.com'. You may need to add 'fuwu.sogou.com' to ALLOWED_HOSTS.
+Invalid HTTP_HOST header: 'fuwu.sogou.com'. You may need to add 'fuwu.sogou.com' to ALLOWED_HOSTS.
+Bad Request: /http:/fuwu.sogou.com/404/index.html
+Bad Request: /http:/fuwu.sogou.com/404/index.html
+[01/Dec/2021 02:08:30] "GET http://fuwu.sogou.com/404/index.html HTTP/1.1" 400 68609
+[01/Dec/2021 02:08:30] "GET http://fuwu.sogou.com/404/index.html HTTP/1.1" 400 68629
+[01/Dec/2021 02:08:37] code 400, message Bad request syntax ('\x05\x01\x00')
+[01/Dec/2021 02:08:37] " " 400 -
+[01/Dec/2021 02:08:37,058] - Broken pipe from ('222.186.19.235', 50838)
+
+[01/Dec/2021 02:11:25] "GET /User/groups/3 HTTP/1.1" 200 9298
+[01/Dec/2021 02:11:41,179] - Broken pipe from ('68.44.249.150', 63596)
+
+[01/Dec/2021 02:13:59] "GET /User/groups/3 HTTP/1.1" 200 9298
+[01/Dec/2021 02:25:02] "GET /User/groups/3 HTTP/1.1" 200 9576
+[01/Dec/2021 02:28:19] "GET /User/groups/3 HTTP/1.1" 200 9854
+[01/Dec/2021 02:28:45,846] - Broken pipe from ('68.44.249.150', 63702)
+
+[01/Dec/2021 02:32:10] "GET /User/groups/3 HTTP/1.1" 200 11160
+/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API/views.py changed, reloading.
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+['/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd', '/home/chunao/WhiteBoard/Backend/OCR', '/home/chunao/WhiteBoard/Backend/Compiler', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/API', '/usr/lib/python38.zip', '/usr/lib/python3.8', '/usr/lib/python3.8/lib-dynload', '/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/Backend/lib/python3.8/site-packages']
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 2 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): API.
+Run 'python manage.py migrate' to apply them.
+December 01, 2021 - 02:39:26
+Django version 3.2.8, using settings 'WhiteBoardBackEnd.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+[01/Dec/2021 02:39:50] "GET /User/groups/3 HTTP/1.1" 200 11160
+[01/Dec/2021 02:43:47] "GET /User/groups/3 HTTP/1.1" 200 6919
+[01/Dec/2021 02:44:15] "GET /User/groups/3 HTTP/1.1" 200 6919
+[01/Dec/2021 02:44:25] "GET /User/groups/3 HTTP/1.1" 200 6919
+[01/Dec/2021 02:44:28] "GET /User/groups/3 HTTP/1.1" 200 6919
+[01/Dec/2021 02:44:35] "GET /User/groups/3 HTTP/1.1" 200 6919
+[01/Dec/2021 02:45:02] "GET /User/groups/3 HTTP/1.1" 200 6919
+[01/Dec/2021 02:45:31,077] - Broken pipe from ('68.44.249.150', 63859)
+
+[01/Dec/2021 02:52:43] "GET /User/groups/3 HTTP/1.1" 200 6919
+Not Found: /
+[01/Dec/2021 03:30:43] "GET / HTTP/1.1" 404 6324
