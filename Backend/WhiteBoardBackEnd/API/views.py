@@ -143,7 +143,7 @@ class SpecificGroup(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, id):
-        Serializer = GroupSerializer(self.get_group_object(id))
+        Serializer = GroupSerializerWithoutImage(self.get_group_object(id))
         return Response(Serializer.data)
 
     def put(self, request, id):
@@ -242,7 +242,10 @@ class ImageUpload(APIView):
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
-        language_in = request.data['language']
+        try:
+            language_in = request.data['language']
+        except:
+            language_in = "C"
         custom_name = name + ":" + str(GPid) + ".jpg"
         try:
             img = ContentFile(base64.b64decode(file), name=custom_name)
@@ -262,7 +265,7 @@ class ImageUpload(APIView):
         print(Path(path).as_uri())
 
         # ocr_return should have the stack trace so far
-        ocr_return = ocr.ocr(path, language=language_in)
+        ocr_return = ocr.ocr(path)
 
         print(ocr_return)
 
@@ -317,20 +320,17 @@ class ImageUpload(APIView):
 class ImageDeleteWithID(APIView):
     permission_classes = [AllowAny, ]
 
-    def delete(self, request, id):
+    def delete(self, request, id):        
         try:
-            Group_to_delete = Group.objects.get(pk=id)
+            ImageObject = GroupImages.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        ImageObject = GroupImages.objects.filter(GpID=Group_to_delete)
-        for images in ImageObject:
-            print(images.Image.url)
-            if os.path.isfile(images.Image.url):
-                os.remove(images.Image.url)
-            print(images.Image_after.url)
-            if os.path.isfile(images.Image_after_url):
-                os.remove(str(images.Image_afte_url))
+        print(ImageObject.Image.url)
+        if os.path.isfile(ImageObject.Image.url):
+            os.remove(ImageObject.Image.url)
+        print(ImageObject.Image_after_url)
+        if os.path.isfile(str(ImageObject.Image_after_url)):
+            os.remove(str(ImageObject.Image_after_url))
         ImageObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
@@ -356,6 +356,7 @@ class TempImageUpload(APIView):
 
     def post(self, request):
         file = request.data['Image']
+        print(file)
         name = request.data['name']
         custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + name + ".png"
         CVImageOut = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + name + ".png"
@@ -430,8 +431,6 @@ class TempImageUpload(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function receives image from the frontend and send it to ocr to process the image
-
-
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
@@ -528,8 +527,6 @@ def register(request):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function allows the user to log in by providing their username and password
-
-
 @api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -689,7 +686,7 @@ class UserGroups(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_default_group(self, uid):
+    def get_default_group(self, request, uid):
         user = User.objects.get(pk=uid)
         return user.group_set.get(isDefault=True)
 
