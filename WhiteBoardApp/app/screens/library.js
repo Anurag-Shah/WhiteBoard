@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet,SafeAreaView,Button,Alert, Modal,Image, LogBox } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Modal, Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
+import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
+import Topbar from './shared/Topbar';
 import { Icon } from "react-native-elements";
 
 //import {SafeAreaView} from 'react-navigation';
@@ -16,7 +18,7 @@ class library extends Component {
       loading: false,
       show: false,
       //data: [],
-      data: [ {
+      data: [{
         name: 'testing1',
         //Image: require("../image/code_snip.jpg"),
         Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
@@ -116,7 +118,7 @@ class library extends Component {
         autoCorrect={false}
         value={this.state.value}
       />
-      
+
     );
   };
 
@@ -131,7 +133,8 @@ class library extends Component {
     //console.log(this.state.data);
     //<Avatar source={item.avatar_url} />
     return (
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Topbar title="Team Images" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
           //keyExtractor={item => item.name.toString()}
@@ -141,16 +144,15 @@ class library extends Component {
               this.image_title = item.name;
               this.image_code = item.Code;
               console.log(this.image_url);
-              this.setState({show:true});
-              }}>
-              <Avatar source={{uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image}}/>
+              this.setState({ show: true });
+            }}>
+              <Avatar source={{ uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image }} />
               <ListItem.Content>
-              <ListItem.Title>{item.name}</ListItem.Title>
-              <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
-              
+                <ListItem.Title>{item.name}</ListItem.Title>
+                <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
+
               </ListItem.Content>
-              <ListItem.Chevron 
-              onPress={() => {
+              <AntDesign name="minuscircleo" size={24} color="red" onPress={() => {
                 Alert.alert(
                   //title
                   'File Delete',
@@ -162,8 +164,8 @@ class library extends Component {
                       onPress: () => {
                         console.log(item.pk)
                         console.log('Yes Pressed')
-                        fetch("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, {method: 'DELETE'});
-                        this.props.navigation.replace("library", {url: this.props.route.params.url})
+                        fetch("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, { method: 'DELETE' });
+                        this.props.navigation.replace("library", { url: this.props.route.params.url })
                         //this.render();
                       }
                     },
@@ -172,34 +174,36 @@ class library extends Component {
                       onPress: () => console.log('No Pressed')
                     },
                   ],
-                  {cancelable: true},
+                  { cancelable: true },
                 );
-                }} />
+              }} />
               <Modal
-               transparent={true}
-               visible={this.state.show}
-               >
-                 <SafeAreaView style={{backgroundColor:"#CED0CE", flex:1}}>
-                    <Text>{this.image_title}</Text>
-                    <Image
-                    style={{width: 500,
-                        height: 500}}
+                transparent={true}
+                visible={this.state.show}
+              >
+                <SafeAreaView style={{ backgroundColor: "#CED0CE", flex: 1 }}>
+                  <Text>{this.image_title}</Text>
+                  <Image
+                    style={{
+                      width: 500,
+                      height: 500
+                    }}
                     resizeMode="contain"
-                    source={{uri: this.image_url}}/>
-                    <Text>{this.image_code}</Text>
-                    <Button
-                        title="close"
-                        onPress={() => this.setState({show:false})}
-                    />
-                 </SafeAreaView>
+                    source={{ uri: this.image_url }} />
+                  <Text>{this.image_code}</Text>
+                  <Button
+                    title="close"
+                    onPress={() => this.setState({ show: false })}
+                  />
+                </SafeAreaView>
               </Modal>
             </ListItem>
             //<Avatar rounded source={{uri: item.picture.thumbnail}} />
-              //<ListItem //style={{ height: 50 }}
-              //leftAvatar={{ source: { uri: item.picture.thumbnail } }}
-              //title={`${item.name.first} ${item.name.last}`}
-              //subtitle={item.email}
-              ///>
+            //<ListItem //style={{ height: 50 }}
+            //leftAvatar={{ source: { uri: item.picture.thumbnail } }}
+            //title={`${item.name.first} ${item.name.last}`}
+            //subtitle={item.email}
+            ///>
             //<Text style={{fontSize: 30}}>{item.name.first}</Text>
           )}
           //data={ this.state.FlatListItems }
@@ -215,22 +219,22 @@ class library extends Component {
 }
 
 const styles = StyleSheet.create({
- 
-  MainContainer :{
-   
-  // Setting up View inside content in Vertically center.
-  justifyContent: 'center',
-  flex:1,
-  margin: 10
-   
+
+  MainContainer: {
+
+    // Setting up View inside content in Vertically center.
+    justifyContent: 'center',
+    flex: 1,
+    margin: 10
+
   },
-   
+
   item: {
-      padding: 10,
-      fontSize: 18,
-      height: 44,
-    },
-   
-  });
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+
+});
 
 export default library;

@@ -19,16 +19,19 @@ import {
   ScrollView,
   Text,
   Button,
+  Modal,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import {
-  MenuProvider,
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from "react-native-popup-menu";
+import { Dropdown } from "sharingan-rn-modal-dropdown";
+// import {
+//   MenuProvider,
+//   Menu,
+//   MenuOptions,
+//   MenuOption,
+//   MenuTrigger,
+// } from "react-native-popup-menu";
 import Topbar from "./shared/Topbar";
+import storage from "../config/storage";
 
 import urls from "../requests/urls";
 
@@ -42,7 +45,19 @@ export default class TextEditorPage extends React.Component {
       responseReceived: false,
       returnValue: 1,
       returnMessage: "",
+
+      loading: false,
+      user: null,
+      groupList: null,
+      showGroups: "",
+      showRenameDlg: "",
+      selGroupId: "",
+      imageName: "",
     };
+  }
+
+  componentDidMount() {
+    this.getUserInfo();
   }
 
   async sendCode() {
@@ -126,6 +141,7 @@ export default class TextEditorPage extends React.Component {
 
   saveOrDiscard() {
     if (this.state.responseReceived) {
+      //if (!this.state.loading) {
       return (
         <View style={styles.saveDiscard}>
           <View style={styles.button}>
@@ -133,6 +149,11 @@ export default class TextEditorPage extends React.Component {
               title="Save"
               onPress={() => {
                 // TODO: popup window to choose a group and name the code file
+
+                console.log(this.state.user);
+
+                //this.fetchGroups();
+                //cconsole.log(this.state.groupList);
               }}
             />
           </View>
@@ -160,119 +181,157 @@ export default class TextEditorPage extends React.Component {
           </View>
         </View>
       );
+      //}
+    }
+  }
+
+  getUserInfo() {
+    this.setState({ loading: true });
+    storage
+      .load({
+        key: "login-session",
+        autoSync: true,
+        syncInBackground: true,
+      })
+      .then((ret) => {
+        this.setState({ user: ret, loading: false });
+      })
+      .catch((err) => {
+        this.setState({ user: false });
+      });
+  }
+
+  async fetchGroups() {
+    try {
+      const res = await fetch(urls.getAllGroups + this.state.user.uid, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      const response = await res.json();
+
+      this.setState({
+        groupList: response.all_groups.map((x) => {
+          return { label: x.Gpname, value: x.GpID };
+        }),
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 
   render() {
-    // return (
-    //   <SafeAreaView
-    //     style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
-    //   >
-    //     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    //       <View>
-    //         <Topbar title="Text Editor" navigation={this.props.navigation} />
-    //       </View>
-    //     </TouchableWithoutFeedback>
-
-    //     <TextInput
-    //       style={styles.input}
-    //       placeholder="Start typying your code here..."
-    //       multiline={true}
-    //       onChangeText={(typedCode) => this.setState({ typedCode })}
-    //     />
-
-    //     <View style={styles.view}>
-    //       <Icon
-    //         name="play"
-    //         type="ionicon"
-    //         color="#000"
-    //         size={40}
-    //         style={styles.play}
-    //         onPress={() =>
-    //           Alert.alert("Attention", "Are you sure of running the code?", [
-    //             { text: "Cancel", style: "cancel" },
-    //             {
-    //               text: "Submit",
-    //               style: "destructive",
-    //               onPress: () => this.sendCode(),
-    //             },
-    //           ])
-    //         }
-    //       />
-    //     </View>
-
-    //     <View>{this.displayConsoleLog()}</View>
-
-    //     <View>{this.saveOrDiscard()}</View>
-    //   </SafeAreaView>
-    // );
-
     return (
-      <MenuProvider>
-        <SafeAreaView
-          style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
-        >
+      <SafeAreaView
+        style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View>
-            <Menu>
-              <MenuTrigger />
-              <MenuOptions>
-                <MenuOption onSelect={() => alert(`Save`)} text="Save" />
-                <MenuOption onSelect={() => alert(`Delete`)}>
-                  <Text style={{ color: "red" }}>Delete</Text>
-                </MenuOption>
-                <MenuOption
-                  onSelect={() => alert(`Not called`)}
-                  disabled={true}
-                  text="Disabled"
-                />
-              </MenuOptions>
-            </Menu>
-            <TouchableWithoutFeedback
-              onPress={Keyboard.dismiss}
-              accessible={false}
-            >
-              <View>
-                <Topbar
-                  title="Text Editor"
-                  navigation={this.props.navigation}
-                />
-              </View>
-            </TouchableWithoutFeedback>
+            <Topbar title="Text Editor" navigation={this.props.navigation} />
           </View>
+        </TouchableWithoutFeedback>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Start typying your code here..."
-            multiline={true}
-            onChangeText={(typedCode) => this.setState({ typedCode })}
+        <TextInput
+          style={styles.input}
+          placeholder="Start typying your code here..."
+          multiline={true}
+          onChangeText={(typedCode) => this.setState({ typedCode })}
+        />
+
+        <View style={styles.view}>
+          <Icon
+            name="play"
+            type="ionicon"
+            color="#000"
+            size={40}
+            style={styles.play}
+            onPress={() =>
+              Alert.alert("Attention", "Are you sure of running the code?", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Submit",
+                  style: "destructive",
+                  onPress: () => this.sendCode(),
+                },
+              ])
+            }
           />
+        </View>
 
-          <View style={styles.view}>
-            <Icon
-              name="play"
-              type="ionicon"
-              color="#000"
-              size={40}
-              style={styles.play}
-              onPress={() =>
-                Alert.alert("Attention", "Are you sure of running the code?", [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Submit",
-                    style: "destructive",
-                    onPress: () => this.sendCode(),
-                  },
-                ])
-              }
-            />
-          </View>
+        <View>{this.displayConsoleLog()}</View>
 
-          <View>{this.displayConsoleLog()}</View>
-
-          <View>{this.saveOrDiscard()}</View>
-        </SafeAreaView>
-      </MenuProvider>
+        <View>{this.saveOrDiscard()}</View>
+      </SafeAreaView>
     );
+
+    // return (
+    //   <MenuProvider>
+    //     <SafeAreaView
+    //       style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
+    //     >
+    //       <View>
+    //         <Menu>
+    //           <MenuTrigger />
+    //           <MenuOptions>
+    //             <MenuOption onSelect={() => alert(`Save`)} text="Save" />
+    //             <MenuOption onSelect={() => alert(`Delete`)}>
+    //               <Text style={{ color: "red" }}>Delete</Text>
+    //             </MenuOption>
+    //             <MenuOption
+    //               onSelect={() => alert(`Not called`)}
+    //               disabled={true}
+    //               text="Disabled"
+    //             />
+    //           </MenuOptions>
+    //         </Menu>
+    //         <TouchableWithoutFeedback
+    //           onPress={Keyboard.dismiss}
+    //           accessible={false}
+    //         >
+    //           <View>
+    //             <Topbar
+    //               title="Text Editor"
+    //               navigation={this.props.navigation}
+    //             />
+    //           </View>
+    //         </TouchableWithoutFeedback>
+    //       </View>
+
+    //       <TextInput
+    //         style={styles.input}
+    //         placeholder="Start typying your code here..."
+    //         multiline={true}
+    //         onChangeText={(typedCode) => this.setState({ typedCode })}
+    //       />
+
+    //       <View style={styles.view}>
+    //         <Icon
+    //           name="play"
+    //           type="ionicon"
+    //           color="#000"
+    //           size={40}
+    //           style={styles.play}
+    //           onPress={() =>
+    //             Alert.alert("Attention", "Are you sure of running the code?", [
+    //               { text: "Cancel", style: "cancel" },
+    //               {
+    //                 text: "Submit",
+    //                 style: "destructive",
+    //                 onPress: () => this.sendCode(),
+    //               },
+    //             ])
+    //           }
+    //         />
+    //       </View>
+
+    //       <View>{this.displayConsoleLog()}</View>
+
+    //       <View>{this.saveOrDiscard()}</View>
+    //     </SafeAreaView>
+    //   </MenuProvider>
+    // );
   }
 }
 

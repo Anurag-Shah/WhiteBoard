@@ -75,11 +75,10 @@ export default function CameraScreen({ navigation }) {
   const [selLang, setSelLang] = useState('Auto');
   const [ocrReturnData, setOcrReturnData] = useState(null);
   const langs = ['Auto', 'C', 'C#', 'Java'];
-  const langList = langs.map(x=>{return {'label':x, 'value':x}});
+  const langList = langs.map(x => { return { 'label': x, 'value': x } });
 
   useEffect(() => {
     getUserInfo();
-
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -101,35 +100,35 @@ export default function CameraScreen({ navigation }) {
 
   const modalBody = (
     <View style={styles.modalBody}>
-        <Dropdown
-            // label="Group"
-            data={groupList}
-            value={selGroupId}
-            onChange={(v)=>{setSelGroupId(v)}}
-          />
-        <View style={styles.divider}></View>
-        <View style={{flexDirection:"row-reverse",margin:10}}>
-          <TouchableOpacity style={{...styles.actions,backgroundColor:"#21ba45"}}
-            onPress={() => {
-              if(selGroupId) {
-                // Alert.alert(selGroupId);
-                setShowRenameDlg(true);
-              }
-              else {
-                Alert.alert('Please select a group.');
-              }
-            }}>
-            <Text style={styles.actionText}>Select</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{...styles.actions,backgroundColor:"#db2828"}} 
-            onPress={() => {
-              // Alert.alert('Modal has been closed.');
-              // setSelGroupId(null);
-              setShowGroups(!showGroups);
-            }}>
-            <Text style={styles.actionText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+      <Dropdown
+        // label="Group"
+        data={groupList}
+        value={selGroupId}
+        onChange={(v) => { setSelGroupId(v) }}
+      />
+      <View style={styles.divider}></View>
+      <View style={{ flexDirection: "row-reverse", margin: 10 }}>
+        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
+          onPress={() => {
+            if (selGroupId) {
+              // Alert.alert(selGroupId);
+              setShowRenameDlg(true);
+            }
+            else {
+              Alert.alert('Please select a group.');
+            }
+          }}>
+          <Text style={styles.actionText}>Select</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#db2828" }}
+          onPress={() => {
+            // Alert.alert('Modal has been closed.');
+            // setSelGroupId(null);
+            setShowGroups(!showGroups);
+          }}>
+          <Text style={styles.actionText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
   const modalContainer = (
@@ -170,13 +169,13 @@ export default function CameraScreen({ navigation }) {
               <View style={styles.divider}></View>
             </View>
             <View style={styles.modalBody}>
-            <TextInput
-              style={{height: 40}}
-              // placeholder="Type the image name"
-              onChangeText={v => setImageName(v)}
-              defaultValue={'image'}
-              value={imageName}
-            />
+              <TextInput
+                style={{ height: 40 }}
+                // placeholder="Type the image name"
+                onChangeText={v => setImageName(v)}
+                defaultValue={'image'}
+                value={imageName}
+              />
               <View style={styles.divider}></View>
               <View style={{ flexDirection: "row-reverse", margin: 10 }}>
                 <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
@@ -220,7 +219,7 @@ export default function CameraScreen({ navigation }) {
         console.log(ret)
         setSelGroupId(ret.groupId)
         // console.log(ret)
-        setUser(ret);
+        setUser(ret.userInfo);
         // for test, in real, Do Comment below line Kk
         //setGroupList(DATA.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
         // Do active try-clause in real
@@ -284,7 +283,7 @@ export default function CameraScreen({ navigation }) {
       const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
         method: 'GET',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           // 'Authorization': "Token " + user.token,
         },
         redirect: 'follow'
@@ -292,11 +291,11 @@ export default function CameraScreen({ navigation }) {
       const result = await response.json();
       // setShowGroups(true);
       // setGroupList(result.all_groups); 
-      setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
+      setGroupList(result.all_groups.map(x => { return { 'label': x.Gpname, 'value': x.GpID } }));
       console.log('Done fetching groups...')
-      
+
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       console.log('Connection Error!');
       setGroupList(null);
       Alert.alert('Error', 'Connection Error in fetch groups!');
@@ -398,7 +397,7 @@ export default function CameraScreen({ navigation }) {
     // let localUri = picture;
     // console.log(picture);
     let filename = picture.uri.split('/').pop();
-    
+
     // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
@@ -435,17 +434,17 @@ export default function CameraScreen({ navigation }) {
       //console.log(data);
       return data;
     };
-    
+
     // const selectedLang = 'Auto'
-    if(!selLang) setSelLang('Auto');
+    if (!selLang) setSelLang('Auto');
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
     const targetUrl = user ? uploadImageUrl : tempUploadImgUrl;
-    const targetBody = user ? 
-      createFormData(picture, { name: imageName, description: 'picture', language:selLang }):
-      createFormData(picture, { name: 'TempImage', description: 'picture', language:selLang });
-    try {      
-      const response = await fetch( targetUrl , {
+    const targetBody = user ?
+      createFormData(picture, { name: imageName, description: 'picture', language: selLang }) :
+      createFormData(picture, { name: 'TempImage', description: 'picture', language: selLang });
+    try {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         body: targetBody,
         headers: {
@@ -746,8 +745,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20
   },
-  actionText:{
-    color:"#fff"
+  actionText: {
+    color: "#fff"
   },
   dropdownLang: {
     fontSize: 24, 
