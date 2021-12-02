@@ -1,6 +1,8 @@
-checkout scm
-stage('Build') {
-    steps {
-        sh './Build_Script.sh'
+node('main') {
+    checkout scm
+    stage('Build') {
+        steps {
+            sh './Build_Script.sh'
+        }
     }
 }
