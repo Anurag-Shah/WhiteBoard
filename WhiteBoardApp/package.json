@@ -6,11 +6,25 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest -u"
+    "test": "jest"
   },
   "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ],
     "preset": "jest-expo",
     "collectCoverage": true,
+    "coverageReporters": [
+      "text"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "jest-junit": {
+      "output": "output/coverage/junit/junit.xml",
+      "usePathForSuiteName": "true"
+    },
     "collectCoverageFrom": [
       "**/*.{js,jsx}",
       "!**/coverage/**",
@@ -18,9 +32,7 @@
       "!**/babel.config.js",
       "!**/jest.setup.js"
     ],
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-    ]
+    "testResultsProcessor": "jest-junit"
   },
   "dependencies": {
     "@expo/vector-icons": "^12.0.2",
@@ -60,6 +72,7 @@
     "@testing-library/jest-native": "^4.0.4",
     "@testing-library/react-native": "^8.0.0",
     "jest-expo": "39.0.0",
+    "jest-junit": "^13.0.0",
     "react-test-renderer": "16.13"
   },
   "peerDependencies": {

@@ -53,7 +53,7 @@ class library extends Component {
     /*local test*/
     //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
     console.log(this.props.route.params.url);
-    const url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com/Images/" + this.props.route.params.url;
+    const url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/" + this.props.route.params.url;
 
     this.setState({ loading: true });
 
@@ -137,7 +137,7 @@ class library extends Component {
         <Topbar title="Team Images" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
-          //keyExtractor={item => item.name.toString()}
+          keyExtractor={item => item.name.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider onPress={() => {
               this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
