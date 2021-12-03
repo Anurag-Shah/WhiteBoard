@@ -20,7 +20,7 @@ import {
   Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-// import { Icon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 
 import urls from "../requests/urls";
 
@@ -124,7 +124,7 @@ export default class RegistrationPage extends React.Component {
         return Alert.alert(
           "Success",
           "Your account has been successfully created!",
-          [{ text: "OK", onPress: () => this.props.navigation.push("Login") }]
+          [{ text: "OK", onPress: () => this.props.navigation.replace("Login") }]
         );
       }
     } catch (error) {
@@ -141,7 +141,7 @@ export default class RegistrationPage extends React.Component {
           name="arrow-undo-outline"
           type="ionicon"
           color="#000"
-          onPress={() => this.props.navigation.push("Login")}
+          onPress={() => this.props.navigation.replace("Login")}
         />
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
