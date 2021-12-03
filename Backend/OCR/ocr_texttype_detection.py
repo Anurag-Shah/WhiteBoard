@@ -20,4 +20,4 @@ from ocr_utils import OCRError
 # Detects if text is typeform or handwritten
 
 def detect(image):
-	return "typeform_pretrained"
+	return "typeform"

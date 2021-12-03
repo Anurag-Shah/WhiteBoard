@@ -30,25 +30,40 @@ MINUS_THREE = [14, 15, 16]
 #	1. input_image - image
 # This function performs any postprocessing needed on image
 
-def ocr_postprocess_image(input_image, line_numbers):
+def ocr_postprocess_image(input_image, line_numbers, hh=False):
 	pil_w, pil_h = input_image.size
 	image = np.array(input_image)
 	image = image[:, :, ::-1].copy()
 	out_image = image.copy()
+	bg_color = detect_background_color(out_image)
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	__, threshed = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
+		#__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+		gray = cv2.bitwise_not(gray)
+		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 10)
+	else:
+		#__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+		threshed = cv2.bitwise_not(threshed)
 	((cx, cy), (w, h), ang) = cv2.minAreaRect(cv2.findNonZero(threshed))
-	if abs(math.ceil(ang)) >= 45:
+
+	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
+		ang = 0
+	elif abs(math.ceil(ang)) >= 45:
 		w, h = h, w
 		ang -= 90
+	if hh:
+		ang = 0
 	output_ang = ang
 
 	M = cv2.getRotationMatrix2D((cx,cy), ang, 1.0)
 	rotated = cv2.warpAffine(threshed, M, (image.shape[1], image.shape[0]))
 
-	bg_color = detect_background_color(out_image)
 	rotated_out = cv2.warpAffine(out_image, M, (out_image.shape[1], out_image.shape[0]), borderValue=bg_color)
-
+	#cv2.imshow("", threshed)
+	#cv2.imshow("", rotated)
+	#cv2.waitKey(0)
+	#cv2.destroyAllWindows()
 	hist = cv2.reduce(rotated, 1, cv2.REDUCE_AVG).reshape(-1)
 	diff_thresh = 2
 	H,W = image.shape[:2]
@@ -128,10 +143,13 @@ def detect_background_color(image):
 		average_blue = math.floor(blue / sample)
 		return (int(average_red), int(average_green), int(average_blue))
 
-if __name__ == "__main__":
+def main():
 	test_im_path = "images/tesseract_tests/"
 	test_im = "test_tall_2"
 	imsuffix = ".jpg"
 	#test_im = "test2"
 	#imsuffix = ".png"
 	print(ocr_postprocess_image(Image.open(test_im_path + test_im + imsuffix).convert('RGB'), [0, 2, 5]))
+
+if __name__ == "__main__":
+	main()
