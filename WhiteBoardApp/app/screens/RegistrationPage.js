@@ -19,8 +19,8 @@ import {
   Button,
   Alert,
 } from "react-native";
-import { Icon } from "react-native-elements";
 import { StatusBar } from "expo-status-bar";
+import { Icon } from "react-native-elements";
 
 import urls from "../requests/urls";
 
@@ -89,7 +89,6 @@ export default class RegistrationPage extends React.Component {
       email: this.state.email,
       password: this.state.password,
     };
-
     try {
       const res = await fetch(urls.register, {
         method: "POST",
@@ -124,7 +123,7 @@ export default class RegistrationPage extends React.Component {
         return Alert.alert(
           "Success",
           "Your account has been successfully created!",
-          [{ text: "OK", onPress: () => this.props.navigation.push("Login") }]
+          [{ text: "OK", onPress: () => this.props.navigation.replace("Login") }]
         );
       }
     } catch (error) {
@@ -136,13 +135,13 @@ export default class RegistrationPage extends React.Component {
     return (
       <SafeAreaView style={styles.safearea}>
         <StatusBar style="auto" />
-        {/* <Icon
+        <Icon
           style={styles.icon}
           name="arrow-undo-outline"
           type="ionicon"
           color="#000"
-          onPress={() => this.props.navigation.push("Login")}
-        /> */}
+          onPress={() => this.props.navigation.replace("Login")}
+        />
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>

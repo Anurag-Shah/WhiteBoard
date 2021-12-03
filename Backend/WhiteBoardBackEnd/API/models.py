@@ -53,8 +53,10 @@ class GroupImages(models.Model):
     ImageID = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
     Image = models.ImageField(upload_to='images/', null=True)
+    # Note: due to some minor issues, Image_after is no longer used. Please use Image_after_url
     Image_after = models.ImageField(upload_to='images/OCR/', null=True)
-    Code = models.TextField()
+    Image_after_url = models.URLField(null=True)
+    Code = models.TextField(default="Need_To_Discard")
     GpID = models.ForeignKey(Group, to_field="GpID", on_delete=CASCADE, default=8888)
     save_time = models.DateTimeField(default=timezone.now)
 

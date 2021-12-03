@@ -25,7 +25,6 @@ def compiler_wrapper(compiler_input, language):
 	container = None
 	line_numbers = []
 	if language == "C":
-		# Chunao: I've changed echo to printf cuz printf will parse \n literally without actual line break, causing compilation to fail
 		dockerCommand = ["/bin/sh", "-c", ("printf '" + compiler_input + "' > compile.c && gcc compile.c && ./a.out")]
 		client = docker.from_env()
 		error_r = False

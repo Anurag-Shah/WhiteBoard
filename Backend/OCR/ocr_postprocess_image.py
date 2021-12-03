@@ -71,7 +71,7 @@ def ocr_postprocess_image(input_image, line_numbers, hh=False):
 	lowers = [y for y in range(H - 1) if hist[y] > diff_thresh and hist[y + 1] <= diff_thresh]
 	rotated = cv2.cvtColor(rotated, cv2.COLOR_GRAY2BGR)
 	left_coords = []
-	i = 1
+	i = 0
 	for y in lowers:
 		if (i in line_numbers):
 			#cv2.line(rotated_out, (0, y + math.floor(pil_h / 200)), (W, y + math.floor(pil_h / 200)), (0, 0, 255), 1)

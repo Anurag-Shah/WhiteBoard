@@ -9,6 +9,7 @@
 
 import compiler_wrapper
 import os
+import re
 from typing import Text
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -32,7 +33,7 @@ from rest_framework.response import Response
 import ocr
 from forms import SetPasswordForm
 from .models import User, Group, GroupImages
-from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer
+from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer, AvatarSerializer, GroupSerializerWithoutImage
 
 
 from .serializer import UserSerializer, GroupSerializer, GroupImagesSerializer
@@ -46,6 +47,7 @@ from django.core.files.temp import NamedTemporaryFile
 from PIL import Image
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from base64 import b64encode
 
 import threading
 import time
@@ -142,7 +144,7 @@ class SpecificGroup(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, id):
-        Serializer = GroupSerializer(self.get_group_object(id))
+        Serializer = GroupSerializerWithoutImage(self.get_group_object(id))
         return Response(Serializer.data)
 
     def put(self, request, id):
@@ -188,13 +190,15 @@ class TextUpload(APIView):
         return_data['terminal_output'] = compile_result[0]
         return_data['problem_line'] = compile_result[1]
         group = self.get_group_object(id)
-        image = GroupImages.objects.create(GpID = group, Code = text)
+        image = GroupImages.objects.create(GpID=group, Code=text)
         image.save()
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
         return response
 
+
 class TempTextUpload(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny, ]
 
     def post(self, request):
         text = request.data["compile_text"]
@@ -206,7 +210,8 @@ class TempTextUpload(APIView):
         return_data['compile_result'] = compile_result[0]
         return_data['terminal_output'] = compile_result[0]
         return_data['problem_line'] = compile_result[1]
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
         return response
 
 
@@ -238,6 +243,10 @@ class ImageUpload(APIView):
     def post(self, request, GPid):
         file = request.data['Image']
         name = request.data['name']
+        try:
+            language_in = request.data['language']
+        except:
+            language_in = "C"
         custom_name = name + ":" + str(GPid) + ".jpg"
         try:
             img = ContentFile(base64.b64decode(file), name=custom_name)
@@ -248,35 +257,49 @@ class ImageUpload(APIView):
         image_path = image.Image
         ImageID = image.pk
         print("ID is: " + str(ImageID))
-        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + \
+        path = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/" + \
             str(image_path)
-        path_after = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/AfterImages/"
+        path_after = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/AfterImages/"
         return_data = {}
         return_data['status'] = 'success'
         return_data['image_uri'] = str(image_path)
         print(Path(path).as_uri())
+
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(path)
+
         print(ocr_return)
-        print(type(ocr_return[0]))
+
+        ocr_error_output = []
+        error_msg_whole = ocr_return[2]
+        for i in ocr_return[6]:
+            current_error = []
+            print("compile\.c:[" + str(i) +
+                  "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)")
+            matches = re.finditer(
+                "compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)", error_msg_whole, re.MULTILINE)
+            for match in matches:
+                print(match.group())
+                error_msg_whole.replace(match.group(), "")
+                current_error.append(match.group())
+            ocr_error_output.append(current_error)
+
         img_pil = ocr_return[0]
         CVImageOut = path_after + str(GPid) + "_" + str(ImageID) + ".png"
         img_pil.save(CVImageOut, format="PNG")
         image.Image_after = CVImageOut
+        image.Image_after_url = CVImageOut
         image.save()
-        buffer = BytesIO()
-        img_pil.save(fp=buffer, format="PNG")
-        pil_file = ContentFile(
-            buffer.getvalue(), name=request.data['name'] + "OCR_Return")
-        ImageObject = GroupImages.objects.filter(pk=ImageID)
-        print(ImageObject)
-        ImageObject.update(Image_after=pil_file)
-        ImageObject.update(Code=ocr_return[1])
         return_data['ocr_return'] = ocr_return[2]
         image_path = image.Image_after
-        return_data['image_after_uri'] = str(image_path)[str(image_path).find("AfterImages"):]
+        return_data['image_after_uri'] = str(
+            image_path)[str(image_path).find("AfterImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
+        return_data['y-coord'] = ocr_return[5]
+        return_data['line-num'] = ocr_return[6]
+        return_data['y-coord-match'] = ocr_error_output
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
         return response
 
     def get(self, request, GPid):
@@ -300,18 +323,15 @@ class ImageDeleteWithID(APIView):
 
     def delete(self, request, id):
         try:
-            Group_to_delete = Group.objects.get(pk = id)
+            ImageObject = GroupImages.objects.get(pk=id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        ImageObject = GroupImages.objects.filter(GpID=Group_to_delete)
-        for images in ImageObject:
-            print(images.Image.url)
-            if os.path.isfile(images.Image.url):
-                os.remove(images.Image.url)
-            print(images.Image_after.url)
-            if os.path.isfile(images.Image_after):
-                os.remove(images.Image_after)
+        print(ImageObject.Image.url)
+        if os.path.isfile(ImageObject.Image.url):
+            os.remove(ImageObject.Image.url)
+        print(ImageObject.Image_after_url)
+        if os.path.isfile(str(ImageObject.Image_after_url)):
+            os.remove(str(ImageObject.Image_after_url))
         ImageObject.delete()
         return Response(status.HTTP_204_NO_CONTENT)
 
@@ -338,8 +358,12 @@ class TempImageUpload(APIView):
     def post(self, request):
         file = request.data['Image']
         name = request.data['name']
-        custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + name + ".png"
-        CVImageOut = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + name + ".png"
+        random_str = b64encode(os.urandom(10)).decode("utf-8")
+        random_str = random_str.replace("/", "a")
+        custom_name = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + \
+            str(random_str) + ".png"
+        CVImageOut = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + \
+            str(random_str) + ".png"
         temp_file = open(custom_name, "wb")
         try:
             temp_file.write(base64.b64decode(file))
@@ -350,18 +374,48 @@ class TempImageUpload(APIView):
         return_data = {}
         return_data['status'] = 'success'
         return_data['image_uri'] = custom_name[custom_name.find("TempImages"):]
-        print(Path(path).as_uri())
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(custom_name)
-        print(ocr_return)
+
+        for line in ocr_return:
+            print(line)
+
+        print("goodies!\n")
+
+        ocr_error_output = []
+        error_msg_whole = ocr_return[2]
+        for i in ocr_return[6]:
+            current_error = []
+            print("compile\.c:[" + str(i) +
+                  "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)")
+            matches = re.finditer(
+                "compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)", error_msg_whole, re.MULTILINE)
+            for match in matches:
+                print(match.group())
+                error_msg_whole.replace(match.group(), "")
+                current_error.append(match.group())
+            ocr_error_output.append(current_error)
+
+        print("all errors are as follows:\n")
+        for error in ocr_error_output:
+            print(error)
+            print("size of error: " + str(len(error)))
+            print("------------------\n")
+        print("\nend of error\n")
+
         img_pil = ocr_return[0]
         img_pil.save(CVImageOut, format="PNG")
         return_data['ocr_return'] = ocr_return[2]
-        print (CVImageOut[CVImageOut.find("TempImages"):])
+        print(CVImageOut[CVImageOut.find("TempImages"):])
         return_data['CV_return'] = CVImageOut[CVImageOut.find("TempImages"):]
         return_data['ocr_text_detected'] = ocr_return[1]
-        response = HttpResponse(json.dumps(return_data), content_type='application/json')
-        hired_gun = threading.Thread(target=self.sleep_and_kill, args=[str(custom_name)])
+        return_data['y-coord'] = ocr_return[5]
+        return_data['line-num'] = ocr_return[6]
+        return_data['y-coord-match'] = ocr_error_output
+        response = HttpResponse(json.dumps(return_data),
+                                content_type='application/json')
+        hired_gun = threading.Thread(
+            target=self.sleep_and_kill, args=[str(custom_name)])
         hired_gun.start()
         hired_CV_gun = threading.Thread(
             target=self.sleep_and_kill, args=[CVImageOut])
@@ -530,6 +584,7 @@ def logout_view(request):
 def update_user(request):
     data = JSONParser().parse(request)
     user = User.objects.get(pk=request.user.pk)
+    defaultGroup = user.group_set.get(isDefault=True)
     name = data.get('username')
     email = data.get('email')
     nameDup = 0
@@ -569,9 +624,29 @@ def update_user(request):
         return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
 
     user.save()
+    defaultGroup.Gpname = name
+    defaultGroup.description = name + "'s default group"
+    defaultGroup.save()
     request.user.save()
     serializer = UserSerializer(user)
     return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
+
+# Fuction Delete User
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function will delete the account
+
+
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['DELETE'])
+@transaction.atomic()
+def delete_account(request):
+    user = User.objects.get(pk=request.user.pk)
+    user.group_set.filter(leader_uid=user.pk).delete()
+    user.delete()
+    request.user.delete()
+    return JsonResponse({"code": 0, "msg": "Account Deleted!"})
 
 
 class Avatar(APIView):
@@ -607,31 +682,29 @@ class Avatar(APIView):
 # Class get all groups the user is in
 # Author: Jenna Zhang
 # Return value: JsonResponse
-# This function logs the user out
-# class UserGroups(APIView):
-#     authentication_classes = [TokenAuthentication]
-#     # permission_classes = [IsAuthenticated]
-#     permission_classes = [AllowAny]
-#     parser_classes = [MultiPartParser, FormParser]
-#
-#     def get_default_group(self, request):
-#         user = User.objects.get(pk=request.user.pk)
-#         return user.group_set.get(isDefault=True)
-#
-#     def get(self, request):
-#         user = User.objects.get(pk=request.user.pk)
-#         groups = user.group_set.all()
-#         default_group = self.get_default_group(request)
-#         serializer = GroupSerializer(groups, many=True)
-#         default_group_serializer = GroupSerializer(default_group)
-#         return JsonResponse(
-#             {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
-#              "all_groups": serializer.data})
+class UserGroupsW(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_default_group(self, request):
+        user = User.objects.get(pk=request.user.pk)
+        return user.group_set.get(isDefault=True)
+
+    def get(self, request):
+        user = User.objects.get(pk=request.user.pk)
+        groups = user.group_set.all()
+        default_group = self.get_default_group(request)
+        serializer = GroupSerializerWithoutImage(groups, many=True)
+        default_group_serializer = GroupSerializerWithoutImage(default_group)
+        return JsonResponse(
+            {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
+             "all_groups": serializer.data})
+
 
 # Class get all groups of a certain user without authentication
 # Author: Jenna Zhang
 # Return value: JsonResponse
-# This function logs the user out
 class UserGroups(APIView):
     authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
@@ -646,15 +719,14 @@ class UserGroups(APIView):
         user = User.objects.get(pk=uid)
         groups = user.group_set.all()
         default_group = self.get_default_group(request, uid)
-        serializer = GroupSerializer(groups, many=True)
-        default_group_serializer = GroupSerializer(default_group)
+        serializer = GroupSerializerWithoutImage(groups, many=True)
+        default_group_serializer = GroupSerializerWithoutImage(default_group)
         return JsonResponse(
             {"code": 0, "msg": "The teams are fetched!", "default_group": default_group_serializer.data,
              "all_groups": serializer.data})
 
+
 # get all team members
-
-
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])

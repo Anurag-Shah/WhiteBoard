@@ -1,7 +1,6 @@
 import urls from "./urls";
 import storage from "../config/storage";
 
-
 export const getToken = async () => {
     try {
         let data = await storage.load({
@@ -16,6 +15,23 @@ export const getToken = async () => {
     } catch (error) {
         console.log(error);
         return '';
+    }
+};
+
+const retrieveUser = async () => {
+    // console.log("Side bar retrieving data");
+    try {
+        let data = await storage.load({
+            key: "login-session",
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
+            syncInBackground: true,
+        });
+        return data;
+    } catch (err) {
+        console.log(err);
+        return null
     }
 };
 
@@ -59,6 +75,37 @@ export const logoutApi = async () => {
         return data;
     } catch (error) {
         console.error(error);
+        return null;
+        // let user = await retrieveUser();
+        // user.logged_in = false;
+        // user.logged_in = false;
+        // storage.save({
+        //     key: "login-session",
+        //     data: user,
+        // });
+    }
+};
+
+export const deleteAccountApi = async () => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.login, {
+            method: 'DELETE',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                username: username,
+                password: pwd,
+            })
+        });
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
     }
 };
 
@@ -82,7 +129,7 @@ export const resetPwdApi = async (email) => {
     }
 };
 
-export const updateAccountApi = async (user, email) => {
+export const updateAccountApi = async (username, email) => {
     let token = await getToken();
     try {
         const response = await fetch(urls.updateAccount, {
@@ -94,7 +141,6 @@ export const updateAccountApi = async (user, email) => {
                 'Authorization': token,
             },
             body: JSON.stringify({
-                uid: user.uid,
                 username: username,
                 email: email,
             })
@@ -107,7 +153,70 @@ export const updateAccountApi = async (user, email) => {
     }
 };
 
-export const getAvatarApi = async (user, email) => {
+export const getAllGroupsApi = async (uid) => {
+    try {
+        const response = await fetch(urls.getAllGroups + uid, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const getAllGroupsWApi = async (uid) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.getAllGroupsW, {
+            method: 'GET',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+export const getAllTeamMemebersApi = async (id) => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.getAllMembers, {
+            method: 'POST',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                "groupId": id,
+            })
+        });
+        console.log(response);
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+export const getAvatarApi = async () => {
     let token = await getToken();
     try {
         const response = await fetch(urls.avatar, {
@@ -161,7 +270,7 @@ export const createGroupApi = async (Gpname, description) => {
                 'Authorization': token,
             },
             body: JSON.stringify({
-                "Gpname": Gpname,
+                "name": Gpname,
                 "description": description
             })
         });
@@ -197,7 +306,7 @@ export const deleteGroupApi = async (groupId) => {
     }
 };
 
-export const addMemeberApi = async (groupId, email) => {
+export const addMemberApi = async (groupId, email) => {
     let token = await getToken();
     try {
         const response = await fetch(urls.memeber_operations, {
