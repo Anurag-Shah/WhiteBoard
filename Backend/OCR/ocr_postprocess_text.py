@@ -28,4 +28,7 @@ def ocr_postprocess(text):
 # This function performs tesseract postprocessing
 
 def tesseract_postprocess(text):
-	return text[0:len(text)-2]
+	o = text.replace("%", "%%")
+	o = o.replace("\\n", "\n")
+	o = o[0:len(o)-2]
+	return o

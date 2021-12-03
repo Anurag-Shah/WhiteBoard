@@ -11,7 +11,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { setAvatarApi, updateAccountApi } from '../requests/api';
+import { setAvatarApi, updateAccountApi, deleteAccountApi } from '../requests/api';
 import * as ImagePicker from 'expo-image-picker';
 import storage from "../config/storage";
 import defAvatar from '../assets/avatar.png';
@@ -106,6 +106,7 @@ function Account({ navigation }) {
       if (res && res.code == 0) {
         let new_avatar = urls.base_url.slice(0, -1) + res.user.avatar;
         res.user.avatar = new_avatar;
+        // \console.log(res);
         update_user(res);
         setUri(null);
         setAvatar(picture);
@@ -120,18 +121,24 @@ function Account({ navigation }) {
   };
 
   const update = () => {
+    console.log(username);
     updateAccountApi(username, email).then((res) => {
+      //console.log(res);
       if (res) {
         if (res.code == 0) {
           setNameDup(false);
           setEmailDup(false);
+          let new_avatar = urls.base_url.slice(0, -1) + res.user.avatar;
+          res.user.avatar = new_avatar;
           update_user(res);
           Alert.alert("UserInfo successfully updated!");
           SetEdit(false);
         } else if (res.code == -1) {
+          Alert.alert("Username already in use");
           setNameDup(true);
           setEmailDup(false);
         } else if (res.code == -2) {
+          Alert.alert("Email provided already in use");
           setNameDup(false);
           setEmailDup(true);
         } else {
@@ -150,6 +157,7 @@ function Account({ navigation }) {
       data: new_user,
     });
     setUser(new_user);
+    // console.log(new_user);
   }
 
   const userInfo = {
@@ -158,6 +166,23 @@ function Account({ navigation }) {
     uid: 1,
     email: "member1@team18.com",
   };
+
+  const deleteAccount = () => {
+    deleteAccountApi().then((ret) => {
+      if (ret && ret.code == 0) {
+        storage.remove({
+          key: 'login-session'
+        });
+        storage.remove({
+          key: 'account'
+        });
+        Alert.alert("Account successfully deleted!");
+        navigation.push("Camera");
+      } else {
+        Alert.alert("Sorry...Something went wrong", "Please try again later");
+      }
+    })
+  }
 
   const [user, setUser] = useState(userInfo);
   const [uid, setUid] = useState(user.uid + "");
@@ -258,6 +283,12 @@ function Account({ navigation }) {
         <Button
           title="Edit"
           onPress={() => SetEdit(!edit)}
+        />
+        <Button
+          title="Delete Account"
+          color="red"
+          onPress={() => Alert.alert("Are you sure you want to delte this account?", '', [{ text: "Cancel" }, { text: "OK", onPress: () => deleteAccount() }])
+          }
         />
       </View>}
     </SafeAreaView>

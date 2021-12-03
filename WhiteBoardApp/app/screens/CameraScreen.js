@@ -75,12 +75,28 @@ export default function CameraScreen({ navigation }) {
   const [selLang, setSelLang] = useState('Auto');
   const [ocrReturnData, setOcrReturnData] = useState(null);
   const langs = ['Auto', 'C', 'C#', 'Java'];
-  const langList = langs.map(x=>{return {'label':x, 'value':x}});
+  const langList = langs.map(x => { return { 'label': x, 'value': x } });
 
   useEffect(() => {
-    getUserInfo();
+    storage
+      .load({
+        key: 'login-session',
+        autoSync: true,
+        syncInBackground: true,
+      })
+      .then(ret => {
+        console.log(ret, '=== fetch user ===')
+        setUser(ret);
+        console.log(user, '=== user fetch done ===')
+
+      })
+      .catch(err => {
+        setSelGroupId(null);
+        setUser(null);
+      });
 
     (async () => {
+
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
       const galleryStatus =
@@ -101,35 +117,35 @@ export default function CameraScreen({ navigation }) {
 
   const modalBody = (
     <View style={styles.modalBody}>
-        <Dropdown
-            // label="Group"
-            data={groupList}
-            value={selGroupId}
-            onChange={(v)=>{setSelGroupId(v)}}
-          />
-        <View style={styles.divider}></View>
-        <View style={{flexDirection:"row-reverse",margin:10}}>
-          <TouchableOpacity style={{...styles.actions,backgroundColor:"#21ba45"}}
-            onPress={() => {
-              if(selGroupId) {
-                // Alert.alert(selGroupId);
-                setShowRenameDlg(true);
-              }
-              else {
-                Alert.alert('Please select a group.');
-              }
-            }}>
-            <Text style={styles.actionText}>Select</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{...styles.actions,backgroundColor:"#db2828"}} 
-            onPress={() => {
-              // Alert.alert('Modal has been closed.');
-              // setSelGroupId(null);
-              setShowGroups(!showGroups);
-            }}>
-            <Text style={styles.actionText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+      <Dropdown
+        // label="Group"
+        data={groupList}
+        value={selGroupId}
+        onChange={(v) => { setSelGroupId(v) }}
+      />
+      <View style={styles.divider}></View>
+      <View style={{ flexDirection: "row-reverse", margin: 10 }}>
+        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
+          onPress={() => {
+            if (selGroupId) {
+              // Alert.alert(selGroupId);
+              setShowRenameDlg(true);
+            }
+            else {
+              Alert.alert('Please select a group.');
+            }
+          }}>
+          <Text style={styles.actionText}>Select</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#db2828" }}
+          onPress={() => {
+            // Alert.alert('Modal has been closed.');
+            // setSelGroupId(null);
+            setShowGroups(!showGroups);
+          }}>
+          <Text style={styles.actionText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
   const modalContainer = (
@@ -170,13 +186,13 @@ export default function CameraScreen({ navigation }) {
               <View style={styles.divider}></View>
             </View>
             <View style={styles.modalBody}>
-            <TextInput
-              style={{height: 40}}
-              // placeholder="Type the image name"
-              onChangeText={v => setImageName(v)}
-              defaultValue={'image'}
-              value={imageName}
-            />
+              <TextInput
+                style={{ height: 40 }}
+                // placeholder="Type the image name"
+                onChangeText={v => setImageName(v)}
+                defaultValue={'image'}
+                value={imageName}
+              />
               <View style={styles.divider}></View>
               <View style={{ flexDirection: "row-reverse", margin: 10 }}>
                 <TouchableOpacity style={{ ...styles.actions, backgroundColor: "#21ba45" }}
@@ -184,11 +200,9 @@ export default function CameraScreen({ navigation }) {
                     if (!imageName) {
                       // Alert.alert(imageName);
                       // after renaming, we can send the picture for logged in user.
-                      setImageName('image')  
+                      setImageName('image')
                     }
-                    sendPicture(photo, false).then(()=>{                      
-                         
-                    }); // for backend save
+                    sendPicture(photo, false) // for backend save
                     //saveToPhone(returnImg)// for local save
 
                     // setPhoto(null);
@@ -199,7 +213,7 @@ export default function CameraScreen({ navigation }) {
                     //   [{ text: 'OK', onPress: () => saveToPhone(returnImg) }],
                     //   { cancelable: false },
                     //   )// for local save
-                    
+
                   }}>
                   <Text style={styles.actionText}>Ok</Text>
                 </TouchableOpacity>
@@ -219,65 +233,17 @@ export default function CameraScreen({ navigation }) {
     </Modal>
   )
   /******    ***** */
-  const getUserInfo = () => {
-    storage
-      .load({
-        key: 'login-session',
-        // autoSync (default: true) means if data is not found or has expired,
-        // then invoke the corresponding sync method
-        autoSync: true,
-        syncInBackground: true,
-      })
-      .then(ret => {
-        // found data go to then()
-        console.log(ret)
-        setSelGroupId(ret.groupId)
-        // console.log(ret)
-        setUser(ret.userInfo);
-        
-        // for test, in real, Do Comment below line Kk
-        //setGroupList(DATA.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
-        // Do active try-clause in real
-        /*
-        try {
-          const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            redirect:'follow'
-          });
-          const result = await response.json();
-          console.log(result);
-          // setShowGroups(true);
-          // setGroupList(result.all_groups); 
-          setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
-        } catch (error) {
-          console.log(error);
-          console.log('Connection Error!');
-          setGroupList(null);
-          Alert.alert('Error', 'Connection Error!');
-        }
-        */
+  // const getUserInfo = () => {
 
-
-      })
-      .catch(err => {
-        selGroupId(null);
-        setUser(null);
-        // any exception including data not found
-        // goes to catch()
-        // navigation.push('LoginPage');
-      });
-  };
+  // };
 
   const showError = (evt) => {
     //ocrReturnData
-    const ocr_return = ocrReturnData?ocrReturnData.ocr_return:[];
-    if(ocr_return.length){
+    const ocr_return = ocrReturnData ? ocrReturnData.ocr_return : [];
+    if (ocr_return.length) {
       Alert.alert('Compile Error', ocr_return, [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-      { cancelable: false },);
-    }   
+        { cancelable: false });
+    }
 
     // console.log("Coordinates",`x coord = ${evt.nativeEvent.locationX}`);
     // console.log("Coordinates",`y coord = ${evt.nativeEvent.locationY}`);
@@ -290,12 +256,12 @@ export default function CameraScreen({ navigation }) {
     return <>No access to camera or gallery</>;
   }
 
-  const fetchGroups = async () => {
+  const fetchGroups = async (uid) => {
     try {
       console.log(user);
       console.log('fetching groups...')
-      console.log(serverUrl + 'User/groups/' + user.uid)
-      const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
+      console.log(serverUrl + 'User/groups/' + uid)
+      const response = await fetch(serverUrl + 'User/groups/' + uid, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -306,9 +272,14 @@ export default function CameraScreen({ navigation }) {
       const result = await response.json();
       // setShowGroups(true);
       // setGroupList(result.all_groups); 
-      setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
+      setSelGroupId(result.default_group.GpID);
+      setGroupList(result.all_groups.map(x => {
+        return { 'label': x.Gpname, 'value': x.GpID }
+      }));
+
+
       console.log('Done fetching groups...')
-      
+
     } catch (error) {
       console.log(error);
       console.log('Connection Error!');
@@ -359,8 +330,15 @@ export default function CameraScreen({ navigation }) {
   };
 
   const saveToPhone = async (url) => {
-    if ( user ) {
-      if (! showGroups && !showRenameDlg) {setShowGroups(true); return;}
+    // console.log(user, showGroups, showRenameDlg)
+    // if (!user) {
+    //   getUserInfo();
+    // }
+    console.log(user);
+    if (user && user.logged_in) {
+      if (!showGroups && !showRenameDlg) {
+        setShowGroups(true); return;
+      }
       // else if(showGroups && !showRenameDlg) {setShowGroups(true); return;} 
       // show groupList
       // show renameDlg
@@ -402,35 +380,38 @@ export default function CameraScreen({ navigation }) {
     // if logged in: fetch groups & show groups list
     // else call temp_image
     // fetchGroups();
-    sendPicture(picture, true) // isTempIamge
-    if (!user) {
-      sendPicture(picture);
-    }
-    else if (user && !showGroups) {
-      fetchGroups().then(() => {
-        setShowGroups(true);
-        setShowRenameDlg(false);
-      });
-    }
-    else if (user && showGroups && !showRenameDlg) {
-      setShowRenameDlg(true);
-    }
+    console.log(user)
+    if (user && user.logged_in && !groupList) fetchGroups(user.userInfo.uid)
+
+    sendPicture(picture, true) // isTempImage
+    // if (!user) {
+    //   sendPicture(picture);
+    // }
+    // else if (user && !showGroups) {
+    //   fetchGroups().then(() => {
+    //     setShowGroups(true);
+    //     setShowRenameDlg(false);
+    //   });
+    // }
+    // else if (user && showGroups && !showRenameDlg) {
+    //   setShowRenameDlg(true);
+    // }
   }
 
-  const sendPicture = async (picture, isTempIamge) => {
+  const sendPicture = async (picture, isTempImage) => {
 
     // dispatch(removeClipItem());
     // let localUri = picture;
     // console.log(picture);
     let filename = picture.uri.split('/').pop();
-    
+
     // // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-    
+
     // if(filename) setImageName(filename.split('.')[0])
     // else setImageName('image')
-    
+
     // Upload the image using the fetch and FormData APIs
     //let formData = new FormData();
     // "Image, name" is the name of the form field the server expects
@@ -450,17 +431,18 @@ export default function CameraScreen({ navigation }) {
       });
       return data;
     };
-    
-    if(!selLang) setSelLang('Auto');
+
+    if (!selLang) setSelLang('Auto');
 
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
-    const targetUrl = isTempIamge ? tempUploadImgUrl:uploadImageUrl;
-    const targetBody = !isTempIamge ? 
-      createFormData(picture, { name: imageName, description: 'picture', language:selLang }):
-      createFormData(picture, { name: 'TempImage', description: 'picture', language:selLang });
-    try {      
-      const response = await fetch( targetUrl , {
+    const targetUrl = !isTempImage ? uploadImageUrl : tempUploadImgUrl;
+    const targetBody = !isTempImage ?
+      createFormData(picture, { name: imageName, description: 'picture', language: selLang }) :
+      createFormData(picture, { name: 'TempImage', description: 'picture', language: selLang });
+    console.log(isTempImage, targetUrl)
+    try {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         body: targetBody,
         headers: {
@@ -470,49 +452,58 @@ export default function CameraScreen({ navigation }) {
       });
 
       const result = await response.json();
-      console.log(targetUrl,result)
-      if(result.status === 'success') {    
-        if(isTempIamge) {   
-            const ycoord = result['y-coord'];
-            console.log(ycoord);
-            setOcrReturnData(result);
-            const hasError_ = ycoord.length;
-            if(hasError_) Alert.alert('Compiling Error', 'Detected Language: '+selLang+' \n' + 'Please fix the error(s)', 
-              [{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }],);
-            else 
-              Alert.alert('Success',
-                'Detected Language: ' +  selLang + '\n ' + result.ocr_return,
-                [{ text: 'OK', 
-                  onPress: () => {
-                    setReturnImg(serverUrl+'media/'+(isTempIamge?result.image_after_uri:result.CV_return))                     
-                  }}], )
+
+      console.log(targetUrl, result)
+      if (result.status === 'success') {
+        if (isTempImage) {
+          const ycoord = result['y-coord'];
+          console.log(ycoord);
+          setOcrReturnData(result);
+          const hasError_ = ycoord.length;
+          if (hasError_) Alert.alert('Compiling Error', 'Detected Language: ' + selLang + ' \n' + 'Please fix the error(s)',
+            [{ text: 'OK', onPress: () => setReturnImg(serverUrl + 'media/' + (!isTempImage ? result.image_after_uri : result.CV_return)) }]);
+          else
+            Alert.alert('Success',
+              'Detected Language: ' + selLang + '\n ' + result.ocr_return,
+              [{
+                text: 'OK',
+                onPress: () => {
+                  setReturnImg(serverUrl + 'media/' + (!isTempImage ? result.image_after_uri : result.CV_return))
+                }
+              }])
         }
-        else{
-          Alert.alert('Success', 'Successfully saved the image on Server!');
+        else {
+          Alert.alert('Success', 'Successfully saved the image on Server!', [
+            {
+              tex: 'OK', onPress: () => {
+                setShowGroups(false);
+                setShowRenameDlg(false);
+              }
+            }
+          ]);
         }
-        console.log('return_image:'+serverUrl+'media/'+ (isTempIamge ? result.image_after_uri : result.CV_return));       
+        console.log('return_image:' + serverUrl + 'media/' + (!isTempImage ? result.image_after_uri : result.CV_return));
+      }
+      else {
+        setOcrReturnData(null);
         setShowGroups(false);
         setShowRenameDlg(false);
-      }
-      else {        
-        setOcrReturnData(null);
         Alert.alert('Error', 'Something is wrong on Server!');
       }
-      
-      setShowGroups(false);
-      setShowRenameDlg(false);
+
+
 
     } catch (error) {
-      
-      console.error(error.message);
+
+      console.error(error);
       console.log('Connection Error in sending picture!');
-      
+
       setReturnImg(null);
       setOcrReturnData(null);
 
       setShowGroups(false);
       setShowRenameDlg(false);
-      
+
       Alert.alert('Error', 'Something went wrong!');
     }
 
@@ -521,8 +512,8 @@ export default function CameraScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, marginTop: (Platform.OS === 'ios'? 50: 30) }}>
-      {!showGroups && !showRenameDlg && <Topbar title="Camera" navigation={navigation} />}
+    <SafeAreaView style={{ flex: 1, marginTop: (Platform.OS === 'ios' ? 50 : 30) }}>
+      <Topbar title="Camera" navigation={navigation} />
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
           <Camera
@@ -596,7 +587,7 @@ export default function CameraScreen({ navigation }) {
             source={{ uri: photo.uri }}
             style={{
               width: width,
-              height: height - ((Platform.OS === 'ios') ? 45 + 80 + 80 :  60 + 80 + 20), //Topbar & footer, status height due to OS
+              height: height - ((Platform.OS === 'ios') ? 45 + 80 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
               resizeMode: isCamera ? 'cover' : 'contain',
             }}
           />
@@ -611,18 +602,18 @@ export default function CameraScreen({ navigation }) {
               </View>
             </TouchableOpacity>
             <View style={styles.dropdownLang}>
-            <Dropdown
-              // label="Language"
-              data={langList}
-              value={selLang}
-              itemTextStyle = {{fontSize:20,}}
-              selectedItemTextStyle={{ fontSize:20,fontWeight: 'bold' }}
-              selectedItemViewStyle={{ fontSize:20,fontWeight: 'bold', backgroundColor: '#fff' }}
-              selectedItemTextStyle={{ fontWeight: 'bold' }}
-              disableSelectionTick
-              removeLabel
-              onChange={(v)=>{setSelLang(v)}}
-            />
+              <Dropdown
+                // label="Language"
+                data={langList}
+                value={selLang}
+                itemTextStyle={{ fontSize: 20, }}
+                selectedItemTextStyle={{ fontSize: 20, fontWeight: 'bold' }}
+                selectedItemViewStyle={{ fontSize: 20, fontWeight: 'bold', backgroundColor: '#fff' }}
+                selectedItemTextStyle={{ fontWeight: 'bold' }}
+                disableSelectionTick
+                removeLabel
+                onChange={(v) => { setSelLang(v) }}
+              />
             </View>
             <TouchableOpacity onPress={() => {
               setPhoto(null); setShowGroups(false);
@@ -640,55 +631,57 @@ export default function CameraScreen({ navigation }) {
       )}
       {returnImg && (
         <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}          
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <View
+            style={{ flex: 1, width: width, height: height - ((Platform.OS === 'ios') ? 45 + 80 + 80 : 60 + 80 + 20) }}
           >
-            <View 
-              style={{ flex:1, width: width, height: height - ((Platform.OS === 'ios') ?  45 + 80 + 80 : 60 + 80 + 20)}}
-            >
             <TouchableOpacity onPress={(evt) => showError(evt)}>
               <Image
                 // source={{ uri: returnImg }}
                 source={{ uri: `${returnImg}` }}
-                style={{ width: width, height: height - ((Platform.OS === 'ios') ?  45 + 80 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
-                resizeMode: 'contain' }}
-                // onLayout={(event) => {
-                //   event.target.measure(
-                //     (x, y, width, height, pageX, pageY) => {
-                //       // doSomethingWithAbsolutePosition({
-                //       //   x: x + pageX, 
-                //       //   y: y + pageY,
-                //       // });
-                //       console.log(x,y,width,height,pageX,pageY);
-                //     },
-                //   );
-                // }}
+                style={{
+                  width: width, height: height - ((Platform.OS === 'ios') ? 45 + 80 + 80 : 60 + 80 + 20), //Topbar & footer, status height due to OS
+                  resizeMode: 'contain'
+                }}
+              // onLayout={(event) => {
+              //   event.target.measure(
+              //     (x, y, width, height, pageX, pageY) => {
+              //       // doSomethingWithAbsolutePosition({
+              //       //   x: x + pageX, 
+              //       //   y: y + pageY,
+              //       // });
+              //       console.log(x,y,width,height,pageX,pageY);
+              //     },
+              //   );
+              // }}
               />
             </TouchableOpacity>
-            </View>
-            <View style={[styles.modalBottomContainer]}>
-              <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems:'center' }}>
-                    Save
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              {/* <Text style={{ width: 30 }}></Text> */}
-              <TouchableOpacity
-                onPress={() => {
-                  setPhoto(null);
-                  setReturnImg(null);
-                  // Alert.alert('Close')
-                }}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems:'center' }}>
-                    Close
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+          </View>
+          <View style={[styles.modalBottomContainer]}>
+            <TouchableOpacity onPress={() => saveToPhone(returnImg)}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'green', alignSelf: 'flex-start', alignItems: 'center' }}>
+                  Save
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {/* <Text style={{ width: 30 }}></Text> */}
+            <TouchableOpacity
+              onPress={() => {
+                setPhoto(null);
+                setReturnImg(null);
+                // Alert.alert('Close')
+              }}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'red', alignSelf: 'flex-end', alignItems: 'center' }}>
+                  Close
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
       {
@@ -768,15 +761,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20
   },
-  actionText:{
-    color:"#fff"
+  actionText: {
+    color: "#fff"
   },
   dropdownLang: {
-    fontSize: 24, 
+    fontSize: 24,
     fontWeight: 'bold',
-    backgroundColor:"#fff",
-    paddingVertical:10,
-    paddingHorizontal:5,
+    backgroundColor: "#fff",
+    paddingVertical: 10,
+    paddingHorizontal: 5,
     width: 150,
   }
 });

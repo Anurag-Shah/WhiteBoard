@@ -139,11 +139,11 @@ class library extends Component {
     //console.log(this.state.data);
     //<Avatar source={item.avatar_url} />
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
         <Topbar title="Team Images" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
-          //keyExtractor={item => item.name.toString()}
+          keyExtractor={item => item.pk.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider onPress={() => {
               this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080" + item.Image;
@@ -156,7 +156,8 @@ class library extends Component {
               <Avatar source={{ uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080" + item.Image }} />
               <ListItem.Content>
                 <ListItem.Title>{item.name}</ListItem.Title>
-                <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
+                <ListItem.Subtitle>ID: {item.pk.toString()}</ListItem.Subtitle>
+                <ListItem.Subtitle>Created: {item.save_time ? item.save_time.replace("T", " ").substring(0, item.save_time.indexOf('.')) : "NULL"}</ListItem.Subtitle>
 
               </ListItem.Content>
               <AntDesign name="minuscircleo" size={24} color="red" onPress={() => {
@@ -172,7 +173,8 @@ class library extends Component {
                         console.log(item.pk)
                         console.log('Yes Pressed')
                         fetch("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, { method: 'DELETE' });
-                        this.props.navigation.replace("library", { url: this.props.route.params.url })
+                        //this.props.navigation.replace("library", { url: this.props.route.params.url })
+                        this.makeRemoteRequest();
                         //this.render();
                       }
                     },
@@ -242,7 +244,8 @@ const styles = StyleSheet.create({
     // Setting up View inside content in Vertically center.
     justifyContent: 'center',
     flex: 1,
-    margin: 10
+    margin: 10,
+    backgroundColor: "white"
 
   },
 

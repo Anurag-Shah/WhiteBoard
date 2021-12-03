@@ -5,6 +5,7 @@ export default {
   base_url: base_url,
   login: base_url + "User/login/",
   logout: base_url + "User/logout/",
+  delete: base_url + "User/delete/",
   resetPwd: base_url + "password_reset",
   register: base_url + "Register/",
   updateAccount: base_url + "User/update/",

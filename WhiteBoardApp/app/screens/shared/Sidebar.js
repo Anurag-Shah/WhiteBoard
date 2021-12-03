@@ -60,6 +60,7 @@ function Sidebar({ navigation }) {
         syncInBackground: true,
       });
       let user = data;
+      //console.log(user);
       if (user && user.logged_in) {
         setUser(user);
       }
@@ -69,6 +70,7 @@ function Sidebar({ navigation }) {
       switch (err.name) {
         case "NotFoundError":
           console.log("User not found!");
+          setUser(null);
           break;
         case "ExpiredError":
           console.log("Login Session Expired!");
@@ -97,7 +99,7 @@ function Sidebar({ navigation }) {
               onPress: () => navigation.navigate("Camera"),
             },
           ]);
-        } else if (response.code == -1) {
+        } else if (response && response.code == -1) {
           Alert.alert("Already Logged out!");
           user.logged_in = false;
           storage.save({
@@ -113,6 +115,7 @@ function Sidebar({ navigation }) {
             key: "login-session",
             data: user,
           });
+          navigation.navigate("Camera")
         }
       });
     } else {
