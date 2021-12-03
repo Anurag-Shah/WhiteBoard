@@ -71,9 +71,10 @@ def ocr(image_file_name, input_text=None, texttype=None):
 def main():
 	sys.path.insert(1, os.path.abspath("../../Compiler"))
 	sys.path.insert(1, os.path.abspath("../../OCR"))
+	import ocr_utils
 	# Testing function for pipeline
 	print("Testing Images\n")
-	test_im_path = "images/tesseract_tests/"
+	test_im_path = "../../OCR/images/tesseract_tests/"
 	for i, im in enumerate(ocr_utils.ims):
 		print("Image: " + im)
 		if i <= 5:
