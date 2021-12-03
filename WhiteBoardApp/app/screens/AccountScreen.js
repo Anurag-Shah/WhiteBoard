@@ -11,7 +11,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { setAvatarApi, updateAccountApi } from '../requests/api';
+import { setAvatarApi, updateAccountApi, deleteAccountApi } from '../requests/api';
 import * as ImagePicker from 'expo-image-picker';
 import storage from "../config/storage";
 import defAvatar from '../assets/avatar.png';
@@ -165,6 +165,23 @@ function Account({ navigation }) {
     email: "member1@team18.com",
   };
 
+  const deleteAccount = () => {
+    deleteAccountApi().then((ret) => {
+      if (ret && ret.code == 0) {
+        storage.remove({
+          key: 'login-session'
+        });
+        storage.remove({
+          key: 'account'
+        });
+        Alert.alert("Account successfully deleted!");
+        navigation.push("Camera");
+      } else {
+        Alert.alert("Sorry...Something went wrong", "Please try again later");
+      }
+    })
+  }
+
   const [user, setUser] = useState(userInfo);
   const [uid, setUid] = useState(user.uid + "");
   const [username, setUsername] = useState(user.name);
@@ -264,6 +281,12 @@ function Account({ navigation }) {
         <Button
           title="Edit"
           onPress={() => SetEdit(!edit)}
+        />
+        <Button
+          title="Delete Account"
+          color="red"
+          onPress={() => Alert.alert("Are you sure you want to delte this account?", '', [{ text: "Cancel" }, { text: "OK", onPress: () => deleteAccount() }])
+          }
         />
       </View>}
     </SafeAreaView>

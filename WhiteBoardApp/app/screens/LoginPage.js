@@ -119,6 +119,8 @@ function LoginPage({ navigation }) {
         switch (err.name) {
           case 'NotFoundError':
             console.log("User not found!");
+            setUsername("");
+            setPwd("");
             break;
           case 'ExpiredError':
             console.log("Login Session Expired!");

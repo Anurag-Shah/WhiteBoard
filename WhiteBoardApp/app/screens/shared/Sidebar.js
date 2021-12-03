@@ -70,6 +70,7 @@ function Sidebar({ navigation }) {
       switch (err.name) {
         case "NotFoundError":
           console.log("User not found!");
+          setUser(null);
           break;
         case "ExpiredError":
           console.log("Login Session Expired!");

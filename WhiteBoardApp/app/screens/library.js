@@ -149,8 +149,8 @@ class library extends Component {
               <Avatar source={{ uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image }} />
               <ListItem.Content>
                 <ListItem.Title>{item.name}</ListItem.Title>
-                <ListItem.Subtitle>ID: {item.pk}</ListItem.Subtitle>
-                <ListItem.Subtitle>Created: {item.save_time}</ListItem.Subtitle>
+                <ListItem.Subtitle>ID: {item.pk.toString()}</ListItem.Subtitle>
+                <ListItem.Subtitle>Created: {item.save_time ? item.save_time.replace("T", " ").substring(0, item.save_time.indexOf('.')) : "NULL"}</ListItem.Subtitle>
 
               </ListItem.Content>
               <AntDesign name="minuscircleo" size={24} color="red" onPress={() => {
@@ -166,7 +166,8 @@ class library extends Component {
                         console.log(item.pk)
                         console.log('Yes Pressed')
                         fetch("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, { method: 'DELETE' });
-                        this.props.navigation.replace("library", { url: this.props.route.params.url })
+                        //this.props.navigation.replace("library", { url: this.props.route.params.url })
+                        this.makeRemoteRequest();
                         //this.render();
                       }
                     },

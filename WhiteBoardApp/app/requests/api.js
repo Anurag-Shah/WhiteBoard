@@ -86,6 +86,29 @@ export const logoutApi = async () => {
     }
 };
 
+export const deleteAccountApi = async () => {
+    let token = await getToken();
+    try {
+        const response = await fetch(urls.login, {
+            method: 'DELETE',
+            headers: {
+                token: '',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                username: username,
+                password: pwd,
+            })
+        });
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 // No token needed to reset password since the user is not logged in
 export const resetPwdApi = async (email) => {
     try {
@@ -193,7 +216,7 @@ export const getAllTeamMemebersApi = async (id) => {
 };
 
 
-export const getAvatarApi = async (user, email) => {
+export const getAvatarApi = async () => {
     let token = await getToken();
     try {
         const response = await fetch(urls.avatar, {

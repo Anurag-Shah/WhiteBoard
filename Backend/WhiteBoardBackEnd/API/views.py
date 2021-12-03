@@ -631,6 +631,24 @@ def update_user(request):
     serializer = UserSerializer(user)
     return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
 
+# Fuction Delete User
+# Author: Jenna Zhang
+# Return value: JsonResponse
+# This function will delete the account
+
+
+@authentication_classes([TokenAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@api_view(['DELETE'])
+@transaction.atomic()
+def delete_account(request):
+    data = JSONParser().parse(request)
+    user = User.objects.get(pk=request.user.pk)
+    user.group_set.delete(leader_uid=user.pk)
+    user.delete()
+    request.user.delete()
+    return JsonResponse({"code": 0, "msg": "Account Deleted!"})
+
 
 class Avatar(APIView):
     authentication_classes = [TokenAuthentication]
