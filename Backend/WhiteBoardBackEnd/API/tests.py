@@ -7,14 +7,14 @@ from ocr_lang_detect import detect
 
 class CompilerTestCase(TestCase):
 	def setUp(self):
-		c_execute = '#include<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}'
-		c_error = '#incelude<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}'
-		cpp_execute = "#include <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}"
-		cpp_error = "#incelude <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}"
-		cs_execute = "namespace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WriteLine(\"Hello World\");\n}\n}\n}"
-		cs_error = "namespeace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WriteLine(\"Hello World\");\n}\n}\n}"
-		java_execute = "class HelloWorld {\npublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}"
-		java_error = "clases HelloWorld {\npublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}"
+		self.c_execute = '#include<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}'
+		self.c_error = '#incelude<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}'
+		self.cpp_execute = "#include <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}"
+		self.cpp_error = "#incelude <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}"
+		self.cs_execute = "namespace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WriteLine(\"Hello World\");\n}\n}\n}"
+		self.cs_error = "namespeace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WriteLine(\"Hello World\");\n}\n}\n}"
+		self.java_execute = "class HelloWorld {\npublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}"
+		self.java_error = "clases HelloWorld {\npublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}"
 
 	def test_c(self):
 		lang = detect(self.c_execute)
