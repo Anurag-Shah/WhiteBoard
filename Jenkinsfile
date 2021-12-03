@@ -13,5 +13,6 @@ node('built-in') {
     } catch (e) {
         echo 'Build Failed!'
         sh './Failed_script.sh'
+        currentBuild.result = 'FAILURE'
     }
 }
