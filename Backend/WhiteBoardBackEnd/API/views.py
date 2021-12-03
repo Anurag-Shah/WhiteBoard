@@ -47,6 +47,7 @@ from django.core.files.temp import NamedTemporaryFile
 from PIL import Image
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from base64 import b64encode
 
 import threading
 import time
