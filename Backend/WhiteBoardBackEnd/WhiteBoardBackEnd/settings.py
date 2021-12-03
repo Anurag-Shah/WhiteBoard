@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'WhiteBoardBackEnd',
     'django_jenkins',
+    'test_wrong_build',
 ]
 
 MIDDLEWARE = [
