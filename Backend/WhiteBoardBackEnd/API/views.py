@@ -257,9 +257,9 @@ class ImageUpload(APIView):
         image_path = image.Image
         ImageID = image.pk
         print("ID is: " + str(ImageID))
-        path = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/" + \
+        path = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/" + \
             str(image_path)
-        path_after = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/AfterImages/"
+        path_after = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/AfterImages/"
         return_data = {}
         return_data['status'] = 'success'
         return_data['image_uri'] = str(image_path)
