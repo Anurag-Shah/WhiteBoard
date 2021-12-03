@@ -44,8 +44,6 @@ def compiler_wrapper(compiler_input, language):
 				line_numbers += [int(temp_m[0])]
 		return out_text, line_numbers
 	elif language == "C++":
-		compiler_input = compiler_input.replace("%", "%%")
-		compiler_input = compiler_input.replace("\\n\"", "\\\\n\"")
 		dockerCommand = ["/bin/sh", "-c", ("printf '" + compiler_input + "' > compile.cpp && g++ compile.cpp && ./a.out")]
 		client = docker.from_env()
 		error_r = False
@@ -66,8 +64,6 @@ def compiler_wrapper(compiler_input, language):
 				line_numbers += [int(temp_m[0])]
 		return out_text, line_numbers
 	elif language == "C#":
-		compiler_input = compiler_input.replace("%", "%%")
-		compiler_input = compiler_input.replace("\\n\"", "\\\\n\"")
 		dockerCommand = ["/bin/sh", "-c", ("printf '" + compiler_input + "' > compile.cs && mcs compile.cs && mono compile.exe")]
 		client = docker.from_env()
 		error_r = False
@@ -89,8 +85,6 @@ def compiler_wrapper(compiler_input, language):
 				line_numbers += [int(temp_m[0])]
 		return out_text, line_numbers
 	elif language.upper() == "JAVA":
-		compiler_input = compiler_input.replace("%", "%%")
-		compiler_input = compiler_input.replace("\\n\"", "\\\\n\"")
 		temp = compiler_input
 		classn = ""
 		if len(re.findall("class .* {", temp)) > 1:
