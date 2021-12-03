@@ -51,21 +51,22 @@ def preprocess_tesseract(image, hh=False):
 	gray = cv2.cvtColor(out2, cv2.COLOR_BGR2GRAY)
 	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
 		gray = cv2.bitwise_not(gray)
-		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 10)
+		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 10)
 	else:
-		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 10)
 		threshed = cv2.bitwise_not(threshed)
-	((cx, cy), (w, h), ang) = cv2.minAreaRect(cv2.findNonZero(threshed))
-	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
-		ang = 0
-	elif abs(math.ceil(ang)) >= 45:
-		w, h = h, w
-		ang -= 90
-	if hh:
-		ang = 0
-	M = cv2.getRotationMatrix2D((cx,cy), ang, 1.0)
-	rotated = cv2.warpAffine(threshed, M, (out2.shape[1], out2.shape[0]))
-	rotated_colored = cv2.cvtColor(rotated, cv2.COLOR_GRAY2BGR)
+	#((cx, cy), (w, h), ang) = cv2.minAreaRect(cv2.findNonZero(threshed))
+	#if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
+	#	ang = 0
+	#elif abs(math.ceil(ang)) >= 45:
+	#	w, h = h, w
+	#	ang -= 90
+	#if hh:
+	#	ang = 0
+	#M = cv2.getRotationMatrix2D((cx,cy), ang, 1.0)
+	#rotated = cv2.warpAffine(threshed, M, (out2.shape[1], out2.shape[0]))
+	#rotated_colored = cv2.cvtColor(rotated, cv2.COLOR_GRAY2BGR)
+	rotated_colored = cv2.cvtColor(threshed, cv2.COLOR_GRAY2BGR)
 
 	# Noise Removal
 	denoised = cv2.fastNlMeansDenoisingColored(rotated_colored, None, 10, 10, 7, 15)

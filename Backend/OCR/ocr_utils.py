@@ -18,8 +18,8 @@ ims = [
 	"test_cpp.png",
 	"test_cs.png",
 	"test_broken.png",
-	"test_tall_2.jpg",
-	"ph1.jpg",
+	"test_tall_1.jpg",
+	"test_nontrivial_2.png",
 	"ph3.jpg"
 	]
 

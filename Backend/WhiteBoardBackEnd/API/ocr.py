@@ -77,7 +77,7 @@ def main():
 	test_im_path = "../../OCR/images/tesseract_tests/"
 	for i, im in enumerate(ocr_utils.ims):
 		print("Image: " + im)
-		if i <= 5:
+		if i <= 6:
 			out = ocr(test_im_path + im, "typeform")
 		else:
 			out = ocr(test_im_path + im, "handwritten")

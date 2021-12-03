@@ -64,7 +64,7 @@ def main():
 	for i, im in enumerate(ocr_utils.ims):
 		image = apply_orientation(Image.open(test_im_path + im))
 		image = image.convert('RGB')
-		if i <= 5:
+		if i <= 6:
 			out = ocr_wrapper(image)
 		else:
 			out = ocr_wrapper(image, texttype="handwritten")
