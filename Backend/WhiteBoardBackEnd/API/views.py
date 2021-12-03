@@ -606,7 +606,7 @@ def update_user(request):
     try:
         email_match = User.objects.get(email=email)
         if email_match.pk == user.pk:
-            return JsonResponse({"code": -4, "msg": "What? They are the same?"})
+            pass
         else:
             emailDup = 1
     except User.DoesNotExist:

@@ -123,13 +123,13 @@ function Account({ navigation }) {
   const update = () => {
     console.log(username);
     updateAccountApi(username, email).then((res) => {
+      console.log(res);
       if (res) {
         if (res.code == 0) {
           setNameDup(false);
           setEmailDup(false);
           let new_avatar = urls.base_url.slice(0, -1) + res.user.avatar;
           res.user.avatar = new_avatar;
-          console.log(res);
           update_user(res);
           Alert.alert("UserInfo successfully updated!");
           SetEdit(false);
