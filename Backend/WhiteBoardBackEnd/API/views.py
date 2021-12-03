@@ -359,8 +359,8 @@ class TempImageUpload(APIView):
         file = request.data['Image']
         name = request.data['name']
         random_str = b64encode(os.urandom(10)).decode("utf-8")
-        custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + str(random_str) + ".png"
-        CVImageOut = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + str(random_str) + ".png"
+        custom_name = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + str(random_str) + ".png"
+        CVImageOut = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + str(random_str) + ".png"
         temp_file = open(custom_name, "wb")
         try:
             temp_file.write(base64.b64decode(file))
