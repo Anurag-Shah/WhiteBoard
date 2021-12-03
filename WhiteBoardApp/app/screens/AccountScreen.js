@@ -106,6 +106,7 @@ function Account({ navigation }) {
       if (res && res.code == 0) {
         let new_avatar = urls.base_url.slice(0, -1) + res.user.avatar;
         res.user.avatar = new_avatar;
+        console.log(res);
         update_user(res);
         setUri(null);
         setAvatar(picture);
@@ -120,6 +121,7 @@ function Account({ navigation }) {
   };
 
   const update = () => {
+    console.log(username);
     updateAccountApi(username, email).then((res) => {
       if (res) {
         if (res.code == 0) {
@@ -127,6 +129,7 @@ function Account({ navigation }) {
           setEmailDup(false);
           let new_avatar = urls.base_url.slice(0, -1) + res.user.avatar;
           res.user.avatar = new_avatar;
+          console.log(res);
           update_user(res);
           Alert.alert("UserInfo successfully updated!");
           SetEdit(false);
@@ -152,6 +155,7 @@ function Account({ navigation }) {
       data: new_user,
     });
     setUser(new_user);
+    // console.log(new_user);
   }
 
   const userInfo = {

@@ -208,7 +208,7 @@ class TeamScreen extends Component {
                 syncInBackground: true,
             })
             .then((ret) => {
-                console.log(ret);
+                // console.log(ret);
                 this.setState({
                     user: ret.userInfo,
                     loading: false,

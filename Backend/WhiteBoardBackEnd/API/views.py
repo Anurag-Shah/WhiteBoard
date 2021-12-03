@@ -321,7 +321,7 @@ class ImageUpload(APIView):
 class ImageDeleteWithID(APIView):
     permission_classes = [AllowAny, ]
 
-    def delete(self, request, id):        
+    def delete(self, request, id):
         try:
             ImageObject = GroupImages.objects.get(pk=id)
         except:
@@ -360,8 +360,10 @@ class TempImageUpload(APIView):
         name = request.data['name']
         random_str = b64encode(os.urandom(10)).decode("utf-8")
         random_str = random_str.replace("/", "a")
-        custom_name = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + str(random_str) + ".png"
-        CVImageOut = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + str(random_str) + ".png"
+        custom_name = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + \
+            str(random_str) + ".png"
+        CVImageOut = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + \
+            str(random_str) + ".png"
         temp_file = open(custom_name, "wb")
         try:
             temp_file.write(base64.b64decode(file))
@@ -433,6 +435,8 @@ class TempImageUpload(APIView):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function receives image from the frontend and send it to ocr to process the image
+
+
 @authentication_classes([TokenAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
@@ -529,6 +533,8 @@ def register(request):
 # Author: Jenna Zhang
 # Return value: JsonResponse
 # This function allows the user to log in by providing their username and password
+
+
 @api_view(http_method_names=['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -594,8 +600,6 @@ def update_user(request):
     except User.DoesNotExist:
         nameDup = 0
         user.name = name
-        defaultGroup.Gpname = name
-        defaultGroup.description = name + "'s default group"
         request.user.username = name
 
     # check if the email is duplicated
@@ -620,10 +624,12 @@ def update_user(request):
         return JsonResponse({"code": -3, "msg": "Both email address and username are in use"})
 
     user.save()
+    defaultGroup.Gpname = name
+    defaultGroup.description = name + "'s default group"
     defaultGroup.save()
     request.user.save()
     serializer = UserSerializer(user)
-    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
+    return JsonResponse({"code": 0, "msg": "?Account info successfully updated!", "user": serializer.data})
 
 
 class Avatar(APIView):

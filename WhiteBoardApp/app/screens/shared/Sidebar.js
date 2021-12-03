@@ -60,6 +60,7 @@ function Sidebar({ navigation }) {
         syncInBackground: true,
       });
       let user = data;
+      //console.log(user);
       if (user && user.logged_in) {
         setUser(user);
       }
@@ -97,7 +98,7 @@ function Sidebar({ navigation }) {
               onPress: () => navigation.navigate("Camera"),
             },
           ]);
-        } else if (response.code == -1) {
+        } else if (response && response.code == -1) {
           Alert.alert("Already Logged out!");
           user.logged_in = false;
           storage.save({
@@ -113,6 +114,7 @@ function Sidebar({ navigation }) {
             key: "login-session",
             data: user,
           });
+          navigation.navigate("Camera")
         }
       });
     } else {

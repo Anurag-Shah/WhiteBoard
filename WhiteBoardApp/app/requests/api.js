@@ -18,6 +18,23 @@ export const getToken = async () => {
     }
 };
 
+const retrieveUser = async () => {
+    // console.log("Side bar retrieving data");
+    try {
+        let data = await storage.load({
+            key: "login-session",
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
+            syncInBackground: true,
+        });
+        return data;
+    } catch (err) {
+        console.log(err);
+        return null
+    }
+};
+
 export const loginApi = async (username, pwd) => {
     try {
         const response = await fetch(urls.login, {
@@ -58,6 +75,14 @@ export const logoutApi = async () => {
         return data;
     } catch (error) {
         console.error(error);
+        return null;
+        // let user = await retrieveUser();
+        // user.logged_in = false;
+        // user.logged_in = false;
+        // storage.save({
+        //     key: "login-session",
+        //     data: user,
+        // });
     }
 };
 
