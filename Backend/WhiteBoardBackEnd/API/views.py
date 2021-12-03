@@ -606,7 +606,7 @@ def update_user(request):
     try:
         email_match = User.objects.get(email=email)
         if email_match.pk == user.pk:
-            pass
+            return JsonResponse({"code": -4, "msg": "What? They are the same?"})
         else:
             emailDup = 1
     except User.DoesNotExist:
@@ -629,7 +629,7 @@ def update_user(request):
     defaultGroup.save()
     request.user.save()
     serializer = UserSerializer(user)
-    return JsonResponse({"code": 0, "msg": "?Account info successfully updated!", "user": serializer.data})
+    return JsonResponse({"code": 0, "msg": "Account info successfully updated!", "user": serializer.data})
 
 
 class Avatar(APIView):
