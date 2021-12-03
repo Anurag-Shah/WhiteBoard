@@ -12,6 +12,6 @@ node('built-in') {
         }   
     } catch (e) {
         echo 'Build Failed!'
-        git reset --hard HEAD@{1}
+        sg '.Failed_script.sh'
     }
 }
