@@ -26,7 +26,7 @@ class CompilerTestCase(TestCase):
 		self.assertEqual(lang, "C")
 
 	def test_cpp(self):
-		lang = detect(self.cpp_execute)
+		lang = detect(self.cpp_execute) 
 		out1 = compiler_wrapper(self.cpp_execute, lang)
 		out2 = compiler_wrapper(self.cpp_error, lang)
 		self.assertEqual(out1[0], "Hello World")
