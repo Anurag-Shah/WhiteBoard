@@ -134,9 +134,11 @@ function Account({ navigation }) {
           Alert.alert("UserInfo successfully updated!");
           SetEdit(false);
         } else if (res.code == -1) {
+          Alert.alert("Username already in use");
           setNameDup(true);
           setEmailDup(false);
         } else if (res.code == -2) {
+          Alert.alert("Email provided already in use");
           setNameDup(false);
           setEmailDup(true);
         } else {

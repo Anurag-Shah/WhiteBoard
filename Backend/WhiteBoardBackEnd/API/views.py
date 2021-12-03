@@ -642,9 +642,8 @@ def update_user(request):
 @api_view(['DELETE'])
 @transaction.atomic()
 def delete_account(request):
-    data = JSONParser().parse(request)
     user = User.objects.get(pk=request.user.pk)
-    user.group_set.delete(leader_uid=user.pk)
+    user.group_set.filter(leader_uid=user.pk).delete()
     user.delete()
     request.user.delete()
     return JsonResponse({"code": 0, "msg": "Account Deleted!"})
