@@ -21,12 +21,13 @@ from PIL import Image
 #	Backend/OCR/ocr_wrapper.py
 #	Backend/Compiler/compiler_wrapper.py
 
-def ocr(image_file_name, input_text=None):
+def ocr(image_file_name, input_text=None, texttype=None):
 	# Setup migrated into the function
 	from ocr_wrapper import ocr_wrapper
 	from compiler_wrapper import compiler_wrapper
 	from ocr_postprocess_image import ocr_postprocess_image
 	import ocr_lang_detect
+	from ocr_utils import apply_orientation
 
 	# Output:
 	# 1. Postprocessed image
@@ -44,16 +45,20 @@ def ocr(image_file_name, input_text=None):
 	imlang = ""
 	left_coords = None
 	line_numbers = []
+	if texttype is None:
+		hh = True
+	else:
+		hh = False
 
 	if image_file_name != None:
-		image = Image.open(image_file_name).convert('RGB')
-		ocr_out, imlang, outimage, imtype = ocr_wrapper(image)
+		image = Image.open(image_file_name)
+		image = apply_orientation(image)
+		image = image.convert('RGB')
+		ocr_out, imlang, outimage, imtype = ocr_wrapper(image, texttype=texttype)
 		while "\n\n" in ocr_out:
 			ocr_out = ocr_out.replace("\n\n", "\n")
 		compiler_out, line_numbers = compiler_wrapper(ocr_out, imlang)
-		print(compiler_out)
-		exit()
-		outimage, left_coords = ocr_postprocess_image(outimage, line_numbers)
+		outimage, left_coords = ocr_postprocess_image(image, line_numbers, hh=hh)
 	else:
 		# Raw text input
 		imlang = ocr_lang_detect.detect(input_text)
@@ -67,12 +72,17 @@ def main():
 	sys.path.insert(1, os.path.abspath("../../Compiler"))
 	sys.path.insert(1, os.path.abspath("../../OCR"))
 	# Testing function for pipeline
-	test_im_path = "../../OCR/images/tesseract_tests/"
-	test_im = "test_broken"
-	imsuffix = ".png"
-	out = ocr(test_im_path + test_im + imsuffix)
-	print(out)
-	out[0].save("result.png")
+	print("Testing Images\n")
+	test_im_path = "images/tesseract_tests/"
+	for i, im in enumerate(ocr_utils.ims):
+		print("Image: " + im)
+		if i <= 5:
+			out = ocr(test_im_path + im, "typeform")
+		else:
+			out = ocr(test_im_path + im, "handwritten")
+		print(out)
+		out[0].save("result" + im + ".png")
+	print("\n\nTesting Code\n")
 	print(ocr(None, '#include<stdio.h>\nint main() {printf("Hello World");}'))
 
 if __name__ == "__main__":

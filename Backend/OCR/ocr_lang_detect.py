@@ -20,6 +20,8 @@ import ocr_utils
 
 def detect(code):
 	language = ocr_utils.GLOBAL_GUESSER.language_name(code)
+	if language not in ["C", "C++", "C#", "Java"]:
+		return "C"
 	return language
 
 def main():

@@ -10,7 +10,7 @@
 #############################################################################
 
 import ocr_utils
-from ocr_utils import OCRError
+from ocr_utils import OCRError, apply_orientation
 import preprocess_handwritten
 import preprocess_typeform
 import charseg_handwritten
@@ -40,40 +40,36 @@ from PIL import Image
 #	ocr_postprocess_text.py
 #	ocr_texttype_detection.py
 
-def ocr_wrapper(image):
-	texttype = ocr_texttype_detection.detect(image)
+def ocr_wrapper(image, texttype=None):
+	if texttype is None:
+		texttype = ocr_texttype_detection.detect(image)
 	code = ""
-	out_image = ""
-	if texttype == "typeform":
-		im = preprocess_typeform.preprocess_image(image)
-		out = ""
-		for char in charseg_typeform.segment(im):
-			out += ocr_typeform.ocr_typeform(im)
-		code = ocr_postprocess_text.ocr_postprocess(out)
-		out_image = im
-	elif texttype == "handwritten":
-		im = preprocess_handwritten.preprocess_image(image)
-		out = ""
-		for char in charseg_handwritten.segment(im):
-			out += ocr_handwritten.ocr_handwritten(im)
-		code = ocr_postprocess_text.ocr_postprocess(out)
-		out_image = im
-	elif texttype == "typeform_pretrained":
-		out = preprocess_typeform.preprocess_tesseract(image)
-		out_image = out
+	out = ""
+	if texttype == "handwritten":
+		out = preprocess_handwritten.preprocess_image(image)
+		ocr_out_text = ocr_typeform.ocr_tesseract(out)
+		code = ocr_postprocess_text.tesseract_postprocess(ocr_out_text)
+	elif texttype == "typeform":
+		out = preprocess_typeform.preprocess_tesseract(image, hh=False)
 		ocr_out_text = ocr_typeform.ocr_tesseract(out)
 		code = ocr_postprocess_text.tesseract_postprocess(ocr_out_text)
 	else:
 		raise OCRError
 	language = ocr_lang_detect.detect(code)
-	return (code, language, out_image, texttype)
+	return (code, language, out, texttype)
 
 def main():
 	# Testing function for pipeline
 	test_im_path = "images/tesseract_tests/"
-	test_im = "min_area_rect_test"
-	imsuffix = ".png"
-	print(ocr_wrapper(Image.open(test_im_path + test_im + imsuffix).convert('RGB')))
+	for i, im in enumerate(ocr_utils.ims):
+		image = apply_orientation(Image.open(test_im_path + im))
+		image = image.convert('RGB')
+		if i <= 5:
+			out = ocr_wrapper(image)
+		else:
+			out = ocr_wrapper(image, texttype="handwritten")
+		print(out)
+		out[2].show()
 
 if __name__ == "__main__":
 	main()

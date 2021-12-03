@@ -30,7 +30,7 @@ MINUS_THREE = [14, 15, 16]
 #	1. input_image - image
 # This function performs any postprocessing needed on image
 
-def ocr_postprocess_image(input_image, line_numbers):
+def ocr_postprocess_image(input_image, line_numbers, hh=False):
 	pil_w, pil_h = input_image.size
 	image = np.array(input_image)
 	image = image[:, :, ::-1].copy()
@@ -38,18 +38,22 @@ def ocr_postprocess_image(input_image, line_numbers):
 	bg_color = detect_background_color(out_image)
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
-		__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+		#__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+		gray = cv2.bitwise_not(gray)
+		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 10)
 	else:
-		__, threshed = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+		#__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+		threshed = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+		threshed = cv2.bitwise_not(threshed)
 	((cx, cy), (w, h), ang) = cv2.minAreaRect(cv2.findNonZero(threshed))
-	
-	print(ang, line_numbers)
+
 	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
 		ang = 0
-		output_ang = 0
 	elif abs(math.ceil(ang)) >= 45:
 		w, h = h, w
 		ang -= 90
+	if hh:
+		ang = 0
 	output_ang = ang
 
 	M = cv2.getRotationMatrix2D((cx,cy), ang, 1.0)
