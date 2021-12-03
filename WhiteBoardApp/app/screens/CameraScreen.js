@@ -78,9 +78,25 @@ export default function CameraScreen({ navigation }) {
   const langList = langs.map(x=>{return {'label':x, 'value':x}});
 
   useEffect(() => {
-    getUserInfo();
+    storage
+      .load({
+        key: 'login-session',
+        autoSync: true,
+        syncInBackground: true,
+      })
+      .then(ret => {
+        console.log(ret, '=== fetch user ===')
+        setUser(ret);
+        console.log(user, '=== user fetch done ===')
+        
+      })
+      .catch(err => {
+        setSelGroupId(null);
+        setUser(null);
+      });
 
     (async () => {
+      
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
       const galleryStatus =
@@ -186,9 +202,7 @@ export default function CameraScreen({ navigation }) {
                       // after renaming, we can send the picture for logged in user.
                       setImageName('image')  
                     }
-                    sendPicture(photo, false).then(()=>{                      
-                         
-                    }); // for backend save
+                    sendPicture(photo, false) // for backend save
                     //saveToPhone(returnImg)// for local save
 
                     // setPhoto(null);
@@ -219,57 +233,9 @@ export default function CameraScreen({ navigation }) {
     </Modal>
   )
   /******    ***** */
-  const getUserInfo = () => {
-    storage
-      .load({
-        key: 'login-session',
-        // autoSync (default: true) means if data is not found or has expired,
-        // then invoke the corresponding sync method
-        autoSync: true,
-        syncInBackground: true,
-      })
-      .then(ret => {
-        // found data go to then()
-        console.log(ret)
-        setSelGroupId(ret.groupId)
-        // console.log(ret)
-        setUser(ret);
-        
-        // for test, in real, Do Comment below line Kk
-        //setGroupList(DATA.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
-        // Do active try-clause in real
-        /*
-        try {
-          const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            redirect:'follow'
-          });
-          const result = await response.json();
-          console.log(result);
-          // setShowGroups(true);
-          // setGroupList(result.all_groups); 
-          setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
-        } catch (error) {
-          console.log(error);
-          console.log('Connection Error!');
-          setGroupList(null);
-          Alert.alert('Error', 'Connection Error!');
-        }
-        */
-
-
-      })
-      .catch(err => {
-        selGroupId(null);
-        setUser(false);
-        // any exception including data not found
-        // goes to catch()
-        // navigation.push('LoginPage');
-      });
-  };
+  // const getUserInfo = () => {
+    
+  // };
 
   const showError = (evt) => {
     //ocrReturnData
@@ -290,12 +256,12 @@ export default function CameraScreen({ navigation }) {
     return <>No access to camera or gallery</>;
   }
 
-  const fetchGroups = async () => {
+  const fetchGroups = async (uid) => {
     try {
       // console.log(user);
       console.log('fetching groups...')
-      console.log(serverUrl + 'User/groups/' + user.uid)
-      const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
+      console.log(serverUrl + 'User/groups/' + uid)
+      const response = await fetch(serverUrl + 'User/groups/' + uid, {
         method: 'GET',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -306,7 +272,11 @@ export default function CameraScreen({ navigation }) {
       const result = await response.json();
       // setShowGroups(true);
       // setGroupList(result.all_groups); 
-      setGroupList(result.all_groups.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
+      setSelGroupId(result.default_group.GpID);
+      setGroupList(result.all_groups.map(x=>{
+        return {'label':x.Gpname, 'value':x.GpID}}));
+
+      
       console.log('Done fetching groups...')
       
     } catch (error) {
@@ -359,8 +329,15 @@ export default function CameraScreen({ navigation }) {
   };
 
   const saveToPhone = async (url) => {
+    // console.log(user, showGroups, showRenameDlg)
+    // if (!user) {
+    //   getUserInfo();
+    // }
+    console.log( user );
     if ( user ) {
-      if (! showGroups && !showRenameDlg) {setShowGroups(true); return;}
+      if (! showGroups && !showRenameDlg) {
+        setShowGroups(true); return;
+      }
       // else if(showGroups && !showRenameDlg) {setShowGroups(true); return;} 
       // show groupList
       // show renameDlg
@@ -401,8 +378,11 @@ export default function CameraScreen({ navigation }) {
     // check whether user logged in or not
     // if logged in: fetch groups & show groups list
     // else call temp_image
-    fetchGroups();
-    sendPicture(picture, true) // isTempIamge
+    // fetchGroups();
+    console.log(user)
+    if(user && !groupList) fetchGroups(user.userInfo.uid)
+   
+    sendPicture(picture, true) // isTempImage
     // if (!user) {
     //   sendPicture(picture);
     // }
@@ -417,7 +397,7 @@ export default function CameraScreen({ navigation }) {
     // }
   }
 
-  const sendPicture = async (picture, isTempIamge) => {
+  const sendPicture = async (picture, isTempImage) => {
 
     // dispatch(removeClipItem());
     // let localUri = picture;
@@ -455,10 +435,11 @@ export default function CameraScreen({ navigation }) {
 
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
-    const targetUrl = isTempIamge ? uploadImageUrl : tempUploadImgUrl;
-    const targetBody = !isTempIamge ? 
+    const targetUrl = !isTempImage ? uploadImageUrl : tempUploadImgUrl;
+    const targetBody = !isTempImage ? 
       createFormData(picture, { name: imageName, description: 'picture', language:selLang }):
       createFormData(picture, { name: 'TempImage', description: 'picture', language:selLang });
+    console.log(isTempImage, targetUrl)
     try {      
       const response = await fetch( targetUrl , {
         method: 'POST',
@@ -473,26 +454,25 @@ export default function CameraScreen({ navigation }) {
 
       console.log(targetUrl,result)
       if(result.status === 'success') {    
-        if(isTempIamge) {   
+        if(isTempImage) {   
             const ycoord = result['y-coord'];
             console.log(ycoord);
             setOcrReturnData(result);
             const hasError_ = ycoord.length;
             if(hasError_) Alert.alert('Compiling Error', 'Detected Language: '+selLang+' \n' + 'Please fix the error(s)', 
-              [{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(user?result.image_after_uri:result.CV_return)) }],);
+              [{ text: 'OK', onPress: () => setReturnImg(serverUrl+'media/'+(!isTempImage?result.image_after_uri:result.CV_return)) }],);
             else 
               Alert.alert('Success',
                 'Detected Language: ' +  selLang + '\n ' + result.ocr_return,
                 [{ text: 'OK', 
                   onPress: () => {
-                    setReturnImg(serverUrl+'media/'+(isTempIamge?result.image_after_uri:result.CV_return))                     
+                    setReturnImg(serverUrl+'media/' + ( !isTempImage ? result.image_after_uri:result.CV_return ))                     
                   }}], )
         }
         else{
           Alert.alert('Success', 'Successfully saved the image on Server!');
         }
-        console.log('return_image:'+serverUrl+'media/'+ (isTempIamge ? result.image_after_uri : result.CV_return));       
-        
+        console.log('return_image:'+serverUrl+'media/'+ (!isTempImage ? result.image_after_uri : result.CV_return));       
       }
       else {        
         setOcrReturnData(null);
