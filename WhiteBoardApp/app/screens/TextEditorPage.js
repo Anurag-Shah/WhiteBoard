@@ -393,7 +393,7 @@ export default class TextEditorPage extends React.Component {
     try {
       const text = {
         compile_text: this.state.typedCode,
-        language: "C",
+        language: this.state.lang,
       };
 
       const res = await fetch(urls.text_upload + this.state.selGroupId, {
