@@ -356,7 +356,6 @@ class TempImageUpload(APIView):
 
     def post(self, request):
         file = request.data['Image']
-        print(file)
         name = request.data['name']
         custom_name = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + name + ".png"
         CVImageOut = "/home/chunao/WhiteBoard/Backend/WhiteBoardBackEnd/media/TempImages/After_temp_" + name + ".png"
