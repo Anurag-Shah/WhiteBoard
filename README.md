@@ -1,2 +1,2 @@
-# OCR-Code-Scanner
-App that scans printed/handwritten code and 
+# WhiteBoard
+Mobile application to scan printed/handwritten code, compile it on the backend, and collaborate on handwritten code projects.
