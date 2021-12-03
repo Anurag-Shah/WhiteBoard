@@ -12,6 +12,6 @@ node('built-in') {
         }   
     } catch (e) {
         echo 'Build Failed!'
-        sh '.Failed_script.sh'
+        sh './Failed_script.sh'
     }
 }
