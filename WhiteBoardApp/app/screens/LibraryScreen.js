@@ -121,7 +121,7 @@ class LibraryScreen extends Component {
         <Topbar title="Team Library" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
-          //keyExtractor={item => item.name.toString()}
+          keyExtractor={item => item.GpID.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider onPress={() => this.props.navigation.push("library", { url: item.GpID })}>
               <ListItem.Content>
