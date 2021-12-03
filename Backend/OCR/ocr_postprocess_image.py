@@ -35,14 +35,19 @@ def ocr_postprocess_image(input_image, line_numbers):
 	image = np.array(input_image)
 	image = image[:, :, ::-1].copy()
 	out_image = image.copy()
-	bg_color = detect_background_color(input_image)
+	bg_color = detect_background_color(out_image)
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
 		__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 	else:
-		__, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+		__, threshed = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
 	((cx, cy), (w, h), ang) = cv2.minAreaRect(cv2.findNonZero(threshed))
-	if abs(math.ceil(ang)) >= 45:
+	
+	print(ang, line_numbers)
+	if (bg_color[0] + bg_color[1] + bg_color[2]) / 3 < 100:
+		ang = 0
+		output_ang = 0
+	elif abs(math.ceil(ang)) >= 45:
 		w, h = h, w
 		ang -= 90
 	output_ang = ang
@@ -51,7 +56,10 @@ def ocr_postprocess_image(input_image, line_numbers):
 	rotated = cv2.warpAffine(threshed, M, (image.shape[1], image.shape[0]))
 
 	rotated_out = cv2.warpAffine(out_image, M, (out_image.shape[1], out_image.shape[0]), borderValue=bg_color)
-
+	#cv2.imshow("", threshed)
+	#cv2.imshow("", rotated)
+	#cv2.waitKey(0)
+	#cv2.destroyAllWindows()
 	hist = cv2.reduce(rotated, 1, cv2.REDUCE_AVG).reshape(-1)
 	diff_thresh = 2
 	H,W = image.shape[:2]
