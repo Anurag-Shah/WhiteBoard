@@ -233,7 +233,7 @@ export default function CameraScreen({ navigation }) {
         console.log(ret)
         setSelGroupId(ret.groupId)
         // console.log(ret)
-        setUser(ret);
+        setUser(ret.userInfo);
         
         // for test, in real, Do Comment below line Kk
         //setGroupList(DATA.map(x=>{return {'label':x.Gpname, 'value':x.GpID}}));
@@ -264,7 +264,7 @@ export default function CameraScreen({ navigation }) {
       })
       .catch(err => {
         selGroupId(null);
-        setUser(false);
+        setUser(null);
         // any exception including data not found
         // goes to catch()
         // navigation.push('LoginPage');
@@ -292,13 +292,13 @@ export default function CameraScreen({ navigation }) {
 
   const fetchGroups = async () => {
     try {
-      // console.log(user);
+      console.log(user);
       console.log('fetching groups...')
       console.log(serverUrl + 'User/groups/' + user.uid)
       const response = await fetch(serverUrl + 'User/groups/' + user.uid, {
         method: 'GET',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           // 'Authorization': "Token " + user.token,
         },
         redirect: 'follow'
@@ -401,20 +401,20 @@ export default function CameraScreen({ navigation }) {
     // check whether user logged in or not
     // if logged in: fetch groups & show groups list
     // else call temp_image
-    fetchGroups();
+    // fetchGroups();
     sendPicture(picture, true) // isTempIamge
-    // if (!user) {
-    //   sendPicture(picture);
-    // }
-    // else if (user && !showGroups) {
-    //   fetchGroups().then(() => {
-    //     setShowGroups(true);
-    //     setShowRenameDlg(false);
-    //   });
-    // }
-    // else if (user && showGroups && !showRenameDlg) {
-    //   setShowRenameDlg(true);
-    // }
+    if (!user) {
+      sendPicture(picture);
+    }
+    else if (user && !showGroups) {
+      fetchGroups().then(() => {
+        setShowGroups(true);
+        setShowRenameDlg(false);
+      });
+    }
+    else if (user && showGroups && !showRenameDlg) {
+      setShowRenameDlg(true);
+    }
   }
 
   const sendPicture = async (picture, isTempIamge) => {
@@ -455,7 +455,7 @@ export default function CameraScreen({ navigation }) {
 
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
-    const targetUrl = isTempIamge ? uploadImageUrl : tempUploadImgUrl;
+    const targetUrl = isTempIamge ? tempUploadImgUrl:uploadImageUrl;
     const targetBody = !isTempIamge ? 
       createFormData(picture, { name: imageName, description: 'picture', language:selLang }):
       createFormData(picture, { name: 'TempImage', description: 'picture', language:selLang });
@@ -470,7 +470,6 @@ export default function CameraScreen({ navigation }) {
       });
 
       const result = await response.json();
-
       console.log(targetUrl,result)
       if(result.status === 'success') {    
         if(isTempIamge) {   
@@ -492,7 +491,8 @@ export default function CameraScreen({ navigation }) {
           Alert.alert('Success', 'Successfully saved the image on Server!');
         }
         console.log('return_image:'+serverUrl+'media/'+ (isTempIamge ? result.image_after_uri : result.CV_return));       
-        
+        setShowGroups(false);
+        setShowRenameDlg(false);
       }
       else {        
         setOcrReturnData(null);
@@ -504,7 +504,7 @@ export default function CameraScreen({ navigation }) {
 
     } catch (error) {
       
-      console.error(error);
+      console.error(error.message);
       console.log('Connection Error in sending picture!');
       
       setReturnImg(null);
