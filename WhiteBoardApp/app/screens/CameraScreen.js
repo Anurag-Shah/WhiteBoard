@@ -334,7 +334,7 @@ export default function CameraScreen({ navigation }) {
     //   getUserInfo();
     // }
     console.log( user );
-    if ( user ) {
+    if ( user && user.logged_in ) {
       if (! showGroups && !showRenameDlg) {
         setShowGroups(true); return;
       }
@@ -380,7 +380,7 @@ export default function CameraScreen({ navigation }) {
     // else call temp_image
     // fetchGroups();
     console.log(user)
-    if(user && !groupList) fetchGroups(user.userInfo.uid)
+    if(user && user.logged_in && !groupList) fetchGroups(user.userInfo.uid)
    
     sendPicture(picture, true) // isTempImage
     // if (!user) {
@@ -470,17 +470,21 @@ export default function CameraScreen({ navigation }) {
                   }}], )
         }
         else{
-          Alert.alert('Success', 'Successfully saved the image on Server!');
+          Alert.alert('Success', 'Successfully saved the image on Server!', [
+            {tex:'OK', onPress:() => {setShowGroups(false);
+              setShowRenameDlg(false);}}
+          ]);
         }
         console.log('return_image:'+serverUrl+'media/'+ (!isTempImage ? result.image_after_uri : result.CV_return));       
       }
       else {        
         setOcrReturnData(null);
+        setShowGroups(false);
+        setShowRenameDlg(false);
         Alert.alert('Error', 'Something is wrong on Server!');
       }
       
-      setShowGroups(false);
-      setShowRenameDlg(false);
+      
 
     } catch (error) {
       
@@ -502,7 +506,7 @@ export default function CameraScreen({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1, marginTop: (Platform.OS === 'ios'? 50: 30) }}>
-      {!showGroups && !showRenameDlg && <Topbar title="Camera" navigation={navigation} />}
+      <Topbar title="Camera" navigation={navigation} />
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
           <Camera
