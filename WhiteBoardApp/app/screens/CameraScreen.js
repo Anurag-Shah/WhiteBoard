@@ -40,23 +40,23 @@ import urls from '../requests/urls';
 const { height, width } = Dimensions.get('window');
 
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = urls.base_url; //urls.base; //
+const serverUrl = urls.base_url;//'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080'; //urls.base; //
 //TempImages
 
-const DATA = [
-  {
-    GpID: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    Gpname: 'First Item',
-  },
-  {
-    GpID: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    Gpname: 'Second Item',
-  },
-  {
-    GpID: '58694a0f-3da1-471f-bd96-145571e29d72',
-    Gpname: 'Third Item',
-  },
-];
+// const DATA = [
+//   {
+//     GpID: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+//     Gpname: 'First Item',
+//   },
+//   {
+//     GpID: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     Gpname: 'Second Item',
+//   },
+//   {
+//     GpID: '58694a0f-3da1-471f-bd96-145571e29d72',
+//     Gpname: 'Third Item',
+//   },
+// ];
 
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -258,13 +258,13 @@ export default function CameraScreen({ navigation }) {
 
   const fetchGroups = async (uid) => {
     try {
-      // console.log(user);
+      console.log(user);
       console.log('fetching groups...')
       console.log(serverUrl + 'User/groups/' + uid)
       const response = await fetch(serverUrl + 'User/groups/' + uid, {
         method: 'GET',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           // 'Authorization': "Token " + user.token,
         },
         redirect: 'follow'
@@ -335,7 +335,7 @@ export default function CameraScreen({ navigation }) {
     //   getUserInfo();
     // }
     console.log(user);
-    if (user) {
+    if (user && user.logged_in) {
       if (!showGroups && !showRenameDlg) {
         setShowGroups(true); return;
       }
@@ -381,7 +381,7 @@ export default function CameraScreen({ navigation }) {
     // else call temp_image
     // fetchGroups();
     console.log(user)
-    if (user && !groupList) fetchGroups(user.userInfo.uid)
+    if (user && user.logged_in && !groupList) fetchGroups(user.userInfo.uid)
 
     sendPicture(picture, true) // isTempImage
     // if (!user) {
@@ -473,17 +473,25 @@ export default function CameraScreen({ navigation }) {
               }])
         }
         else {
-          Alert.alert('Success', 'Successfully saved the image on Server!');
+          Alert.alert('Success', 'Successfully saved the image on Server!', [
+            {
+              tex: 'OK', onPress: () => {
+                setShowGroups(false);
+                setShowRenameDlg(false);
+              }
+            }
+          ]);
         }
         console.log('return_image:' + serverUrl + 'media/' + (!isTempImage ? result.image_after_uri : result.CV_return));
       }
       else {
         setOcrReturnData(null);
+        setShowGroups(false);
+        setShowRenameDlg(false);
         Alert.alert('Error', 'Something is wrong on Server!');
       }
 
-      setShowGroups(false);
-      setShowRenameDlg(false);
+
 
     } catch (error) {
 
@@ -505,7 +513,7 @@ export default function CameraScreen({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1, marginTop: (Platform.OS === 'ios' ? 50 : 30) }}>
-      {!showGroups && !showRenameDlg && <Topbar title="Camera" navigation={navigation} />}
+      <Topbar title="Camera" navigation={navigation} />
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
           <Camera
@@ -659,7 +667,16 @@ export default function CameraScreen({ navigation }) {
                 </Text>
               </View>
             </TouchableOpacity>
-            {/* <Text style={{ width: 30 }}></Text> */}
+            <TouchableOpacity onPress={() => {
+              navigation.navigate("TextEditorPage", { ocr_text_detected: ocrReturnData ? ocrReturnData.ocr_text_detected : '' })
+            }}>
+              <View style={styles.modalButton}>
+                <Text
+                  style={{ fontSize: 24, fontWeight: 'bold', color: 'blue', alignItems: 'center' }}>
+                  Edit
+                </Text>
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 setPhoto(null);
