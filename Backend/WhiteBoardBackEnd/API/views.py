@@ -266,7 +266,7 @@ class ImageUpload(APIView):
         print(Path(path).as_uri())
 
         # ocr_return should have the stack trace so far
-        ocr_return = ocr.ocr(path)
+        ocr_return = ocr.ocr(path, imlang = language)
 
         print(ocr_return)
 
@@ -358,6 +358,10 @@ class TempImageUpload(APIView):
     def post(self, request):
         file = request.data['Image']
         name = request.data['name']
+        try:
+            language = request.data['language']
+        except:
+            language = "auto"
         random_str = b64encode(os.urandom(10)).decode("utf-8")
         random_str = random_str.replace("/", "a")
         custom_name = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + \
@@ -375,7 +379,7 @@ class TempImageUpload(APIView):
         return_data['status'] = 'success'
         return_data['image_uri'] = custom_name[custom_name.find("TempImages"):]
         # ocr_return should have the stack trace so far
-        ocr_return = ocr.ocr(custom_name)
+        ocr_return = ocr.ocr(custom_name, imlang=language)
 
         for line in ocr_return:
             print(line)
