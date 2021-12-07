@@ -89,7 +89,6 @@ export default class RegistrationPage extends React.Component {
       email: this.state.email,
       password: this.state.password,
     };
-
     try {
       const res = await fetch(urls.register, {
         method: "POST",

@@ -7,6 +7,7 @@ urlpatterns = [
     path('Users/<int:id>', SpecificUser.as_view()),
     path('User/login/', login_view, name='login'),
     path('User/logout/', logout_view, name='logout'),
+    path('User/delete/', delete_account, name='delete_account'),
     path('User/update/', update_user, name='account_update'),
     path('User/avatar/', Avatar.as_view(), name='get_or_set_avatar'),
     path('User/groups/w/', UserGroupsW.as_view(),

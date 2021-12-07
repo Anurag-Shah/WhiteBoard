@@ -7,7 +7,10 @@ import { act } from 'react-test-renderer';
 
 import LoginPage from '../../app/screens/LoginPage';
 
-describe('<Login />', () => {
+jest.dontMock('fs');
+jest.dontMock('path');
+
+describe('Login', () => {
     it('renders correctly', () => {
         let topbar = renderer.create(<LoginPage />);
         const tree = topbar.toJSON();

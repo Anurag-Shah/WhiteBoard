@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Modal, Image, LogBox } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Modal, Image, LogBox, ScrollView, Dimensions } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
 import Topbar from './shared/Topbar';
@@ -8,6 +8,10 @@ import { Icon } from "react-native-elements";
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
 LogBox.ignoreAllLogs();//Ignore all log notifications
+const dimensions = Dimensions.get('window');
+const imageHeight = Math.round(dimensions.width);
+const imageWidth = dimensions.width;
+
 //const url = ;
 
 class library extends Component {
@@ -21,7 +25,8 @@ class library extends Component {
       data: [{
         name: 'testing1',
         //Image: require("../image/code_snip.jpg"),
-        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
+        Image: 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
+        Image_after: '',
         GpID: '8/11/2021',
         pk: '0',
         Code: 'hello world 1'
@@ -29,7 +34,8 @@ class library extends Component {
       {
         name: 'testing2',
         //Image: require("../image/code_snip.jpg"),
-        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
+        Image: 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
+        Image_after: '',
         GpID: '8/29/2021',
         pk: '1',
         Code: 'hello world 2'
@@ -49,11 +55,11 @@ class library extends Component {
   makeRemoteRequest = () => {
     //const url = `https://randomuser.me/api/?&results=20`;
     /*server test*/
-    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Users/';
+    //const url = 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/Users/';
     /*local test*/
-    //const url = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/Images/0';
+    //const url = 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/Images/0';
     console.log(this.props.route.params.url);
-    const url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com/Images/" + this.props.route.params.url;
+    const url = "http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/Images/" + this.props.route.params.url;
 
     this.setState({ loading: true });
 
@@ -133,23 +139,25 @@ class library extends Component {
     //console.log(this.state.data);
     //<Avatar source={item.avatar_url} />
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
         <Topbar title="Team Images" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
-          //keyExtractor={item => item.name.toString()}
+          keyExtractor={item => item.pk.toString()}
           renderItem={({ item }) => (
             <ListItem bottomDivider onPress={() => {
-              this.image_url = "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image;
+              this.image_url = "http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080" + item.Image;
+              this.image_after_url = "http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080" + item.Image_after;
               this.image_title = item.name;
               this.image_code = item.Code;
               console.log(this.image_url);
               this.setState({ show: true });
             }}>
-              <Avatar source={{ uri: "http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com" + item.Image }} />
+              <Avatar source={{ uri: "http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080" + item.Image }} />
               <ListItem.Content>
                 <ListItem.Title>{item.name}</ListItem.Title>
-                <ListItem.Subtitle>{item.GpID}</ListItem.Subtitle>
+                <ListItem.Subtitle>ID: {item.pk.toString()}</ListItem.Subtitle>
+                <ListItem.Subtitle>Created: {item.save_time ? item.save_time.replace("T", " ").substring(0, item.save_time.indexOf('.')) : "NULL"}</ListItem.Subtitle>
 
               </ListItem.Content>
               <AntDesign name="minuscircleo" size={24} color="red" onPress={() => {
@@ -164,8 +172,9 @@ class library extends Component {
                       onPress: () => {
                         console.log(item.pk)
                         console.log('Yes Pressed')
-                        fetch("http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, { method: 'DELETE' });
-                        this.props.navigation.replace("library", { url: this.props.route.params.url })
+                        fetch("http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/ImageDeleteByID/" + item.pk, { method: 'DELETE' });
+                        //this.props.navigation.replace("library", { url: this.props.route.params.url })
+                        this.makeRemoteRequest();
                         //this.render();
                       }
                     },
@@ -182,19 +191,29 @@ class library extends Component {
                 visible={this.state.show}
               >
                 <SafeAreaView style={{ backgroundColor: "#CED0CE", flex: 1 }}>
-                  <Text>{this.image_title}</Text>
-                  <Image
-                    style={{
-                      width: 500,
-                      height: 500
-                    }}
-                    resizeMode="contain"
-                    source={{ uri: this.image_url }} />
-                  <Text>{this.image_code}</Text>
-                  <Button
-                    title="close"
-                    onPress={() => this.setState({ show: false })}
-                  />
+                  <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                  >
+                    <Text>{this.image_title}</Text>
+                    <Image
+                      style={{
+                        height: imageHeight, width: imageWidth
+                      }}
+                      resizeMode="contain"
+                      source={{ uri: this.image_url }} />
+                    <Image
+                      style={{
+                        height: imageHeight, width: imageWidth
+                      }}
+                      resizeMode="contain"
+                      source={{ uri: this.image_after_url }} />
+                    <Text>{this.image_code}</Text>
+                    <Button
+                      title="close"
+                      onPress={() => this.setState({ show: false })}
+                    />
+                  </ScrollView>
                 </SafeAreaView>
               </Modal>
             </ListItem>
@@ -225,7 +244,8 @@ const styles = StyleSheet.create({
     // Setting up View inside content in Vertically center.
     justifyContent: 'center',
     flex: 1,
-    margin: 10
+    margin: 10,
+    backgroundColor: "white"
 
   },
 

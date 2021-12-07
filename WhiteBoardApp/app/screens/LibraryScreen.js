@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView, Button, Alert, Modal, Image, LogBox } from 'react-native';
 import { ListItem, Avatar, SearchBar, List } from 'react-native-elements';
 import { Icon } from "react-native-elements";
-import { getAllGroupsApi, createGroupApi, deleteGroupApi } from "../requests/api";
+import { getAllGroupsApi, getAvatarApi } from "../requests/api";
+import urls from '../requests/urls';
 import Topbar from './shared/Topbar';
+import { FontAwesome, Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
+import defAvatar from '../assets/avatar.png';
+
 
 //import {SafeAreaView} from 'react-navigation';
 //console.log("hi");
@@ -15,6 +19,7 @@ class LibraryScreen extends Component {
     super(props);
 
     this.state = {
+      avatar: null,
       loading: false,
       show: false,
       //data: [],
@@ -24,13 +29,13 @@ class LibraryScreen extends Component {
       data: [{
         name: 'group 1',
         //Image: require("../image/code_snip.jpg"),
-        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
+        Image: 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
         GpID: '1',
       },
       {
         name: 'group 2',
         //Image: require("../image/code_snip.jpg"),
-        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
+        Image: 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
         GpID: '2',
       }],
       error: null,
@@ -41,7 +46,6 @@ class LibraryScreen extends Component {
 
   componentDidMount() {
     //this.getData();
-
     this.makeRemoteRequest();
   }
 
@@ -49,7 +53,7 @@ class LibraryScreen extends Component {
 
   makeRemoteRequest = () => {
     this.setState({ loading: true });
-    console.log(this.state.user);
+    // console.log(this.state.user);
     getAllGroupsApi(this.state.user.uid).then((res) => {
       //console.log(res);
       this.setState({
@@ -60,6 +64,13 @@ class LibraryScreen extends Component {
         loading: false,
       });
     })
+    getAvatarApi().then((res) => {
+      let avatar = urls.base_url.slice(0, -1) + res.avatar.image;
+      console.log("avatar", urls.base_url.slice(0, -1) + res.avatar.image);
+      this.setState({
+        avatar: avatar
+      })
+    });
   };
 
   renderSeparator = () => {
@@ -117,16 +128,18 @@ class LibraryScreen extends Component {
     //console.log(this.state.data);
     //<Avatar source={item.avatar_url} />
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
         <Topbar title="Team Library" navigation={this.props.navigation} />
         <FlatList
           data={this.state.data}
-          //keyExtractor={item => item.name.toString()}
+          keyExtractor={item => item.GpID.toString()}
           renderItem={({ item }) => (
-            <ListItem bottomDivider onPress={() => this.props.navigation.push("library", { url: item.GpID })}>
+            <ListItem onPress={() => this.props.navigation.push("library", { url: item.GpID })}>
+              {item.isDefault ? <Avatar rounded size='medium' source={this.state.avatar != null ? { uri: this.state.avatar } : defAvatar} /> : <AntDesign name="team" size={24} color="black" />}
               <ListItem.Content>
                 <ListItem.Title>{item.Gpname}</ListItem.Title>
                 <ListItem.Subtitle>{"Group ID: " + item.GpID}</ListItem.Subtitle>
+                <ListItem.Subtitle>{item.GpDescription}</ListItem.Subtitle>
 
               </ListItem.Content>
             </ListItem>

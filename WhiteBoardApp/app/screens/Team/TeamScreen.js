@@ -208,7 +208,7 @@ class TeamScreen extends Component {
                 syncInBackground: true,
             })
             .then((ret) => {
-                // console.log(ret)
+                // console.log(ret);
                 this.setState({
                     user: ret.userInfo,
                     loading: false,
@@ -224,7 +224,7 @@ class TeamScreen extends Component {
     makeRemoteRequest = () => {
         this.setState({ loading: true });
         getAllGroupsWApi().then((res) => {
-            console.log(res);
+            // console.log(res);
             this.setState({
                 //data: res.results,
                 data: res.all_groups,
@@ -353,7 +353,7 @@ class TeamScreen extends Component {
                         keyExtractor={item => item.GpID.toString()}
                         renderItem={({ item }) => (
                             <ListItem onPress={() => this.props.navigation.push("TeamMember", { group: item, user: this.state.user })}>
-                                {item.isDefault ? <Avatar rounded size='medium' source={this.state.user.avatar !== null ? { uri: this.state.user.avatar } : defAvatar} /> : <AntDesign name="team" size={24} color="black" />}
+                                {item.isDefault ? <Avatar rounded size='medium' source={this.state.user.avatar != null ? { uri: this.state.user.avatar } : defAvatar} /> : <AntDesign name="team" size={24} color="black" />}
                                 <ListItem.Content>
                                     <ListItem.Title>{item.Gpname} </ListItem.Title>
                                     <ListItem.Subtitle>{item.GpDescription}</ListItem.Subtitle>

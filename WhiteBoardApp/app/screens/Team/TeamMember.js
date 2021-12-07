@@ -14,21 +14,6 @@ function Prompt(props) {
             setSuccess(false);
             setFeedback("Please enter a valid email...");
         } else {
-            // if (code == 0) {
-            //     //props.setVisible();
-            //     Alert.alert(
-            //         "User successfully added to the team!", "",
-            //         [{ text: "OK", onPress: () => { props.setVisible(); props.reload() } }]
-            //     );
-            // } else if (code == -1) {
-            //     Alert.alert(
-            //         "User does not exist!", ""
-            //     );
-            // } else if (code == -2) {
-            //     Alert.alert(
-            //         "User Already in the Team", "",
-            //     );
-            // }
 
             addMemberApi(props.groupId, email).then((ret) => {
                 console.log(ret);
@@ -137,7 +122,7 @@ class TeamMemeber extends Component {
                 this.state.members = filtered;
                 this.state.data = filtered;
                 this.setState({ loading: false });
-                console.log("Page reloaded!");
+                console.log("Member Page reloaded!");
             } else if (!res) {
                 // Somehing went wrong
                 Alert.alert("Opps...Something went wrong! Please try again later...")
@@ -256,9 +241,9 @@ class TeamMemeber extends Component {
                 </View>
                 <View style={styles.bottom_bar}>
                     <Ionicons name="person-add" size={50}
-                        color={this.state.isLeader ? "green" : "grey"}
+                        color={this.state.isLeader && !this.state.group.isDefault ? "green" : "grey"}
                         style={{ top: 10 }}
-                        onPress={() => { this.state.isLeader ? this.setVisible() : Alert.alert("Only group leader can add people to the team!") }} />
+                        onPress={() => { this.state.isLeader && !this.state.group.isDefault ? this.setVisible() : (this.state.group.isDefault ? Alert.alert("You cannot add people to your default group!") : Alert.alert("Only group leader can add people to the team!")) }} />
                     {/* <Text style={{ marginTop: 10, color: "green" }}>Add</Text> */}
                 </View>
                 <Prompt groupId={this.state.group.GpID} visible={this.state.visible} setVisible={this.setVisible} reload={this.reload}></Prompt>
