@@ -21,7 +21,7 @@ from PIL import Image
 #	Backend/OCR/ocr_wrapper.py
 #	Backend/Compiler/compiler_wrapper.py
 
-def ocr(image_file_name, input_text=None, texttype=None):
+def ocr(image_file_name, input_text=None, texttype=None, imlang=None):
 	# Setup migrated into the function
 	from ocr_wrapper import ocr_wrapper
 	from compiler_wrapper import compiler_wrapper
@@ -54,15 +54,20 @@ def ocr(image_file_name, input_text=None, texttype=None):
 		image = Image.open(image_file_name)
 		image = apply_orientation(image)
 		image = image.convert('RGB')
-		ocr_out, imlang, outimage, imtype = ocr_wrapper(image, texttype=texttype)
+		ocr_out, imlang, outimage, imtype = ocr_wrapper(image, texttype=texttype, imlang=imlang)
 		while "\n\n" in ocr_out:
 			ocr_out = ocr_out.replace("\n\n", "\n")
-		compiler_out, line_numbers = compiler_wrapper(ocr_out, imlang)
+		compiler_out = ''
+		while compiler_out == '':
+			compiler_out, line_numbers = compiler_wrapper(ocr_out, imlang)
 		outimage, left_coords = ocr_postprocess_image(image, line_numbers, hh=hh)
 	else:
 		# Raw text input
-		imlang = ocr_lang_detect.detect(input_text)
-		compiler_out, line_numbers = compiler_wrapper(input_text, imlang)
+		if imlang is None:
+			imlang = ocr_lang_detect.detect(input_text)
+		compiler_out = ''
+		while compiler_out == '':
+			compiler_out, line_numbers = compiler_wrapper(input_text, imlang)
 		imtype = "Text"
 		ocr_out = None
 	imtype = "Typeform"
@@ -76,7 +81,7 @@ def main():
 	print("Testing Images\n")
 	test_im_path = "../../OCR/images/tesseract_tests/"
 	for i, im in enumerate(ocr_utils.ims):
-		print("Image: " + im)
+		print("\nImage: " + im)
 		if i <= 6:
 			out = ocr(test_im_path + im, "typeform")
 		else:
