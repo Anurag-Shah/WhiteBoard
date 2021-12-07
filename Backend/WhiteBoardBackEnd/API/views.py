@@ -380,6 +380,7 @@ class TempImageUpload(APIView):
         return_data['image_uri'] = custom_name[custom_name.find("TempImages"):]
         # ocr_return should have the stack trace so far
         ocr_return = ocr.ocr(custom_name, imlang=language)
+        temp_lang = ocr_return[4]
 
         for line in ocr_return:
             print(line)
@@ -390,15 +391,46 @@ class TempImageUpload(APIView):
         error_msg_whole = ocr_return[2]
         for i in ocr_return[6]:
             current_error = []
-            print("compile\.c:[" + str(i) +
-                  "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)")
-            matches = re.finditer(
-                "compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)", error_msg_whole, re.MULTILINE)
-            for match in matches:
-                print(match.group())
-                error_msg_whole.replace(match.group(), "")
-                current_error.append(match.group())
-            ocr_error_output.append(current_error)
+            if temp_lang == "C":
+                print("compile\.c:[" + str(i) +
+                      "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)")
+                matches = re.finditer(
+                    "compile\.c:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.c|\Z)", error_msg_whole, re.MULTILINE)
+                for match in matches:
+                    print(match.group())
+                    error_msg_whole.replace(match.group(), "")
+                    current_error.append(match.group())
+                ocr_error_output.append(current_error)
+            elif temp_lang == "C++":
+                print("compile\.cpp:[" + str(i) +
+                      "]+:[0-9]+:(.|\\n)*?(?=compile\.cpp|\Z)")
+                matches = re.finditer(
+                    "compile\.cpp:[" + str(i) + "]+:[0-9]+:(.|\\n)*?(?=compile\.cpp|\Z)", error_msg_whole, re.MULTILINE)
+                for match in matches:
+                    print(match.group())
+                    error_msg_whole.replace(match.group(), "")
+                    current_error.append(match.group())
+                ocr_error_output.append(current_error)
+            elif temp_lang == "C#":
+                print("compile\.cs:\([" + str(i) +
+                      "]+,[0-9]+\):(.|\\n)*?(?=compile\.cs|\Z)")
+                matches = re.finditer(
+                    "compile\.cs\([" + str(i) + "]+,[0-9]+\):(.|\\n)*?(?=compile\.cs|\Z)", error_msg_whole, re.MULTILINE)
+                for match in matches:
+                    print(match.group())
+                    error_msg_whole.replace(match.group(), "")
+                    current_error.append(match.group())
+                ocr_error_output.append(current_error)
+            elif temp_lang.upper() == "JAVA":
+                print("compile\.java:[" + str(i) +
+                      "]+:(.|\\n)*?(?=compile\.java|\Z)")
+                matches = re.finditer(
+                    "compile\.java:[" + str(i) + "]+:(.|\\n)*?(?=compile\.java|\Z)", error_msg_whole, re.MULTILINE)
+                for match in matches:
+                    print(match.group())
+                    error_msg_whole.replace(match.group(), "")
+                    current_error.append(match.group())
+                ocr_error_output.append(current_error)
 
         print("all errors are as follows:\n")
         for error in ocr_error_output:
