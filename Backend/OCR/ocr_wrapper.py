@@ -40,7 +40,7 @@ from PIL import Image
 #	ocr_postprocess_text.py
 #	ocr_texttype_detection.py
 
-def ocr_wrapper(image, texttype=None):
+def ocr_wrapper(image, texttype=None, imlang=None):
 	if texttype is None:
 		texttype = ocr_texttype_detection.detect(image)
 	code = ""
@@ -55,7 +55,10 @@ def ocr_wrapper(image, texttype=None):
 		code = ocr_postprocess_text.tesseract_postprocess(ocr_out_text)
 	else:
 		raise OCRError
-	language = ocr_lang_detect.detect(code)
+	if imlang is None:
+		language = ocr_lang_detect.detect(code)
+	else:
+		language = imlang
 	return (code, language, out, texttype)
 
 def main():

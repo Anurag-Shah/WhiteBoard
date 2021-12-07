@@ -29,7 +29,7 @@ def compiler_wrapper(compiler_input, language):
 		client = docker.from_env()
 		error_r = False
 		try:
-			container = client.containers.run("frolvlad/alpine-gcc", command=dockerCommand, privileged=True)
+			container = client.containers.run("frolvlad/alpine-gcc", command=dockerCommand, privileged=True, mem_limit="50m", cpuset_cpus="0")
 		except docker.errors.ContainerError as e:
 			error_r = True
 			out_text = str(e.stderr.decode())
@@ -49,7 +49,7 @@ def compiler_wrapper(compiler_input, language):
 		error_r = False
 		out_text = ""
 		try:
-			container = client.containers.run("frolvlad/alpine-gxx", command=dockerCommand, privileged=True)
+			container = client.containers.run("frolvlad/alpine-gxx", command=dockerCommand, privileged=True, mem_limit="50m", cpuset_cpus="0")
 		except docker.errors.ContainerError as e:
 			error_r = True
 			out_text = str(e.stderr.decode())
@@ -70,7 +70,7 @@ def compiler_wrapper(compiler_input, language):
 		out_text = ""
 		try:
 			#container = client.containers.run("frolvlad/alpine-mono", command=dockerCommand, privileged=True)
-			container = client.containers.run("mono", command=dockerCommand, privileged=True)
+			container = client.containers.run("mono", command=dockerCommand, privileged=True, mem_limit="50m", cpuset_cpus="0")
 		except docker.errors.ContainerError as e:
 			error_r = True
 			out_text = str(e.stderr.decode())
@@ -92,14 +92,18 @@ def compiler_wrapper(compiler_input, language):
 			pass
 		else:
 			# Only 1 class
-			classn = re.findall("class .*? {", temp)[0]
+			classn = re.findall("class .*? {", temp)
+			if classn == []:
+				return ("Unable to locate class in program. Please review your code.", [1])
+			else:
+				classn = classn[0]
 			classn = classn.split(" ")[1]
 		dockerCommand = ["/bin/sh", "-c", ("printf '" + compiler_input + "' > compile.java && javac compile.java && java " + classn)]
 		client = docker.from_env()
 		error_r = False
 		out_text = ""
 		try:
-			container = client.containers.run("openjdk:11", command=dockerCommand, privileged=True)
+			container = client.containers.run("openjdk:11", command=dockerCommand, privileged=True, mem_limit="50m", cpuset_cpus="0")
 		except docker.errors.ContainerError as e:
 			error_r = True
 			out_text = str(e.stderr.decode())
@@ -118,10 +122,11 @@ def compiler_wrapper(compiler_input, language):
 
 def main():
 	# Testing function for pipeline
-	print(compiler_wrapper('#include<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}', "C"))
-	print(compiler_wrapper("#include <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}", "C++"))
-	print(compiler_wrapper("namespace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WriteLine(\"Hello World\");\n}\n}\n}", "C#"))
-	print(compiler_wrapper("class HelloWorld {\npublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}", "Java"))
+	#print(compiler_wrapper('#include<stdio.h>\n\nint main(int argc, char *argv[]) {\nprintf ("Hello World") ;\nreturn 0;\n\n}', "C"))
+	#print(compiler_wrapper('#include<stdio.h>\n#include<stdlib.h>\nint main(int argc, char *argv[]) {\nchar * a = malloc(sizeof(char) * 52000000);\na[51999999]="\0";\nprintf("%s\n", a);\nreturn 0;\n\n}', "C"))
+	#print(compiler_wrapper("#include <iostream>\nint main() {\nstd::cout << \"Hello World\";\nreturn 0;\n}", "C++"))
+	#print(compiler_wrapper("namespace HelloWorld {\nclass Hello {\n static void Main(string[] args) {\nSystem.Console.WriteLine(\"Hello World\");\n}\n}\n}", "C#"))
+	print(compiler_wrapper("class BC { public void e() { } } class HelloWorld {\npwublic static void main(String[] args) {\nSystem.out.println(\"Hello World\");\n}\n}", "Java"))
 
 if __name__ == "__main__":
 	main()
