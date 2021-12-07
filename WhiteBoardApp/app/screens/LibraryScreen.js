@@ -29,13 +29,13 @@ class LibraryScreen extends Component {
       data: [{
         name: 'group 1',
         //Image: require("../image/code_snip.jpg"),
-        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
+        Image: 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661_2gQnYt1.png',
         GpID: '1',
       },
       {
         name: 'group 2',
         //Image: require("../image/code_snip.jpg"),
-        Image: 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
+        Image: 'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080/media/images/733066527636717661.png',
         GpID: '2',
       }],
       error: null,

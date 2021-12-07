@@ -89,7 +89,7 @@ export const logoutApi = async () => {
 export const deleteAccountApi = async () => {
     let token = await getToken();
     try {
-        const response = await fetch(urls.login, {
+        const response = await fetch(urls.delete, {
             method: 'DELETE',
             headers: {
                 token: '',
@@ -97,10 +97,6 @@ export const deleteAccountApi = async () => {
                 'Content-Type': 'application/json',
                 'Authorization': token,
             },
-            body: JSON.stringify({
-                username: username,
-                password: pwd,
-            })
         });
         let data = await response.json();
         return data;

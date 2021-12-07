@@ -169,6 +169,7 @@ function Account({ navigation }) {
 
   const deleteAccount = () => {
     deleteAccountApi().then((ret) => {
+      console.log(ret);
       if (ret && ret.code == 0) {
         storage.remove({
           key: 'login-session'

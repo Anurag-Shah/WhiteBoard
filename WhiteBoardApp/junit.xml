@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="9" failures="0" errors="0" time="1.985">
-  <testsuite name="&lt;Topbar /&gt;" errors="0" failures="0" skipped="0" timestamp="2021-12-03T04:55:01" time="0.996" tests="5">
-    <testcase classname="&lt;Topbar /&gt; renders correctly" name="&lt;Topbar /&gt; renders correctly" time="0.183">
+<testsuites name="jest tests" tests="9" failures="0" errors="0" time="3.617">
+  <testsuite name="&lt;Topbar /&gt;" errors="0" failures="0" skipped="0" timestamp="2021-12-03T10:04:28" time="1.315" tests="5">
+    <testcase classname="&lt;Topbar /&gt; renders correctly" name="&lt;Topbar /&gt; renders correctly" time="0.227">
     </testcase>
     <testcase classname="&lt;Topbar /&gt; Test Title Hi" name="&lt;Topbar /&gt; Test Title Hi" time="0.006">
     </testcase>
-    <testcase classname="&lt;Topbar /&gt; Test Title Empty Title" name="&lt;Topbar /&gt; Test Title Empty Title" time="0.003">
+    <testcase classname="&lt;Topbar /&gt; Test Title Empty Title" name="&lt;Topbar /&gt; Test Title Empty Title" time="0.002">
     </testcase>
-    <testcase classname="&lt;Topbar /&gt; Test Title Camera" name="&lt;Topbar /&gt; Test Title Camera" time="0.001">
+    <testcase classname="&lt;Topbar /&gt; Test Title Camera" name="&lt;Topbar /&gt; Test Title Camera" time="0.002">
     </testcase>
     <testcase classname="&lt;Topbar /&gt; Test Title Team18" name="&lt;Topbar /&gt; Test Title Team18" time="0.002">
     </testcase>
   </testsuite>
-  <testsuite name="Login" errors="0" failures="0" skipped="0" timestamp="2021-12-03T04:55:01" time="1.074" tests="4">
-    <testcase classname="Login renders correctly" name="Login renders correctly" time="0.15">
+  <testsuite name="Login" errors="0" failures="0" skipped="0" timestamp="2021-12-03T10:04:28" time="1.809" tests="4">
+    <testcase classname="Login renders correctly" name="Login renders correctly" time="0.149">
     </testcase>
-    <testcase classname="Login text input username" name="Login text input username" time="0.063">
+    <testcase classname="Login text input username" name="Login text input username" time="0.061">
     </testcase>
-    <testcase classname="Login text input password" name="Login text input password" time="0.007">
+    <testcase classname="Login text input password" name="Login text input password" time="0.008">
     </testcase>
-    <testcase classname="Login text input username and password" name="Login text input username and password" time="0.007">
+    <testcase classname="Login text input username and password" name="Login text input username and password" time="0.009">
     </testcase>
     <testcase classname="Login add should be associative" name="Login add should be associative" time="0">
     </testcase>

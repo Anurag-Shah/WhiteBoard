@@ -40,7 +40,7 @@ import urls from '../requests/urls';
 const { height, width } = Dimensions.get('window');
 
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/'; //urls.base; //
+const serverUrl = urls.base_url; //urls.base; //
 //TempImages
 
 const DATA = [
@@ -335,7 +335,7 @@ export default function CameraScreen({ navigation }) {
     //   getUserInfo();
     // }
     console.log(user);
-    if (user && user.logged_in) {
+    if (user) {
       if (!showGroups && !showRenameDlg) {
         setShowGroups(true); return;
       }
@@ -381,7 +381,7 @@ export default function CameraScreen({ navigation }) {
     // else call temp_image
     // fetchGroups();
     console.log(user)
-    if (user && user.logged_in && !groupList) fetchGroups(user.userInfo.uid)
+    if (user && !groupList) fetchGroups(user.userInfo.uid)
 
     sendPicture(picture, true) // isTempImage
     // if (!user) {
@@ -473,25 +473,17 @@ export default function CameraScreen({ navigation }) {
               }])
         }
         else {
-          Alert.alert('Success', 'Successfully saved the image on Server!', [
-            {
-              tex: 'OK', onPress: () => {
-                setShowGroups(false);
-                setShowRenameDlg(false);
-              }
-            }
-          ]);
+          Alert.alert('Success', 'Successfully saved the image on Server!');
         }
         console.log('return_image:' + serverUrl + 'media/' + (!isTempImage ? result.image_after_uri : result.CV_return));
       }
       else {
         setOcrReturnData(null);
-        setShowGroups(false);
-        setShowRenameDlg(false);
         Alert.alert('Error', 'Something is wrong on Server!');
       }
 
-
+      setShowGroups(false);
+      setShowRenameDlg(false);
 
     } catch (error) {
 
@@ -513,7 +505,7 @@ export default function CameraScreen({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1, marginTop: (Platform.OS === 'ios' ? 50 : 30) }}>
-      <Topbar title="Camera" navigation={navigation} />
+      {!showGroups && !showRenameDlg && <Topbar title="Camera" navigation={navigation} />}
       {!returnImg && !photo && (
         <View style={{ flex: 1 }}>
           <Camera
