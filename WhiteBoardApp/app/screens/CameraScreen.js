@@ -40,23 +40,23 @@ import urls from '../requests/urls';
 const { height, width } = Dimensions.get('window');
 
 //const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = 'http://ec2-3-138-112-15.us-east-2.compute.amazonaws.com:8080/'; //urls.base; //
+const serverUrl = urls.base_url;//'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080'; //urls.base; //
 //TempImages
 
-const DATA = [
-  {
-    GpID: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    Gpname: 'First Item',
-  },
-  {
-    GpID: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    Gpname: 'Second Item',
-  },
-  {
-    GpID: '58694a0f-3da1-471f-bd96-145571e29d72',
-    Gpname: 'Third Item',
-  },
-];
+// const DATA = [
+//   {
+//     GpID: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+//     Gpname: 'First Item',
+//   },
+//   {
+//     GpID: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+//     Gpname: 'Second Item',
+//   },
+//   {
+//     GpID: '58694a0f-3da1-471f-bd96-145571e29d72',
+//     Gpname: 'Third Item',
+//   },
+// ];
 
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -667,7 +667,16 @@ export default function CameraScreen({ navigation }) {
                 </Text>
               </View>
             </TouchableOpacity>
-            {/* <Text style={{ width: 30 }}></Text> */}
+            <TouchableOpacity onPress={() => {
+                navigation.navigate("TextEditorPage", {ocr_text_detected:ocrReturnData?ocrReturnData.ocr_text_detected:''})
+              }}>
+                <View style={styles.modalButton}>
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 'bold', color: 'blue', alignItems:'center' }}>
+                    Edit
+                  </Text>
+                </View>
+              </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 setPhoto(null);
