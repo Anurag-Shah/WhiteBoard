@@ -24,7 +24,7 @@ export default class Topbar extends React.Component {
         <Text style={styles.title}>{this.props.title ? this.props.title : "WhiteBoard"}</Text>
         {this.props.title === "Camera" ? (
           <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("TextEditorPage")}
+            onPress={() => this.props.navigation.navigate("TextEditorPage", { ocr_text_detected: "" })}
           >
             <Ionicons
               name="clipboard-outline"

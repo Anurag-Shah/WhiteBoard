@@ -54,6 +54,9 @@ export default class TextEditorPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      textFromCamera: props.route.params.ocr_text_detected,
+      // textFromCamera:"",
+      
       typedCode: "",
       lang: "",
       responseReceived: false,
@@ -424,6 +427,8 @@ export default class TextEditorPage extends React.Component {
   }
 
   render() {
+    // const textFromCamera = this.props.navigation.getParam('ocr_text_detected')
+    // this.setState({textFromCamera: this.props.route.params.ocr_text_detected?props.route.params.ocr_text_detected:""})
     return (
       <SafeAreaView
         style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : 20 }}
@@ -437,6 +442,7 @@ export default class TextEditorPage extends React.Component {
         <TextInput
           style={styles.input}
           placeholder="Start typying your code here..."
+          defaultValue={this.state.textFromCamera?this.state.textFromCamera:""}
           multiline={true}
           onChangeText={(typedCode) => this.setState({ typedCode })}
         />
