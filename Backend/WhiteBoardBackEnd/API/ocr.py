@@ -42,7 +42,6 @@ def ocr(image_file_name, input_text=None, texttype=None, imlang=None):
 	ocr_out = ""
 	compiler_out = ""
 	imtype = ""
-	imlang = ""
 	left_coords = None
 	line_numbers = []
 	if texttype is None:
