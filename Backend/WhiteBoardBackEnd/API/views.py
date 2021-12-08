@@ -207,17 +207,18 @@ class TempTextUpload(APIView):
     def post(self, request):
         text = request.data["compile_text"]
         try:
-            language = request.data["language"]
+            languge = request.data["language"]
         except:
             language = None
-        compile_result = compiler_wrapper.compiler_wrapper(text, language)
+        compile_result = ocr.ocr(image_file_name=None, input_text=text, imlang=language)
         while (compile_result[0] == ""):
-            compile_result = compiler_wrapper.compiler_wrapper(text, language)
+            compile_result = ocr.ocr(image_file_name=None, input_text=text, imlang=language)
         print(compile_result)
         return_data = {}
-        return_data['compile_result'] = compile_result[0]
-        return_data['terminal_output'] = compile_result[0]
-        return_data['problem_line'] = compile_result[1]
+        return_data['compile_result'] = compile_result[2]
+        return_data['terminal_output'] = compile_result[2]
+        return_data['problem_line'] = compile_result[6]
+        return_data['language_used'] = compile_result[4]
         response = HttpResponse(json.dumps(return_data),
                                 content_type='application/json')
         return response
