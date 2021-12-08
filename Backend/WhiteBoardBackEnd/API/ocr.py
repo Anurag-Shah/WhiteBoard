@@ -67,6 +67,7 @@ def ocr(image_file_name, input_text=None, texttype=None, imlang=None):
 		compiler_out = ''
 		while compiler_out == '':
 			compiler_out, line_numbers = compiler_wrapper(input_text, imlang)
+		print(input_text)
 		imtype = "Text"
 		ocr_out = None
 		print(compiler_out)
