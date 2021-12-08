@@ -23,7 +23,7 @@ import docker
 
 def compiler_wrapper(compiler_input, language):
 	# Jenkins testing
-	return None
+	#return None
 	# End Jenkins testing
 	container = None
 	line_numbers = []
