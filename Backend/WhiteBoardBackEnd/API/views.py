@@ -362,6 +362,10 @@ class TempImageUpload(APIView):
             language = request.data['language']
         except:
             language = "auto"
+
+        if (language == "auto"):
+            language = None
+
         random_str = b64encode(os.urandom(10)).decode("utf-8")
         random_str = random_str.replace("/", "a")
         custom_name = "/home/chunao/WhiteBoard/workspace/Django-app/Backend/WhiteBoardBackEnd/media/TempImages/temp_" + \
