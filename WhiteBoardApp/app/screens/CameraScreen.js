@@ -651,7 +651,6 @@ export default function CameraScreen({ navigation }) {
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
-<<<<<<< Updated upstream
               navigation.navigate("TextEditorPage", { ocr_text_detected: ocrReturnData ? ocrReturnData.ocr_text_detected : '' })
             }}>
               <View style={styles.modalButton}>
@@ -661,17 +660,6 @@ export default function CameraScreen({ navigation }) {
                 </Text>
               </View>
             </TouchableOpacity>
-=======
-                navigation.navigate("TextEditorPage", {lanuage_used:ocrReturnData?ocrReturnData.lanuage_used:'', ocr_text_detected:ocrReturnData?ocrReturnData.ocr_text_detected:''})
-              }}>
-                <View style={styles.modalButton}>
-                  <Text
-                    style={{ fontSize: 24, fontWeight: 'bold', color: 'blue', alignItems:'center' }}>
-                    Edit
-                  </Text>
-                </View>
-              </TouchableOpacity>
->>>>>>> Stashed changes
             <TouchableOpacity
               onPress={() => {
                 setPhoto(null);
