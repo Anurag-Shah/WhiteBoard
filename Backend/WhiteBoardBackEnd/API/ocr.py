@@ -69,6 +69,7 @@ def ocr(image_file_name, input_text=None, texttype=None, imlang=None):
 			compiler_out, line_numbers = compiler_wrapper(input_text, imlang)
 		imtype = "Text"
 		ocr_out = None
+		print(compiler_out)
 	imtype = "Typeform"
 	return outimage, ocr_out, compiler_out, imtype, imlang, left_coords, line_numbers
 
