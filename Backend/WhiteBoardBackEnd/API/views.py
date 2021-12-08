@@ -275,6 +275,7 @@ class ImageUpload(APIView):
 
         ocr_error_output = []
         error_msg_whole = ocr_return[2]
+        temp_lang = ocr_return[4]
         for i in ocr_return[6]:
             current_error = []
             if temp_lang == "C":
