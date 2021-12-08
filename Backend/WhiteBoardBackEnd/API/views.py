@@ -211,7 +211,7 @@ class TempTextUpload(APIView):
         except:
             language = None
         compile_result = ocr.ocr(image_file_name=None, input_text=text, imlang=language)
-        while (compile_result[0] == ""):
+        while (compile_result[2] == ""):
             compile_result = ocr.ocr(image_file_name=None, input_text=text, imlang=language)
         print(compile_result)
         return_data = {}
