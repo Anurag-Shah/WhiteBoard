@@ -22,6 +22,9 @@ import re
 import docker
 
 def compiler_wrapper(compiler_input, language):
+	# Jenkins testing
+	return None
+	# End Jenkins testing
 	container = None
 	line_numbers = []
 	if language == "C":
