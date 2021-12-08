@@ -39,24 +39,7 @@ import urls from '../requests/urls';
 
 const { height, width } = Dimensions.get('window');
 
-//const serverUrl = 'http://ec2-3-144-142-207.us-east-2.compute.amazonaws.com:8080/';
-const serverUrl = urls.base_url;//'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080'; //urls.base; //
-//TempImages
-
-// const DATA = [
-//   {
-//     GpID: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-//     Gpname: 'First Item',
-//   },
-//   {
-//     GpID: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-//     Gpname: 'Second Item',
-//   },
-//   {
-//     GpID: '58694a0f-3da1-471f-bd96-145571e29d72',
-//     Gpname: 'Third Item',
-//   },
-// ];
+const serverUrl = urls.base_url;//'http://ec2-3-144-231-142.us-east-2.compute.amazonaws.com:8080'; //urls.base_url; //
 
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -72,9 +55,9 @@ export default function CameraScreen({ navigation }) {
   const [groupList, setGroupList] = useState(null);
   const [selGroupId, setSelGroupId] = useState(null);
   const [imageName, setImageName] = useState('image');
-  const [selLang, setSelLang] = useState('Auto');
+  const [selLang, setSelLang] = useState('auto');
   const [ocrReturnData, setOcrReturnData] = useState(null);
-  const langs = ['Auto', 'C', 'C#', 'Java'];
+  const langs = ['auto', 'C', 'C#', 'Java'];
   const langList = langs.map(x => { return { 'label': x, 'value': x } });
 
   useEffect(() => {
@@ -85,9 +68,9 @@ export default function CameraScreen({ navigation }) {
         syncInBackground: true,
       })
       .then(ret => {
-        console.log(ret, '=== fetch user ===')
+        console.log(ret, '=== Fetch user from localstorage ===')
         setUser(ret);
-        console.log(user, '=== user fetch done ===')
+        console.log(user, '=== Done fetch user from localstorage ===')
 
       })
       .catch(err => {
@@ -432,7 +415,7 @@ export default function CameraScreen({ navigation }) {
       return data;
     };
 
-    if (!selLang) setSelLang('Auto');
+    if (!selLang) setSelLang('auto');
 
     const uploadImageUrl = serverUrl + 'Images/' + selGroupId;
     const tempUploadImgUrl = serverUrl + 'TempImages/';
@@ -460,11 +443,11 @@ export default function CameraScreen({ navigation }) {
           console.log(ycoord);
           setOcrReturnData(result);
           const hasError_ = ycoord.length;
-          if (hasError_) Alert.alert('Compiling Error', 'Detected Language: ' + selLang + ' \n' + 'Please fix the error(s)',
+          if (hasError_) Alert.alert('Compiling Error', 'Detected Language: ' + result.language_used + ' \n' + 'Please fix the error(s)',
             [{ text: 'OK', onPress: () => setReturnImg(serverUrl + 'media/' + (!isTempImage ? result.image_after_uri : result.CV_return)) }]);
           else
             Alert.alert('Success',
-              'Detected Language: ' + selLang + '\n ' + result.ocr_return,
+              'Detected Language: ' + result.language_used + '\n ' + result.ocr_return,
               [{
                 text: 'OK',
                 onPress: () => {
@@ -668,6 +651,7 @@ export default function CameraScreen({ navigation }) {
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
+<<<<<<< Updated upstream
               navigation.navigate("TextEditorPage", { ocr_text_detected: ocrReturnData ? ocrReturnData.ocr_text_detected : '' })
             }}>
               <View style={styles.modalButton}>
@@ -677,6 +661,17 @@ export default function CameraScreen({ navigation }) {
                 </Text>
               </View>
             </TouchableOpacity>
+=======
+                navigation.navigate("TextEditorPage", {lanuage_used:ocrReturnData?ocrReturnData.lanuage_used:'', ocr_text_detected:ocrReturnData?ocrReturnData.ocr_text_detected:''})
+              }}>
+                <View style={styles.modalButton}>
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 'bold', color: 'blue', alignItems:'center' }}>
+                    Edit
+                  </Text>
+                </View>
+              </TouchableOpacity>
+>>>>>>> Stashed changes
             <TouchableOpacity
               onPress={() => {
                 setPhoto(null);
