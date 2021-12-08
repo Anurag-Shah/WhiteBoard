@@ -181,9 +181,13 @@ class TextUpload(APIView):
 
     def post(self, request, id):
         text = request.data["compile_text"]
-        compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+        try:
+            language = request.data["language"]
+        except:
+            language = None
+        compile_result = compiler_wrapper.compiler_wrapper(text, language)
         while (compile_result[0] == ""):
-            compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+            compile_result = compiler_wrapper.compiler_wrapper(text, language)
         print(compile_result)
         return_data = {}
         return_data['compile_result'] = compile_result[0]
@@ -202,9 +206,13 @@ class TempTextUpload(APIView):
 
     def post(self, request):
         text = request.data["compile_text"]
-        compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+        try:
+            language = request.data["language"]
+        except:
+            language = None
+        compile_result = compiler_wrapper.compiler_wrapper(text, language)
         while (compile_result[0] == ""):
-            compile_result = compiler_wrapper.compiler_wrapper(text, "C")
+            compile_result = compiler_wrapper.compiler_wrapper(text, language)
         print(compile_result)
         return_data = {}
         return_data['compile_result'] = compile_result[0]
