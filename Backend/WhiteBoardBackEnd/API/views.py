@@ -334,6 +334,7 @@ class ImageUpload(APIView):
         return_data['y-coord'] = ocr_return[5]
         return_data['line-num'] = ocr_return[6]
         return_data['y-coord-match'] = ocr_error_output
+        return_data['language_used'] = ocr_return[4]
         response = HttpResponse(json.dumps(return_data),
                                 content_type='application/json')
         return response
@@ -489,6 +490,7 @@ class TempImageUpload(APIView):
         return_data['y-coord'] = ocr_return[5]
         return_data['line-num'] = ocr_return[6]
         return_data['y-coord-match'] = ocr_error_output
+        return_data['language_used'] = ocr_return[4]
         response = HttpResponse(json.dumps(return_data),
                                 content_type='application/json')
         hired_gun = threading.Thread(
