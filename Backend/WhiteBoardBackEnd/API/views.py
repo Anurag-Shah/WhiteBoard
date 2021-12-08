@@ -207,7 +207,7 @@ class TempTextUpload(APIView):
     def post(self, request):
         text = request.data["compile_text"]
         try:
-            languge = request.data["language"]
+            language = request.data["language"]
         except:
             language = None
         compile_result = ocr.ocr(image_file_name=None, input_text=text, imlang=language)
