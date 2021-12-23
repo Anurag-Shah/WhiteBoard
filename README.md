@@ -28,6 +28,7 @@ execute the code within a docker image. The backend will pipe out the stdout and
 - User can restore their password using email service. This feature is not available if not deployed on an AWS instance.
 
 ## Demo
+![](Demo/demo.gif)
 
 ## Requrirements
 - Everything in the requirement.txt
