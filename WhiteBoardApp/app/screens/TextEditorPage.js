@@ -121,7 +121,7 @@ export default class TextEditorPage extends React.Component {
               this.setState({ responseReceived: true });
 
               const terminalOutput = response.problem_line;
-              if (terminalOutput[0] != null) {
+              if (terminalOutput != null && terminalOutput[0] != null) {
                 this.setState({ returnValue: -1 });
                 Alert.alert(
                   "Error",
