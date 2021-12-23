@@ -185,8 +185,6 @@ class TextUpload(APIView):
             language = request.data["language"]
         except:
             language = None
-        if language == "Auto":
-            language = None
         compile_result = compiler_wrapper.compiler_wrapper(text, language)
         while (compile_result[0] == ""):
             compile_result = compiler_wrapper.compiler_wrapper(text, language)
@@ -211,8 +209,6 @@ class TempTextUpload(APIView):
         try:
             language = request.data["language"]
         except:
-            language = None
-        if language == "Auto":
             language = None
         compile_result = compiler_wrapper.compiler_wrapper(text, language)
         while (compile_result[0] == ""):
