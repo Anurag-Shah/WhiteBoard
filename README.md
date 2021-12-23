@@ -1,41 +1,37 @@
 # WhiteBoard
-#### This is a project of the course CS307 from Purdue University. 
+Project for CS307 - Software Engineering at Purdue University. This application was developed using Agile development methodologies.
 
 ## Introduction
-Modern Coding usually requires a laptop with an IDE (Integrated Development
-Environment) or a compiler, but there are many situations where someone must test a
-code sample without that code even in a textual format. For example, an interviewee
+Modern Coding usually requires a computer with an IDE (Integrated Development Environment) or a compiler, but there are many situations where someone needs to execute a
+code sample present in a non-textual format. For example, an interviewee
 preparing a coding interview will have to write their code on a piece of paper or on a
 whiteboard, and without a compiler, one can only debug by observing their written code
 or typing it out in full, a waste of time for all parties involved.
 
-The purpose of this project is to develop a novel “IDE for Written Code” that can support
+The purpose of this project is to develop a novel “IDE for ritten Code” that can support
 typeform code or scanning hand-written code, compile the code and return the terminal
-output and stack trace back to the user. This application will take the form of a
+output or stack trace back to the user. This application will take the form of a
 cross-platform mobile application, and will allow users to save their code images and
 organize into teams.
 
-While numerous services provide IDEs/Text editors, Compilers, and OCR services, on a
-variety of platforms, there is no single service that integrates all of these. Further, OCR
-services that can detect the full ASCII character set are rare and inaccurate. So, we are
-confident our application will be well above current trends in providing an effective,
-packaged solution!
-
 ## Features
-- User can send an image of code to the backend server. The server will identify the code, using tesseract-OCR to extract the code, identify its language with guessLang and
-execute the code within a docker image. The backend will pipe out the stdout and stderr of the code, indicate where the error is with OpenCV on the original image and return the output to the front-end. User can see the feedback, edit the code and resubmit it.
-- User can also create an account and a workspace to invite other users to work together. All users in the same workspace will be able to see the compile request and result of each other. 
-- User can restore their password using email service. This feature is not available if not deployed on an AWS instance.
+- User can send an image of code to the backend server. The server will convert the code to a textual format, using tesseract-OCR to extract the textual data from the image, identify its language if needed, and
+execute the code within an isolated docker container. The output is processed, with any errors indicated on the original image with a red underline, and the backend returns this output to the front-end. User can see the errors and their location, edit the code and resubmit it.
+- Users can also create an account and a workspace to invite other users to work together, seeing the compiler output for all the images in their team.
+- User can restore their password using an email service. This feature is not available if not deployed on an AWS instance or similar server.
 
 ## Demo
 ![](Demo/Gud_Demo.gif)
 ![](Demo/Bad_Demo.gif)
 
-## Requrirements
-- Everything in the requirement.txt
+## Requirements
+### Backend Server
 - Docker
 - MySQL
-- Expo React-Native for Front-end
+- Python libraries listed in /Backend/requirement.txt
+
+### Frontend Application
+- Expo React-Native (installed using NPM)
 
 ## Setup Instruction
 - ### Frontend
@@ -45,27 +41,30 @@ execute the code within a docker image. The backend will pipe out the stdout and
     ```
     npm start
     ```
+    or
+    ```
+    expo start
+    ```
     This will start an expo server, which allows you to run the app with expo app on any mobile devices or simulators
-  - To export the app into a standalone app, follow the instructions here: https://docs.expo.dev/classic/building-standalone-apps/
+  - To export the app into a standalone app, follow the instructions [here](https://docs.expo.dev/classic/building-standalone-apps/)
 - ### Backend / Server
   - Navigate to the Backend folder
   - Install all the required python libraries with
-  
     ```
-    pip install -r requirement.txt
+    pip3 install -r requirement.txt
     ```
-  - Install and initiate docker service. To install docker, follow instructions at https://docs.docker.com/engine/install/ubuntu/
+  - Install and initiate docker service. To install docker, follow the instructions [here](https://docs.docker.com/engine/install/ubuntu/)
   
     To activate local docker service manually:
     
     ```
     sudo systemctl start docker
     ```
+    The following docker containers are used: [frolvlad/alpine-gcc](https://hub.docker.com/r/frolvlad/alpine-gcc), [frolvlad/alpine-gxx](https://hub.docker.com/r/frolvlad/alpine-gxx/), [mono](https://hub.docker.com/_/mono), [openjdk](https://hub.docker.com/_/openjdk)
   - Install a MySQL server and run a local MySQL server / service. In the MySQL shell, setup a user with full privileges and a database / schema
-    according to the database section of the Setting.py
+    according to the database section in setting.py
     
-    For simplicity, open setting.py and find the database section. Copied the username, password and database name and execute the following scripts in the MySQL shell:
-    
+    For simplicity, open setting.py and find the database section. Copy the username, password and database name and execute the following scripts in the MySQL shell:
     ```
     CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
     CREATE DATABASE django_data_base;
@@ -74,8 +73,8 @@ execute the code within a docker image. The backend will pipe out the stdout and
     After that, exit the MySQL shell and navigate to the directory of manage.py. Update table metadata with command:
     
     ```
-    python3 manage.py makemigrations
-    python3 manage.py migrate
+    sudo python3 manage.py makemigrations
+    sudo python3 manage.py migrate
     ```
     Enter the MySQL shell and double check if the tables are updated.
     
@@ -84,23 +83,24 @@ execute the code within a docker image. The backend will pipe out the stdout and
     Run the localhost server with command:
     
     ```
-    python3 manage.py runserver localhost:8080
+    sudo python3 manage.py runserver localhost:8080
     ```
     To deploy on a server with port forwarding, run the server with command:
     
     ```
-    python3 manage.py runserver 0.0.0.0:8080
+    sudo python3 manage.py runserver 0.0.0.0:8080
     ```
     
     
 ## Note:
-- Before compiling the frontend package, please change the common url to the base_url. If you are running on localhost, change it to 
+- Before compiling the frontend package, please change the common url to the base_url, and additionally update the port if you are not using 8080. If you are running on localhost, change it to 
 
   ```
   const base_url =
   "http://localhost:8080/";  
   ```
-  else, change it to your server's domain or IP address with the specific port.
+  
+  Otherwise, change it to your server's domain or IP address with the specific port you choose.
   
 - For security issues, Secret keys have been hidden. To run your own server, create a .env file under Backend/WhiteBoardBackEnd/WhiteBoardBackEnd
 
@@ -116,7 +116,7 @@ execute the code within a docker image. The backend will pipe out the stdout and
   ```
   SECRET_KEY = 'key_you_just_copied'
   ```
-  Remember to keep the single quote
+  (Remember to keep the single quotes)
   
   We also have other AWS secret keys. If you do not intent to deploy on a AWS server, remove these lines in Setting.py:
   
@@ -125,14 +125,14 @@ execute the code within a docker image. The backend will pipe out the stdout and
   AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")  # hidden
   ```
   
-  However, please note that this will disable the email notification function of this app.
+  However, please note that this will disable the email notification function of this application, relevant for resetting a user's password.
 
-- Due to technical reasons, please allow docker images to run as root. I know it's a dangerous act but for some reason python-docker CLI won't work unless root privileges are provided. 
+- Allow docker images to run as root. As these images are isolated and their memory and CPU usage restricted, this does not pose a security concern.
 
 ## Support CI/CD tools
-- Simple Jenkins file and Jenkin build script have been provided for basic CI/CD. Feel free to modify this part for a better integration process. 
+- A simple Jenkins file and Jenkins build script have been provided for basic CI/CD, along with a basic unit test suite for the Compiler portion. This part may be modified as desired, and more test cases can be easily added to /Backend/WhiteBoardBackEnd/API/tests.py (the test suite can be run using `sudo python3 manage.py test`, while in the /Backend/WhiteBoardBackEnd directory. If you add test cases to your implementation, we would appreciate if you could provide us the source code for the tests through a pull request.
 
-## Future Improvement
-- The Tesseract OCR is not meant to be used to detect hand-written text, therefore this project is not very robust in recognizing hand-written code. Manual correction is always needed. However, We have a 95% accuracy while detecting typen code. Detecting hand-written code would require training a unique model, which will probably be a standalone project itself.
+## Further Work
+- Tesseract OCR is not pretrained on handwritten data, so taking pictures of handwritten code will usually require manual corrections. However, We have a 95% accuracy while detecting typeform code. Detecting hand-written code would require training Tessearct on a large database of handwritten character data.
 
-- Additional layers for different languages can be included for increased accuracy. This can "probably" be done by having lists of key words for different programming languages. 
+- Using a dictionary can alleviate some of the issues with Tesseract without needing to train it on new data.
