@@ -131,3 +131,8 @@ execute the code within a docker image. The backend will pipe out the stdout and
 
 ## Support CI/CD tools
 - Simple Jenkins file and Jenkin build script have been provided for basic CI/CD. Feel free to modify this part for a better integration process. 
+
+## Future Improvement
+- The Tesseract OCR is not meant to be used to detect hand-written text, therefore this project is not very robust in recognizing hand-written code. Manual correction is always needed. However, We have a 95% accuracy while detecting typen code. Detecting hand-written code would require training a unique model, which will probably be a standalone project itself.
+
+- Additional layers for different languages can be included for increased accuracy. This can "probably" be done by having lists of key words for different programming languages. 
